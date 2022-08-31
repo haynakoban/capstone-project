@@ -59,7 +59,8 @@ const SideDrawer = ({ routes, pathname, showLeftDrawer, leftDrawer }) => {
                   <Typography
                     textAlign='center'
                     variant='subtitle1'
-                    fontWeight='bold'
+                    fontWeight='400'
+                    letterSpacing={1}
                     textTransform='uppercase'
                     sx={{
                       px: 2,
@@ -93,7 +94,11 @@ const SideDrawer = ({ routes, pathname, showLeftDrawer, leftDrawer }) => {
               >
                 <ListItemText
                   primary={route?.name}
-                  sx={{ color: '#FFFFFF95' }}
+                  sx={{
+                    color: '#FFFFFF95',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
                 />
               </ListItemButton>
             </ListItem>
