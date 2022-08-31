@@ -1,3 +1,9 @@
-.tnl_logo {
+.tnl_logo,
+.hero_content,
+.hero_content_fitted {
   object-fit: cover;
+}
+
+.hero_content_fitted {
+  object-position: 50% 50%;
 }
