@@ -1,6 +1,6 @@
 import {
   AppBar,
-  Badge,
+  // Badge,
   Box,
   Button,
   CssBaseline,
@@ -13,16 +13,14 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChatIcon from '@mui/icons-material/Chat';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+// import ChatIcon from '@mui/icons-material/Chat';
+// import NotificationsIcon from '@mui/icons-material/Notifications';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import UserSettings from './UserSettings';
+// import UserSettings from './UserSettings';
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';
-
-const drawerWidth = 240;
 
 const NavigationBar = ({ routes, authRoute }) => {
   const [pageTitle, setPageTitle] = useState('Dashboard');
@@ -199,7 +197,6 @@ const NavigationBar = ({ routes, authRoute }) => {
       {/* show drawer */}
       <SideDrawer
         routes={routes}
-        pathname={pathname}
         showLeftDrawer={showLeftDrawer}
         leftDrawer={leftDrawer}
       />

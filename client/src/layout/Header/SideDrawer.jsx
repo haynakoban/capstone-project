@@ -5,7 +5,6 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   Toolbar,
   Typography,
@@ -15,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Logo from './Logo';
 
-const SideDrawer = ({ routes, pathname, showLeftDrawer, leftDrawer }) => {
+const SideDrawer = ({ routes, showLeftDrawer, leftDrawer }) => {
   // Handles route navigation.
   const navigate = useNavigate();
 

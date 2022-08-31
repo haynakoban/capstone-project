@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Container,
   Divider,
   Paper,
@@ -13,7 +12,7 @@ import MainLayout from '../layout';
 
 // images
 import HeroContent from '../assets/svg/project_team_lc5a.svg';
-import HeroContent2 from '../assets/svg/teaching_re_g7e3 (1).svg';
+import HeroContent2 from '../assets/svg/teaching_re_g7e3_blue.svg';
 
 const Home = () => {
   return (
