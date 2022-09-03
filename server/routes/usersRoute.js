@@ -10,6 +10,9 @@ router
 // username validation
 router.post('/auth', usersController.isUsernameValid);
 
+// user log in validation
+router.post('/auth/_log', usersController.userLogin);
+
 // router
 //   .route('/:id')
 //   .get(postsController.selectPostById)

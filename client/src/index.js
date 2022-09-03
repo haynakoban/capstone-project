@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { CookiesProvider } from 'react-cookie';
 
 import './styles/main.scss';
 import theme from './lib/theme';
@@ -11,7 +12,9 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ThemeProvider theme={theme}>
-    <App />
+    <CookiesProvider>
+      <App />
+    </CookiesProvider>
   </ThemeProvider>
 );
 
