@@ -7,7 +7,6 @@ import {
   InputLabel,
   OutlinedInput,
   Paper,
-  styled,
   Typography,
 } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -15,169 +14,199 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
+import axios from '../../lib/axiosConfig';
 import Logo from '../../layout/Header/Logo';
-import bgphoto from '../../assets/svg/real_time_collaboration_c62i.svg';
 
-const LogInContainer = styled('div')(({ theme }) => ({
-  boxSizing: 'border-box',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  margin: 0,
-  height: '100vh',
-  backgroundImage: `url(${bgphoto})`,
-  backgroundColor: '#f2f2f2',
-  [theme.breakpoints.down('sm')]: {
-    backgroundPosition: '80% 0%',
-  },
-}));
+import LogInContainer from '../../components/global/LogInContainer';
+
+const maxAge = 7 * 24 * 60 * 60;
 
 const LogInPage = () => {
-  const [values, setValues] = useState({
-    username: '',
-    password: '',
-    showPassword: false,
-  });
-
   const navigate = useNavigate();
 
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [cookies, setCookie] = useCookies(['uid']);
+
+  const { register, handleSubmit, watch } = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
 
   const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
-    });
+    setShowPassword(!showPassword);
+  };
+
+  const handleFormSubmit = async (data) => {
+    const { username, password } = data;
+
+    const res = await axios.post('api/users/auth/_log', { username, password });
+
+    if (res.data?.err) {
+      setError(res.data?.err);
+    } else {
+      setError('');
+      setCookie('uid', res.data?.token, {
+        path: '/',
+        maxAge,
+        sameSite: 'strict',
+      });
+    }
   };
 
   return (
     <LogInContainer>
-      <Paper
-        elevation={6}
-        sx={{
-          p: {
-            xs: 2,
-            sm: 5,
-          },
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          border: '1px solid #00000030',
-          width: {
-            xs: '100%',
-            sm: 300,
-            md: 300,
-          },
-          position: 'relative',
-        }}
-      >
-        <Fab
-          size='medium'
-          color='primary'
-          aria-label='back'
+      {cookies.uid ? (
+        <Navigate to='/' />
+      ) : (
+        <Paper
+          elevation={6}
           sx={{
-            position: 'absolute',
-            top: 25,
-            right: 25,
-            bgcolor: 'transparent',
-            '&:hover': {
-              bgcolor: 'rgba(0, 0, 0, 0.05)',
+            p: {
+              xs: 2,
+              sm: 5,
             },
-            color: '#000',
-            boxShadow: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            textAlign: 'center',
+            border: '1px solid #00000030',
+            width: {
+              xs: '100%',
+              sm: 300,
+              md: 300,
+            },
+            position: 'relative',
           }}
-          onClick={() => navigate('/')}
         >
-          <ChevronLeftIcon />
-        </Fab>
-        <Logo w={70} />
-        <Typography variant='h4' component='h4' fontWeight={700}>
-          Please sign in
-        </Typography>
+          <Fab
+            size='medium'
+            color='primary'
+            aria-label='back'
+            sx={{
+              position: 'absolute',
+              top: 25,
+              right: 25,
+              bgcolor: 'transparent',
+              '&:hover': {
+                bgcolor: 'rgba(0, 0, 0, 0.05)',
+              },
+              color: '#000',
+              boxShadow: 'none',
+            }}
+            onClick={() => navigate('/')}
+          >
+            <ChevronLeftIcon />
+          </Fab>
+          <Logo w={70} />
+          <Typography variant='h4' component='h4' fontWeight={700}>
+            Please sign in
+          </Typography>
 
-        {/* username */}
-        <FormControl variant='outlined' fullWidth sx={{ my: 2 }}>
-          <InputLabel htmlFor='outlined-adornment-username'>
-            Username
-          </InputLabel>
-          <OutlinedInput
-            autoComplete='off'
-            id='outlined-adornment-username'
-            type='text'
-            value={values.username}
-            onChange={handleChange('username')}
-            label='Username'
-          />
-        </FormControl>
+          {error && (
+            <Typography
+              variant='p'
+              component='p'
+              sx={{ mt: 0.5, color: '#d32f2f' }}
+            >
+              {error}
+            </Typography>
+          )}
 
-        {/* password */}
-        <FormControl variant='outlined' fullWidth>
-          <InputLabel htmlFor='outlined-adornment-password'>
-            Password
-          </InputLabel>
-          <OutlinedInput
-            autoComplete='off'
-            id='outlined-adornment-password'
-            type={values.showPassword ? 'text' : 'password'}
-            value={values.password}
-            onChange={handleChange('password')}
-            endAdornment={
-              <InputAdornment position='end'>
-                <IconButton
-                  aria-label='toggle password visibility'
-                  onClick={handleClickShowPassword}
-                  edge='end'
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label='Password'
-          />
-        </FormControl>
+          {/* username */}
+          <FormControl
+            variant='outlined'
+            fullWidth
+            sx={{ my: 2 }}
+            required
+            {...(error && { error: true })}
+          >
+            <InputLabel htmlFor='username'>Username</InputLabel>
+            <OutlinedInput
+              autoComplete='off'
+              id='username'
+              type='text'
+              label='Username'
+              value={watch('username')}
+              {...register('username')}
+            />
+          </FormControl>
 
-        <Typography
-          variant='subtitle'
-          component='p'
-          color='primary.main'
-          textAlign='right'
-          fontWeight={600}
-          mt={1}
-          mb={1.5}
-          sx={{ cursor: 'pointer' }}
-        >
-          Forget Password?
-        </Typography>
+          {/* password */}
+          <FormControl
+            variant='outlined'
+            fullWidth
+            required
+            {...(error && { error: true })}
+          >
+            <InputLabel htmlFor='password'>Password</InputLabel>
+            <OutlinedInput
+              autoComplete='off'
+              id='password'
+              type={showPassword ? 'text' : 'password'}
+              value={watch('password')}
+              {...register('password')}
+              endAdornment={
+                <InputAdornment position='end'>
+                  <IconButton
+                    aria-label='toggle password visibility'
+                    onClick={handleClickShowPassword}
+                    edge='end'
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label='Password'
+            />
+          </FormControl>
 
-        <Button variant='contained'>Sign In</Button>
+          <Typography
+            variant='subtitle'
+            component='p'
+            color='primary.main'
+            textAlign='right'
+            fontWeight={600}
+            mt={1}
+            mb={1.5}
+            sx={{ cursor: 'pointer' }}
+          >
+            Forget Password?
+          </Typography>
 
-        <Typography
-          variant='subtitle'
-          component='span'
-          color='text.primary'
-          textAlign='right'
-          fontWeight={500}
-          mt={1.5}
-        >
-          Don't have an account?{' '}
+          <Button variant='contained' onClick={handleSubmit(handleFormSubmit)}>
+            Sign In
+          </Button>
+
           <Typography
             variant='subtitle'
             component='span'
-            color='primary.main'
+            color='text.primary'
             textAlign='right'
             fontWeight={500}
-            mt={2}
-            sx={{ cursor: 'pointer' }}
-            onClick={() => navigate('/signup')}
+            mt={1.5}
           >
-            Sign Up
+            Don't have an account?{' '}
+            <Typography
+              variant='subtitle'
+              component='span'
+              color='primary.main'
+              textAlign='right'
+              fontWeight={500}
+              mt={2}
+              sx={{ cursor: 'pointer' }}
+              onClick={() => navigate('/signup')}
+            >
+              Sign Up
+            </Typography>
           </Typography>
-        </Typography>
-      </Paper>
+        </Paper>
+      )}
     </LogInContainer>
   );
 };

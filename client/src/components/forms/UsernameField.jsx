@@ -46,7 +46,7 @@ const UsernameField = ({ errors, name, label, minlen, register, watch }) => {
             value: minlen,
             message: `Username must at least ${minlen} characters`,
           },
-          validate: (username) => handleValidation(username),
+          validate: handleValidation,
         })}
       />
       <FormHelperText id={label}>{errors && errors}</FormHelperText>
