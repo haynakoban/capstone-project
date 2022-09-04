@@ -1,6 +1,5 @@
 const { Users } = require('../../models');
 const bcryptjs = require('bcryptjs');
-const { createToken } = require('../../lib/authToken');
 
 // check if username is valid
 const isUsernameValid = async (req, res, next) => {
@@ -46,9 +45,10 @@ const createNewUser = async (req, res, next) => {
 
     if (!user) return res.json({ err: error });
 
-    const token = createToken(user._id);
+    // set the session cookie
+    req.session.user_id = user._id.toJSON();
 
-    return res.status(201).json({ user: user?._id, token });
+    return res.status(201).json({ username: username, _id: user._id });
   } catch (e) {
     next(e);
   }
@@ -66,10 +66,10 @@ const userLogin = async (req, res, next) => {
     bcryptjs.compare(password, findUser?.password).then((match) => {
       if (!match) return res.json({ err: 'incorrect username and password' });
 
-      // set the token
-      const token = createToken(findUser._id);
+      // set the session cookie
+      req.session.user_id = findUser._id.toJSON();
 
-      return res.json({ username, token });
+      return res.json({ username, _id: findUser._id });
     });
   } catch (e) {
     next(e);
