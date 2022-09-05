@@ -15,9 +15,14 @@ import {
 } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
-import { useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  isUserAuthorized,
+  isUserLoggedIn,
+} from '../../features/users/usersSlice';
 
 import axios from '../../lib/axiosConfig';
 import Logo from '../../layout/Header/Logo';
@@ -30,6 +35,7 @@ import EmailField from '../../components/forms/EmailField';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -53,6 +59,14 @@ const SignUpPage = () => {
     showPassword: false,
     showConfirmPassword: false,
   });
+
+  // is user authorize
+  const isUserAuthorize = useSelector(isUserAuthorized);
+
+  // handle visible routes
+  useEffect(() => {
+    dispatch(isUserLoggedIn()).unwrap();
+  }, [dispatch]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -92,191 +106,199 @@ const SignUpPage = () => {
         password,
       });
 
-      console.log(res.data);
+      if (res.data?.username && res.data?._id) {
+        navigate('/');
+      }
     }
   };
 
   return (
-    <SignUpContainer>
-      <Paper
-        elevation={6}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          border: '1px solid #00000030',
-          width: {
-            xs: '100%',
-            sm: 420,
-            md: 420,
-          },
-          position: 'relative',
-        }}
-      >
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <IconButton aria-label='logo' edge='start'>
-            <Logo w={30} />
-          </IconButton>
-          <Typography variant='h5' component='h5' fontWeight={700} ml={2}>
-            Sign Up Form
-          </Typography>
-          <IconButton
-            aria-label='back'
-            edge='end'
-            onClick={() => navigate('/')}
-          >
-            <ChevronLeftIcon sx={{ color: '#000' }} />
-          </IconButton>
-        </Toolbar>
-        <Divider sx={{ height: 1.5, bgcolor: '#000', mb: 2 }} />
-
-        <Box
-          sx={{
-            px: {
-              xs: 2,
-              sm: 5,
-            },
-            display: 'flex',
-            flexDirection: 'column',
-            textAlign: 'center',
-          }}
-        >
-          {/* fullname */}
-          <TextInputField
-            errors={errors.name?.message}
-            name='name'
-            label='Full Name'
-            register={register}
-            watch={watch}
-          />
-
-          {/* intern or employee */}
-          <FormControl
+    <Fragment>
+      {isUserAuthorize ? (
+        <Navigate to='/' />
+      ) : (
+        <SignUpContainer>
+          <Paper
+            elevation={6}
             sx={{
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-              mb: 2,
+              flexDirection: 'column',
+              textAlign: 'center',
+              border: '1px solid #00000030',
+              width: {
+                xs: '100%',
+                sm: 420,
+                md: 420,
+              },
+              position: 'relative',
             }}
-            required
-            {...(errors.userType?.message && { error: true })}
           >
-            <FormLabel id='demo-row-radio-buttons-group-label'>
-              Type :
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby='demo-row-radio-buttons-group-label'
-              name='row-radio-buttons-group'
+            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <IconButton aria-label='logo' edge='start'>
+                <Logo w={30} />
+              </IconButton>
+              <Typography variant='h5' component='h5' fontWeight={700} ml={2}>
+                Sign Up Form
+              </Typography>
+              <IconButton
+                aria-label='back'
+                edge='end'
+                onClick={() => navigate('/')}
+              >
+                <ChevronLeftIcon sx={{ color: '#000' }} />
+              </IconButton>
+            </Toolbar>
+            <Divider sx={{ height: 1.5, bgcolor: '#000', mb: 2 }} />
+
+            <Box
+              sx={{
+                px: {
+                  xs: 2,
+                  sm: 5,
+                },
+                display: 'flex',
+                flexDirection: 'column',
+                textAlign: 'center',
+              }}
             >
-              <FormControlLabel
-                value='intern'
-                control={<Radio />}
-                label='Intern'
-                {...register('userType', {
-                  required: 'This field is required',
-                })}
+              {/* fullname */}
+              <TextInputField
+                errors={errors.name?.message}
+                name='name'
+                label='Full Name'
+                register={register}
+                watch={watch}
               />
-              <FormControlLabel
-                value='employee'
-                control={<Radio />}
-                label='Employee'
-                {...register('userType', {
-                  required: 'This field is required',
-                })}
+
+              {/* intern or employee */}
+              <FormControl
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-evenly',
+                  mb: 2,
+                }}
+                required
+                {...(errors.userType?.message && { error: true })}
+              >
+                <FormLabel id='demo-row-radio-buttons-group-label'>
+                  Type :
+                </FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby='demo-row-radio-buttons-group-label'
+                  name='row-radio-buttons-group'
+                >
+                  <FormControlLabel
+                    value='intern'
+                    control={<Radio />}
+                    label='Intern'
+                    {...register('userType', {
+                      required: 'This field is required',
+                    })}
+                  />
+                  <FormControlLabel
+                    value='employee'
+                    control={<Radio />}
+                    label='Employee'
+                    {...register('userType', {
+                      required: 'This field is required',
+                    })}
+                  />
+                </RadioGroup>
+                <FormHelperText id='radio-buttons'>
+                  {errors.userType?.message && errors.userType?.message}
+                </FormHelperText>
+              </FormControl>
+
+              {/* username */}
+              <UsernameField
+                errors={errors.username?.message}
+                name='username'
+                label='Username'
+                register={register}
+                watch={watch}
+                minlen={4}
               />
-            </RadioGroup>
-            <FormHelperText id='radio-buttons'>
-              {errors.userType?.message && errors.userType?.message}
-            </FormHelperText>
-          </FormControl>
 
-          {/* username */}
-          <UsernameField
-            errors={errors.username?.message}
-            name='username'
-            label='Username'
-            register={register}
-            watch={watch}
-            minlen={4}
-          />
+              {/* password */}
+              <PasswordField
+                errors={errors.password?.message}
+                name='password'
+                label='Password'
+                register={register}
+                watch={watch}
+                minlen={8}
+                maxlen={20}
+                showPassword={values.showPassword}
+                handleShowPassword={handleClickShowPassword}
+              />
 
-          {/* password */}
-          <PasswordField
-            errors={errors.password?.message}
-            name='password'
-            label='Password'
-            register={register}
-            watch={watch}
-            minlen={8}
-            maxlen={20}
-            showPassword={values.showPassword}
-            handleShowPassword={handleClickShowPassword}
-          />
+              {/* confirm password */}
+              <PasswordField
+                errors={errors.confirmPassword?.message}
+                name='confirmPassword'
+                label='Confirm Password'
+                register={register}
+                watch={watch}
+                minlen={8}
+                maxlen={20}
+                showPassword={values.showConfirmPassword}
+                handleShowPassword={handleClickShowConfirmPassword}
+              />
 
-          {/* confirm password */}
-          <PasswordField
-            errors={errors.confirmPassword?.message}
-            name='confirmPassword'
-            label='Confirm Password'
-            register={register}
-            watch={watch}
-            minlen={8}
-            maxlen={20}
-            showPassword={values.showConfirmPassword}
-            handleShowPassword={handleClickShowConfirmPassword}
-          />
+              {/* email */}
+              <EmailField
+                errors={errors.email?.message}
+                name='email'
+                label='Emaill Address'
+                register={register}
+                watch={watch}
+              />
 
-          {/* email */}
-          <EmailField
-            errors={errors.email?.message}
-            name='email'
-            label='Emaill Address'
-            register={register}
-            watch={watch}
-          />
+              {/* phone number */}
+              <TextInputField
+                errors={errors.phoneNumber?.message}
+                name='phoneNumber'
+                label='Contact Number'
+                register={register}
+                watch={watch}
+              />
 
-          {/* phone number */}
-          <TextInputField
-            errors={errors.phoneNumber?.message}
-            name='phoneNumber'
-            label='Contact Number'
-            register={register}
-            watch={watch}
-          />
-
-          <Button
-            variant='contained'
-            onClick={handleSubmit(handleFormSubmit)}
-            type='submit'
-          >
-            Submit
-          </Button>
-          <Typography
-            variant='subtitle'
-            component='span'
-            color='text.primary'
-            textAlign='right'
-            fontWeight={500}
-            mt={1.5}
-            mb={2.5}
-          >
-            Already have an account?{' '}
-            <Typography
-              variant='subtitle'
-              component='span'
-              color='primary.main'
-              textAlign='right'
-              fontWeight={500}
-              sx={{ cursor: 'pointer' }}
-              onClick={() => navigate('/login')}
-            >
-              Sign In
-            </Typography>
-          </Typography>
-        </Box>
-      </Paper>
-    </SignUpContainer>
+              <Button
+                variant='contained'
+                onClick={handleSubmit(handleFormSubmit)}
+                type='submit'
+              >
+                Submit
+              </Button>
+              <Typography
+                variant='subtitle'
+                component='span'
+                color='text.primary'
+                textAlign='right'
+                fontWeight={500}
+                mt={1.5}
+                mb={2.5}
+              >
+                Already have an account?{' '}
+                <Typography
+                  variant='subtitle'
+                  component='span'
+                  color='primary.main'
+                  textAlign='right'
+                  fontWeight={500}
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/login')}
+                >
+                  Sign In
+                </Typography>
+              </Typography>
+            </Box>
+          </Paper>
+        </SignUpContainer>
+      )}
+    </Fragment>
   );
 };
 export default SignUpPage;

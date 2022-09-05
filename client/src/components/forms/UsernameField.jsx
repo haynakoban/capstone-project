@@ -12,7 +12,7 @@ const isValidUsername = (username) =>
 
 const UsernameField = ({ errors, name, label, minlen, register, watch }) => {
   const handleValidation = async (username) => {
-    const result = await axios.post('api/users/auth', {
+    const result = await axios.post('api/users/validation', {
       username,
     });
 
