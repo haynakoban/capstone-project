@@ -2,6 +2,7 @@ const { Users } = require('../../models');
 const bcryptjs = require('bcryptjs');
 
 // check if username is valid
+// post method | /api/users/validation
 const isUsernameValid = async (req, res, next) => {
   try {
     const { username } = req.body;
@@ -19,6 +20,7 @@ const isUsernameValid = async (req, res, next) => {
 };
 
 // create new user
+// post method | /api/users
 const createNewUser = async (req, res, next) => {
   try {
     const { name, username, email, isIntern, phoneNumber, password } = req.body;
@@ -43,7 +45,7 @@ const createNewUser = async (req, res, next) => {
       password: hashPassword,
     });
 
-    if (!user) return res.json({ err: error });
+    if (!user) return res.json({ err: 'error' });
 
     // set the session cookie
     req.session.user_id = user._id.toJSON();
@@ -55,6 +57,7 @@ const createNewUser = async (req, res, next) => {
 };
 
 // user log in: check weather the user can log in from the system
+// post method | /api/users/auth
 const userLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -76,8 +79,21 @@ const userLogin = async (req, res, next) => {
   }
 };
 
+// get the logged in user
+// get method | /api/users/auth
+const isUserLoggedIn = async (req, res, next) => {
+  try {
+    if (!req.session.user_id) return res.json({ userLoggedIn: false });
+
+    return res.json({ userLoggedIn: true, user: req.session.user_id });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNewUser,
   isUsernameValid,
+  isUserLoggedIn,
   userLogin,
 };

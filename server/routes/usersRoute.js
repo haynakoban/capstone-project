@@ -10,15 +10,12 @@ router
   .post(auth, usersController.createNewUser);
 
 // username validation
-router.post('/auth', usersController.isUsernameValid);
+router.post('/validation', usersController.isUsernameValid);
 
 // user log in validation
-router.post('/auth/_log', auth, usersController.userLogin);
-
-// router
-//   .route('/:id')
-//   .get(postsController.selectPostById)
-//   .put(postsController.updatePost)
-//   .delete(postsController.deletePost);
+router
+  .route('/auth')
+  .get(auth, usersController.isUserLoggedIn)
+  .post(auth, usersController.userLogin);
 
 module.exports = router;

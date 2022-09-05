@@ -1,6 +1,6 @@
 import {
   AppBar,
-  // Badge,
+  Badge,
   Box,
   Button,
   CssBaseline,
@@ -13,19 +13,29 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-// import ChatIcon from '@mui/icons-material/Chat';
-// import NotificationsIcon from '@mui/icons-material/Notifications';
+import ChatIcon from '@mui/icons-material/Chat';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-// import UserSettings from './UserSettings';
+import { Fragment, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  isUserAuthorized,
+  isUserLoggedIn,
+} from '../../features/users/usersSlice';
+
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';
+import UserSettings from './UserSettings';
 
 const NavigationBar = ({ routes, authRoute }) => {
   const [pageTitle, setPageTitle] = useState('Dashboard');
   const [leftDrawer, showLeftDrawer] = useState(false);
 
+  // is user authorize
+  const isUserAuthorize = useSelector(isUserAuthorized);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
@@ -39,6 +49,11 @@ const NavigationBar = ({ routes, authRoute }) => {
     }
     showLeftDrawer(!leftDrawer);
   };
+
+  // handle visible routes
+  useEffect(() => {
+    dispatch(isUserLoggedIn()).unwrap();
+  }, [dispatch]);
 
   // Handle page title parsing.
   useEffect(() => {
@@ -137,66 +152,74 @@ const NavigationBar = ({ routes, authRoute }) => {
 
           {/* will show if user logged in */}
           <Box display='flex' alignItems='center'>
-            {/* if authorized dont show it */}
-            <Box
-              sx={{
-                display: {
-                  xs: 'none',
-                  sm: 'none',
-                  md: 'flex',
-                },
-                alignItems: {
-                  xs: 'none',
-                  sm: 'none',
-                  md: 'center',
-                },
-              }}
-            >
-              {authRoute.map((authroute) => (
-                <Button
-                  key={authroute.name}
-                  onClick={() => navigate(authroute.path)}
+            {!isUserAuthorize ? (
+              <Fragment>
+                {/* if authorized dont show it */}
+                <Box
                   sx={{
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                    fontSize: '1rem',
+                    display: {
+                      xs: 'none',
+                      sm: 'none',
+                      md: 'flex',
+                    },
+                    alignItems: {
+                      xs: 'none',
+                      sm: 'none',
+                      md: 'center',
+                    },
                   }}
                 >
-                  {authroute.name}
-                </Button>
-              ))}
-            </Box>
+                  {authRoute.map((authroute) => (
+                    <Button
+                      key={authroute.name}
+                      onClick={() => navigate(authroute.path)}
+                      sx={{
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.5,
+                        fontSize: '1rem',
+                      }}
+                    >
+                      {authroute.name}
+                    </Button>
+                  ))}
+                </Box>
+              </Fragment>
+            ) : (
+              <Fragment>
+                {/* if authorized show this */}
+                {/* chat icon */}
+                <IconButton
+                  sx={{ color: '#000000', bgcolor: '#00000015', mr: 1.5 }}
+                  aria-label='message icon'
+                >
+                  <Badge color='error' badgeContent={0} max={99}>
+                    <ChatIcon />
+                  </Badge>
+                </IconButton>
 
-            {/* if authorized show this */}
-            {/* chat icon */}
-            {/* <IconButton
-              sx={{ color: '#000000', bgcolor: '#00000015', mr: 1.5 }}
-              aria-label='message icon'
-            >
-              <Badge color='error' badgeContent={0} max={99}>
-                <ChatIcon />
-              </Badge>
-            </IconButton> */}
+                {/* notification icon */}
+                <IconButton
+                  sx={{ color: '#00000090', bgcolor: '#00000015', mr: 1.5 }}
+                  aria-label='message icon'
+                >
+                  <Badge color='error' badgeContent={0} max={99}>
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
 
-            {/* notification icon */}
-            {/* <IconButton
-              sx={{ color: '#00000090', bgcolor: '#00000015', mr: 1.5 }}
-              aria-label='message icon'
-            >
-              <Badge color='error' badgeContent={0} max={99}>
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
-
-            {/* user settings */}
-            {/* <UserSettings /> */}
+                {/* user settings */}
+                <UserSettings />
+              </Fragment>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
 
       {/* show drawer */}
       <SideDrawer
+        isUserAuthorize={isUserAuthorize}
         routes={routes}
+        authRoute={authRoute}
         showLeftDrawer={showLeftDrawer}
         leftDrawer={leftDrawer}
       />

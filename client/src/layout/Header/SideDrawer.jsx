@@ -14,7 +14,13 @@ import { useNavigate } from 'react-router-dom';
 
 import Logo from './Logo';
 
-const SideDrawer = ({ routes, showLeftDrawer, leftDrawer }) => {
+const SideDrawer = ({
+  routes,
+  authRoute,
+  showLeftDrawer,
+  leftDrawer,
+  isUserAuthorize,
+}) => {
   // Handles route navigation.
   const navigate = useNavigate();
 
@@ -102,6 +108,34 @@ const SideDrawer = ({ routes, showLeftDrawer, leftDrawer }) => {
               </ListItemButton>
             </ListItem>
           ))}
+
+          {/* show it not authorize */}
+          {!isUserAuthorize &&
+            authRoute.map((route) => (
+              <ListItem
+                disablePadding
+                key={route?.name}
+                sx={{
+                  transition: 'all 400ms linear',
+                }}
+              >
+                <ListItemButton
+                  onClick={() => {
+                    navigate(route?.path);
+                    showLeftDrawer(false);
+                  }}
+                >
+                  <ListItemText
+                    primary={route?.name}
+                    sx={{
+                      color: '#FFFFFF95',
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
         </List>
       </Box>
     </Drawer>
