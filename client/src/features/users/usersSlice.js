@@ -3,6 +3,7 @@ import axios from '../../lib/axiosConfig';
 
 const initialState = {
   users: [],
+  user_id: '',
   user: {},
   isAuthorized: false,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -14,6 +15,19 @@ export const isUserLoggedIn = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get('/api/users/auth');
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+export const fetchUserInfo = createAsyncThunk(
+  'users/fetchUserInfo',
+  async (id) => {
+    try {
+      const response = await axios.get(`/api/users/auth/${id}`);
 
       return response.data;
     } catch (e) {
@@ -35,7 +49,7 @@ const usersSlice = createSlice({
         state.status = 'succeeded';
 
         if (action.payload.userLoggedIn) {
-          state.user = action.payload.user;
+          state.user_id = action.payload.user_id;
         }
 
         state.isAuthorized = action.payload.userLoggedIn;
@@ -43,12 +57,18 @@ const usersSlice = createSlice({
       .addCase(isUserLoggedIn.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
       });
   },
 });
 
 export const isUserAuthorized = (state) => state.users.isAuthorized;
-export const getUser = (state) => state.users.user;
+export const getUserId = (state) => state.users.user_id;
+export const getUserInfo = (state) => state.users.user;
 
 // remove the comment once a code in reducers added.
 // export const { userAdded } = usersSlice.actions;

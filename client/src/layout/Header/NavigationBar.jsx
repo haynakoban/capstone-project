@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  getUserInfo,
   isUserAuthorized,
   isUserLoggedIn,
 } from '../../features/users/usersSlice';
@@ -28,12 +29,41 @@ import Logo from './Logo';
 import SideDrawer from './SideDrawer';
 import UserSettings from './UserSettings';
 
-const NavigationBar = ({ routes, authRoute }) => {
+const NavigationBar = () => {
+  const authRoute = [
+    {
+      name: 'Log In',
+      path: '/login',
+    },
+    {
+      name: 'Sign Up',
+      path: '/signup',
+    },
+  ];
   const [pageTitle, setPageTitle] = useState('Dashboard');
   const [leftDrawer, showLeftDrawer] = useState(false);
 
   // is user authorize
   const isUserAuthorize = useSelector(isUserAuthorized);
+  const user = useSelector(getUserInfo);
+
+  const routes = user?.isIntern
+    ? [
+        {
+          name: 'Internship',
+          path: '/internship',
+        },
+        {
+          name: 'Room',
+          path: '/room',
+        },
+      ]
+    : [
+        {
+          name: 'Room',
+          path: '/room',
+        },
+      ];
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
