@@ -12,10 +12,14 @@ router
 // username validation
 router.post('/validation', usersController.isUsernameValid);
 
-// user log in validation
+// get -- validate if the user is logged in
+// post -- logged in the user
 router
   .route('/auth')
   .get(auth, usersController.isUserLoggedIn)
   .post(auth, usersController.userLogin);
+
+// get -- get the user information
+router.route('/auth/:id').get(auth, usersController.getUserInfo);
 
 module.exports = router;

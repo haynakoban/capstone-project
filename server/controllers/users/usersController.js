@@ -85,7 +85,25 @@ const isUserLoggedIn = async (req, res, next) => {
   try {
     if (!req.session.user_id) return res.json({ userLoggedIn: false });
 
-    return res.json({ userLoggedIn: true, user: req.session.user_id });
+    return res.json({ userLoggedIn: true, user_id: req.session.user_id });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// get the user information
+// get method | /api/users/auth/:id
+const getUserInfo = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const user = await Users.findById(id);
+
+    if (!user) return res.json({ err: `no user found` });
+
+    return res.json({
+      user: user,
+    });
   } catch (error) {
     next(error);
   }
@@ -93,6 +111,7 @@ const isUserLoggedIn = async (req, res, next) => {
 
 module.exports = {
   createNewUser,
+  getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
   userLogin,

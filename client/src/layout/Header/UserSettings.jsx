@@ -15,7 +15,13 @@ import {
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchUserInfo,
+  getUserId,
+  getUserInfo,
+} from '../../features/users/usersSlice';
 
 const links = [
   {
@@ -29,7 +35,18 @@ const links = [
 ];
 
 const UserSettings = () => {
+  const dispatch = useDispatch();
+
   const [open, setOpen] = useState(false);
+
+  const userId = useSelector(getUserId);
+  const user = useSelector(getUserInfo);
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchUserInfo(userId)).unwrap();
+    }
+  }, [dispatch, userId]);
 
   // click away listener
   const handleClick = () => setOpen((prev) => !prev);
@@ -49,7 +66,7 @@ const UserSettings = () => {
             sx={{ outline: 'none', p: 0 }}
             onClick={handleClick}
           >
-            <Avatar>C</Avatar>
+            <Avatar>{user && user?.name?.[0]?.toUpperCase()}</Avatar>
           </IconButton>
 
           {/* handle the settings modal */}
@@ -78,7 +95,7 @@ const UserSettings = () => {
                   sx={{ color: '#000', cursor: 'pointer' }}
                   onClick={() => console.log('clicked')}
                 >
-                  Jones Charles Ferdinand
+                  {user && user?.name}
                 </Typography>
               </Paper>
 
