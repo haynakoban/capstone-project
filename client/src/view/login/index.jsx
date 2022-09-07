@@ -24,7 +24,6 @@ import {
 
 import axios from '../../lib/axiosConfig';
 import Logo from '../../layout/Header/Logo';
-
 import LogInContainer from '../../components/global/LogInContainer';
 
 const LogInPage = () => {

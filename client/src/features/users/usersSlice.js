@@ -4,8 +4,8 @@ import axios from '../../lib/axiosConfig';
 const initialState = {
   users: [],
   user_id: '',
-  user: {},
-  isAuthorized: false,
+  user: { isIntern: true },
+  isAuthorized: true,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -69,8 +69,9 @@ const usersSlice = createSlice({
 export const isUserAuthorized = (state) => state.users.isAuthorized;
 export const getUserId = (state) => state.users.user_id;
 export const getUserInfo = (state) => state.users.user;
+export const getUserStatus = (state) => state.users.status;
 
 // remove the comment once a code in reducers added.
-// export const { userAdded } = usersSlice.actions;
+// export const { loggedIn } = usersSlice.actions;
 
 export default usersSlice.reducer;
