@@ -28,8 +28,6 @@ const InternshipList = () => {
   const navigate = useNavigate();
   const { _isUserAuth, _user } = useContext(AuthContext);
 
-  console.log(_user);
-
   useEffect(() => {
     if (!_isUserAuth) {
       navigate('/login');
