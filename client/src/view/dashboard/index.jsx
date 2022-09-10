@@ -5,8 +5,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import DashboardHeader from '../../components/dashboard/header';
 import AnnouncementPost from '../../components/dashboard/body';
 import DashboardFooter from '../../components/dashboard/footer';
-import { Fragment } from 'react';
-import RoomLayout from '../../layout/Room';
+import RoomLayout from '../../layout/RoomLayout';
 
 const Tasks = [
   {
@@ -40,8 +39,7 @@ const Member = [
 
 const Dashboard = () => {
   return (
-    <Fragment>
-      <RoomLayout />
+    <RoomLayout>
       <Box display='flex' flexDirection='column'>
         {/* header */}
         {/* interns remaining and completed hours */}
@@ -55,7 +53,7 @@ const Dashboard = () => {
         {/* member and tasks */}
         <DashboardFooter Tasks={Tasks} Member={Member} />
       </Box>
-    </Fragment>
+    </RoomLayout>
   );
 };
 export default Dashboard;
