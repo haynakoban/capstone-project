@@ -1,4 +1,4 @@
-import logo from '../../assets/sample/logo2_(bnb).png';
+import logo from '../../../assets/sample/logo2_(bnb).png';
 import { Link } from 'react-router-dom';
 
 export default function Logo({ w }) {

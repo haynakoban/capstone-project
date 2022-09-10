@@ -12,9 +12,8 @@ import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
 import photo from '../../assets/svg/online_learning_re_qw08.svg';
 
-import { Fragment, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../lib/authContext';
+import { Fragment, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import MainLayout from '../../layout/MainLayout';
 import { Item } from '../../components/global/ItemGrid';
@@ -23,19 +22,18 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from '../../components/global/Search';
+import { AuthContext } from '../../lib/authContext';
+import { useContext } from 'react';
 
-const InternshipList = () => {
+const Rooms = () => {
   const navigate = useNavigate();
-  const { _isUserAuth, _user } = useContext(AuthContext);
+  const { _isUserAuth } = useContext(AuthContext);
 
   useEffect(() => {
     if (!_isUserAuth) {
       navigate('/login');
     }
-    if (!_user?.isIntern) {
-      navigate('/');
-    }
-  }, [_isUserAuth, _user?.isIntern, navigate]);
+  }, [_isUserAuth, navigate]);
 
   return (
     <Fragment>
@@ -67,13 +65,12 @@ const InternshipList = () => {
         <Box sx={{ flexGrow: 1, mt: 2 }}>
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant='h5' component='h5'>
-              Internship
+              My Rooms
             </Typography>
             <Typography variant='body1' component='p'>
-              200 available internship
+              6 rooms
             </Typography>
           </Toolbar>
-
           <Grid
             container
             spacing={{ xs: 1, sm: 2, md: 3 }}
@@ -99,8 +96,9 @@ const InternshipList = () => {
                   <Button
                     variant='contained'
                     sx={{ mt: 2, alignSelf: 'flex-end' }}
+                    onClick={() => navigate(`/room/${index}`)}
                   >
-                    See Details
+                    Dashboard
                   </Button>
                 </Item>
               </Grid>
@@ -108,7 +106,8 @@ const InternshipList = () => {
           </Grid>
         </Box>
       </Container>
+      <Outlet />
     </Fragment>
   );
 };
-export default InternshipList;
+export default Rooms;

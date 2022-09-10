@@ -23,7 +23,7 @@ import {
   getUserInfo,
   isUserAuthorized,
   isUserLoggedIn,
-} from '../../features/users/usersSlice';
+} from '../../../features/users/usersSlice';
 
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';

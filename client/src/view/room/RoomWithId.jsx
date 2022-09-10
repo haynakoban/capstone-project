@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-const RoomParent = () => {
+const RoomWithId = () => {
   return <Outlet />;
 };
-export default RoomParent;
+export default RoomWithId;

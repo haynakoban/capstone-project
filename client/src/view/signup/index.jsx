@@ -25,7 +25,7 @@ import {
 } from '../../features/users/usersSlice';
 
 import axios from '../../lib/axiosConfig';
-import Logo from '../../layout/Header/Logo';
+import Logo from '../../layout/MainLayout/Header/Logo';
 
 import SignUpContainer from '../../components/global/SignUpContainer';
 import TextInputField from '../../components/forms/TextInputField';
