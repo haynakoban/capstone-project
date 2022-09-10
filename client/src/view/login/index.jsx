@@ -23,7 +23,7 @@ import {
 } from '../../features/users/usersSlice';
 
 import axios from '../../lib/axiosConfig';
-import Logo from '../../layout/Header/Logo';
+import Logo from '../../layout/MainLayout/Header/Logo';
 import LogInContainer from '../../components/global/LogInContainer';
 
 const LogInPage = () => {

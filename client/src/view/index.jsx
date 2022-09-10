@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Fragment } from 'react';
-import MainLayout from '../layout';
+import MainLayout from '../layout/MainLayout';
 
 // images
 import HeroContent from '../assets/svg/project_team_lc5a.svg';
