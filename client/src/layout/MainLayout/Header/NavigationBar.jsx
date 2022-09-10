@@ -27,7 +27,7 @@ import {
 
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';
-import UserSettings from './UserSettings';
+import UserSettings from '../../Settings/UserSettings';
 
 const NavigationBar = () => {
   const authRoute = [

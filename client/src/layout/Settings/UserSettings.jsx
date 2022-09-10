@@ -21,7 +21,7 @@ import {
   fetchUserInfo,
   getUserId,
   getUserInfo,
-} from '../../../features/users/usersSlice';
+} from '../../features/users/usersSlice';
 
 const links = [
   {
