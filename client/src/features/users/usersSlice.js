@@ -23,6 +23,16 @@ export const isUserLoggedIn = createAsyncThunk(
   }
 );
 
+export const userLogout = createAsyncThunk('users/userLogout', async () => {
+  try {
+    const response = await axios.get('/api/users/validation');
+
+    return response.data;
+  } catch (e) {
+    return e.message;
+  }
+});
+
 export const fetchUserInfo = createAsyncThunk(
   'users/fetchUserInfo',
   async (id) => {
@@ -57,6 +67,13 @@ const usersSlice = createSlice({
       .addCase(isUserLoggedIn.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(userLogout.fulfilled, (state, action) => {
+        if (!action.payload?.userLoggedIn) {
+          state.user_id = '';
+          state.user = { isIntern: true };
+          state.isAuthorized = true;
+        }
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         if (action.payload.user) {

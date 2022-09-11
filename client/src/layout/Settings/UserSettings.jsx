@@ -16,26 +16,18 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 import { Fragment, useEffect, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchUserInfo,
   getUserId,
   getUserInfo,
+  userLogout,
 } from '../../features/users/usersSlice';
-
-const links = [
-  {
-    name: 'Resume',
-    icon: <InsertDriveFileOutlinedIcon />,
-  },
-  {
-    name: 'Log Out',
-    icon: <LogoutOutlinedIcon />,
-  },
-];
 
 const UserSettings = () => {
   const dispatch = useDispatch();
+  // const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
@@ -51,6 +43,13 @@ const UserSettings = () => {
   // click away listener
   const handleClick = () => setOpen((prev) => !prev);
   const handleClickAway = () => setOpen(false);
+
+  // handle logout button
+  const onUserLogout = () => {
+    dispatch(userLogout());
+
+    window.location.reload(true);
+  };
 
   return (
     <Fragment>
@@ -100,19 +99,26 @@ const UserSettings = () => {
               </Paper>
 
               <List>
-                {links.map((route) => (
-                  <ListItem key={route?.name} disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon sx={{ color: '#000000' }}>
-                        {route?.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={route?.name}
-                        sx={{ color: '#000000' }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      console.log('link to resume');
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#000000' }}>
+                      <InsertDriveFileOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary='Resume' sx={{ color: '#000000' }} />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={onUserLogout}>
+                    <ListItemIcon sx={{ color: '#000000' }}>
+                      <LogoutOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary='Log Out' sx={{ color: '#000000' }} />
+                  </ListItemButton>
+                </ListItem>
               </List>
             </Box>
           ) : null}
