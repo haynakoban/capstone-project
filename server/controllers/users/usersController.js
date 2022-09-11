@@ -109,10 +109,25 @@ const getUserInfo = async (req, res, next) => {
   }
 };
 
+// log out the user
+// get method | /api/users/validation
+const userLogout = async (req, res, next) => {
+  try {
+    if (!req.session.user_id) return res.json({ userLoggedIn: false });
+
+    res.clearCookie('_uid');
+
+    return res.json({ userLoggedIn: false });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNewUser,
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
   userLogin,
+  userLogout,
 };

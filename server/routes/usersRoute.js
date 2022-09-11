@@ -10,7 +10,10 @@ router
   .post(auth, usersController.createNewUser);
 
 // username validation
-router.post('/validation', usersController.isUsernameValid);
+router
+  .route('/validation')
+  .get(auth, usersController.userLogout)
+  .post(usersController.isUsernameValid);
 
 // get -- validate if the user is logged in
 // post -- logged in the user
