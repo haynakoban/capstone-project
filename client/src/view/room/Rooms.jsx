@@ -1,22 +1,26 @@
 import {
+  Alert,
   Box,
   Button,
   Container,
   Divider,
   Grid,
   IconButton,
+  Modal,
+  Snackbar,
   Toolbar,
   Typography,
 } from '@mui/material';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import photo from '../../assets/svg/online_learning_re_qw08.svg';
 
-import { Fragment, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Fragment, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import MainLayout from '../../layout/MainLayout';
-import { Item } from '../../components/global/ItemGrid';
+import { StyledModalBox, Item } from '../../components/global';
 import {
   SearchContainer,
   SearchIconWrapper,
@@ -24,16 +28,56 @@ import {
 } from '../../components/global/Search';
 import { AuthContext } from '../../lib/authContext';
 import { useContext } from 'react';
+import { useForm } from 'react-hook-form';
+import RoomField from '../../components/forms/RoomField';
+import axios from '../../lib/axiosConfig';
 
 const Rooms = () => {
   const navigate = useNavigate();
-  const { _isUserAuth } = useContext(AuthContext);
+  const { _isUserAuth, _user } = useContext(AuthContext);
+
+  const [open, setOpen] = useState(false);
+  const [openSuccessSnackBar, setOpenSuccessSnackBar] = useState(false);
+
+  // handle modal
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  // handle success snackbar
+  const handleSuccessOpen = () => setOpenSuccessSnackBar(true);
+  const handleSuccessClose = () => setOpenSuccessSnackBar(false);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      roomName: '',
+    },
+  });
 
   useEffect(() => {
     if (!_isUserAuth) {
       navigate('/login');
     }
   }, [_isUserAuth, navigate]);
+
+  const handleFormSubmit = async (data) => {
+    const res = await axios.post('api/companies', {
+      name: data?.roomName,
+      createdBy: _user?.name,
+    });
+
+    // open a snackbar
+    if (res.data?.company) {
+      handleSuccessOpen();
+      handleClose();
+      reset({ roomName: '' });
+    }
+  };
 
   return (
     <Fragment>
@@ -42,6 +86,60 @@ const Rooms = () => {
       {/* content */}
       <Toolbar />
       <Container maxWidth='lg' sx={{ p: 1 }}>
+        {/* create room */}
+        <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant='outlined'
+            startIcon={<GroupAddOutlinedIcon />}
+            onClick={handleOpen}
+          >
+            Create Room
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby='modal-modal-title'
+            aria-describedby='modal-modal-description'
+          >
+            <StyledModalBox
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Toolbar
+                sx={{ display: 'flex', justifyContent: 'center' }}
+                disableGutters
+              >
+                <Typography variant='h6' component='h6' fontWeight={700}>
+                  Create a new room
+                </Typography>
+              </Toolbar>
+              {/* Room Name */}
+              <RoomField
+                errors={errors.roomName?.message}
+                name='roomName'
+                label='Room Name'
+                register={register}
+                watch={watch}
+                minlen={4}
+              />
+
+              {/* create room */}
+              <Button
+                variant='contained'
+                onClick={handleSubmit(handleFormSubmit)}
+                type='submit'
+                sx={{ marginX: 'auto' }}
+              >
+                Create
+              </Button>
+            </StyledModalBox>
+          </Modal>
+        </Toolbar>
+
+        <Divider sx={{ bgcolor: '#00000050' }} />
         {/* search and filter */}
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <SearchContainer>
@@ -106,7 +204,20 @@ const Rooms = () => {
           </Grid>
         </Box>
       </Container>
-      <Outlet />
+      <Snackbar
+        open={openSuccessSnackBar}
+        autoHideDuration={6000}
+        onClose={handleSuccessClose}
+      >
+        <Alert
+          onClose={handleSuccessClose}
+          severity='success'
+          variant='filled'
+          sx={{ width: '100%' }}
+        >
+          New Room Created
+        </Alert>
+      </Snackbar>
     </Fragment>
   );
 };

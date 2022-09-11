@@ -30,6 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // routes
 app.use('/api/users', require('./routes/usersRoute'));
+app.use('/api/companies', require('./routes/companiesRoute'));
 // app.use('/api/company', require('./routes/companyRoute'));
 
 httpServer.listen(ACCESS_PORT, () => {
