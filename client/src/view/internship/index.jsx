@@ -17,16 +17,21 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
 import MainLayout from '../../layout/MainLayout';
-import { Item } from '../../components/global/ItemGrid';
 import {
+  Item,
   SearchContainer,
   SearchIconWrapper,
   StyledInputBase,
-} from '../../components/global/Search';
+} from '../../components/global';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchRooms, getRooms } from '../../features/companies/companiesSlice';
 
 const InternshipList = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { _isUserAuth, _user } = useContext(AuthContext);
+  const getRoomsList = useSelector(getRooms);
 
   useEffect(() => {
     if (!_isUserAuth) {
@@ -36,6 +41,10 @@ const InternshipList = () => {
       navigate('/');
     }
   }, [_isUserAuth, _user?.isIntern, navigate]);
+
+  useEffect(() => {
+    dispatch(fetchRooms());
+  }, [dispatch]);
 
   return (
     <Fragment>
@@ -79,8 +88,8 @@ const InternshipList = () => {
             spacing={{ xs: 1, sm: 2, md: 3 }}
             columns={{ xs: 4, sm: 8, md: 12, lg: 16 }}
           >
-            {Array.from(Array(6)).map((_, index) => (
-              <Grid item xs={2} sm={4} md={4} lg={4} key={index}>
+            {getRoomsList.map((room) => (
+              <Grid item xs={2} sm={4} md={4} lg={4} key={room?._id}>
                 <Item>
                   <img
                     src={photo}
@@ -94,11 +103,12 @@ const InternshipList = () => {
                   />
 
                   <Typography fontWeight={500} fontSize='1.25rem' mt={1}>
-                    MySQL Technology
+                    {room?.name}
                   </Typography>
                   <Button
                     variant='contained'
                     sx={{ mt: 2, alignSelf: 'flex-end' }}
+                    onClick={() => console.log('show modal | show description')}
                   >
                     See Details
                   </Button>

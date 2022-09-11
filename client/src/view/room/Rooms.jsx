@@ -86,60 +86,63 @@ const Rooms = () => {
       {/* content */}
       <Toolbar />
       <Container maxWidth='lg' sx={{ p: 1 }}>
-        {/* create room */}
-        <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant='outlined'
-            startIcon={<GroupAddOutlinedIcon />}
-            onClick={handleOpen}
-          >
-            Create Room
-          </Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
-          >
-            <StyledModalBox
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Toolbar
-                sx={{ display: 'flex', justifyContent: 'center' }}
-                disableGutters
-              >
-                <Typography variant='h6' component='h6' fontWeight={700}>
-                  Create a new room
-                </Typography>
-              </Toolbar>
-              {/* Room Name */}
-              <RoomField
-                errors={errors.roomName?.message}
-                name='roomName'
-                label='Room Name'
-                register={register}
-                watch={watch}
-                minlen={4}
-              />
-
-              {/* create room */}
+        {!_user?.isIntern && (
+          <Fragment>
+            {/* create room */}
+            <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button
-                variant='contained'
-                onClick={handleSubmit(handleFormSubmit)}
-                type='submit'
-                sx={{ marginX: 'auto' }}
+                variant='outlined'
+                startIcon={<GroupAddOutlinedIcon />}
+                onClick={handleOpen}
               >
-                Create
+                Create Room
               </Button>
-            </StyledModalBox>
-          </Modal>
-        </Toolbar>
+              <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby='modal-modal-title'
+                aria-describedby='modal-modal-description'
+              >
+                <StyledModalBox
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Toolbar
+                    sx={{ display: 'flex', justifyContent: 'center' }}
+                    disableGutters
+                  >
+                    <Typography variant='h6' component='h6' fontWeight={700}>
+                      Create a new room
+                    </Typography>
+                  </Toolbar>
+                  {/* Room Name */}
+                  <RoomField
+                    errors={errors.roomName?.message}
+                    name='roomName'
+                    label='Room Name'
+                    register={register}
+                    watch={watch}
+                    minlen={4}
+                  />
 
-        <Divider sx={{ bgcolor: '#00000050' }} />
+                  {/* create room */}
+                  <Button
+                    variant='contained'
+                    onClick={handleSubmit(handleFormSubmit)}
+                    type='submit'
+                    sx={{ marginX: 'auto' }}
+                  >
+                    Create
+                  </Button>
+                </StyledModalBox>
+              </Modal>
+            </Toolbar>
+            <Divider sx={{ bgcolor: '#00000050' }} />
+          </Fragment>
+        )}
         {/* search and filter */}
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <SearchContainer>

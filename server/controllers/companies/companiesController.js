@@ -26,10 +26,15 @@ const createRoom = async (req, res, next) => {
   }
 };
 
-// retrieve the room information
+// retrieve rooms
 // get method | /api/companies
-const getRoomInfo = async (req, res, next) => {
+const getRooms = async (req, res, next) => {
   try {
+    const company = await Companies.find().limit(16);
+
+    if (!company) return res.json({ err: 'no rooms available' });
+
+    return res.json({ company });
   } catch (e) {
     next(e);
   }
@@ -61,10 +66,19 @@ const isRoomNameValid = async (req, res, next) => {
     next(e);
   }
 };
+// retrieve the room information
+// get method | /api/companies/validate
+const getRoomInfo = async (req, res, next) => {
+  try {
+  } catch (e) {
+    next(e);
+  }
+};
 
 module.exports = {
   createRoom,
   getRoomId,
   getRoomInfo,
+  getRooms,
   isRoomNameValid,
 };
