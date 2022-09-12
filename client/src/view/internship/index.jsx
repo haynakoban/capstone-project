@@ -79,7 +79,7 @@ const InternshipList = () => {
               Internship
             </Typography>
             <Typography variant='body1' component='p'>
-              200 available internship
+              {getRoomsList.length} available internship
             </Typography>
           </Toolbar>
 
