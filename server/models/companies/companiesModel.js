@@ -7,6 +7,7 @@ const companiesSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    default: '',
   },
   image: {
     type: String,
