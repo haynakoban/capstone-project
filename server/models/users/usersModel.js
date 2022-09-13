@@ -4,30 +4,30 @@ const employeeInfo = {
   hasCompany: {
     type: Boolean,
     required: false,
-    default: null,
+    default: false,
+  },
+  listOfCompanies: {
+    type: Array,
+    required: false,
   },
   companyInfo: {
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+      ref: 'Companies',
       required: false,
-      default: null,
     },
     name: {
       type: String,
       required: false,
-      default: null,
     },
   },
   department: {
     type: String,
     required: false,
-    default: null,
   },
   position: {
     type: String,
     required: false,
-    default: null,
   },
 };
 
@@ -35,35 +35,30 @@ const internInfo = {
   hasCompany: {
     type: Boolean,
     required: false,
-    default: null,
+    default: false,
   },
   companyInfo: {
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+      ref: 'Companies',
       required: false,
-      default: null,
     },
     name: {
       type: String,
       required: false,
-      default: null,
     },
   },
   school: {
     type: String,
     required: false,
-    default: null,
   },
   course: {
     type: String,
     required: false,
-    default: null,
   },
   major: {
     type: String,
     required: false,
-    default: null,
   },
   workingHours: {
     completed: {
