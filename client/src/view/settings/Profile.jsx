@@ -12,10 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import ProfileLayout from '../../layout/ProfileLayout';
 import { AuthContext } from '../../lib/authContext';
 
-import ProfileAction from '../../components/profile/ProfileAction';
-import ContactAction from '../../components/profile/ContactAction';
-import SchoolAction from '../../components/profile/SchoolAction';
-import CompanyAction from '../../components/profile/CompanyAction';
+import {
+  CompanyAction,
+  ContactAction,
+  ProfileAction,
+  SchoolAction,
+} from '../../components/settings';
 
 const Profile = () => {
   const navigate = useNavigate();
