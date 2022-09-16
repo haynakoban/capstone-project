@@ -18,7 +18,7 @@ router
   .get(companiesController.getRoomInfo)
   .post(companiesController.isRoomNameValid);
 
-// get method -- retrieve the company id
-// router.route('/:id').get(companiesController.getRoomId);
+// get method -- retrieve all my room
+router.route('/:id').get(companiesController.getMyRoom);
 
 module.exports = router;

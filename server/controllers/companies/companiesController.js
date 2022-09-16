@@ -4,10 +4,10 @@ const { Companies } = require('../../models');
 // post method | /api/companies
 const createRoom = async (req, res, next) => {
   try {
-    const { name, createdBy } = req.body;
+    const { name, createdBy, members } = req.body;
 
     // if one is empty or missing the result return false, otherwise true.
-    const canSave = [name, createdBy].every(Boolean);
+    const canSave = [name, createdBy, members].every(Boolean);
 
     if (!canSave)
       return res.status(400).json({ err: 'required field must be filled' });
@@ -16,6 +16,7 @@ const createRoom = async (req, res, next) => {
     const company = await Companies.create({
       name,
       createdBy,
+      members,
     });
 
     if (!company) return res.json({ err: 'error' });
@@ -40,10 +41,17 @@ const getRooms = async (req, res, next) => {
   }
 };
 
-// retrieve the company id
+// retrieve the list of rooms by using the id
 // get method | /api/companies/:id
-const getRoomId = async (req, res, next) => {
+const getMyRoom = async (req, res, next) => {
   try {
+    const id = req.params.id;
+
+    const findCompany = await Companies.find({ members: id });
+
+    if (!findCompany) return res.json({ err: 'room name is taken' });
+
+    return res.json({ rooms: findCompany });
   } catch (e) {
     next(e);
   }
@@ -77,7 +85,7 @@ const getRoomInfo = async (req, res, next) => {
 
 module.exports = {
   createRoom,
-  getRoomId,
+  getMyRoom,
   getRoomInfo,
   getRooms,
   isRoomNameValid,

@@ -131,7 +131,16 @@ export const updateUserSchoolInfo = createAsyncThunk(
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    resetState: (state) => {
+      state.users = [];
+      state.user_id = '';
+      state.user = { isIntern: true };
+      state.isAuthorized = true;
+      state.status = 'idle';
+      state.error = null;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(isUserLoggedIn.pending, (state, action) => {
@@ -191,6 +200,6 @@ export const getUserInfo = (state) => state.users.user;
 export const getUserStatus = (state) => state.users.status;
 
 // remove the comment once a code in reducers added.
-// export const { loggedIn } = usersSlice.actions;
+export const { resetState } = usersSlice.actions;
 
 export default usersSlice.reducer;
