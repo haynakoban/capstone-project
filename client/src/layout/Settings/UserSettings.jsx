@@ -16,18 +16,20 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 import { Fragment, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchUserInfo,
   getUserId,
   getUserInfo,
+  resetState,
   userLogout,
 } from '../../features/users/usersSlice';
 
 const UserSettings = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const [open, setOpen] = useState(false);
 
@@ -48,7 +50,14 @@ const UserSettings = () => {
   const onUserLogout = () => {
     dispatch(userLogout());
 
-    window.location.reload(true);
+    if (pathname === '/') {
+      resetState();
+      window.location.reload(true);
+    } else {
+      navigate('/');
+      resetState();
+      window.location.reload(true);
+    }
   };
 
   return (
