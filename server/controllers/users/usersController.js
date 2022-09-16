@@ -36,6 +36,21 @@ const createNewUser = async (req, res, next) => {
     // hash the password for basic security
     const hashPassword = await bcryptjs.hash(password, 10);
 
+    let userProps;
+    if (isIntern) {
+      userProps = {
+        hasCompany: false,
+        workingHours: {
+          completed: 0,
+          remaining: 0,
+        },
+      };
+    } else {
+      userProps = {
+        hasCompany: false,
+      };
+    }
+
     const user = await Users.create({
       name,
       username,
@@ -43,6 +58,8 @@ const createNewUser = async (req, res, next) => {
       isIntern,
       phoneNumber,
       password: hashPassword,
+      internInfo: isIntern && userProps,
+      employeeInfo: !isIntern && userProps,
     });
 
     if (!user) return res.json({ err: 'error' });
@@ -109,6 +126,97 @@ const getUserInfo = async (req, res, next) => {
   }
 };
 
+// update the user profile information
+// put method | api/users/auth/:id
+const updateUserProfileInfo = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const findUser = await Users.findById(id).exec();
+
+    if (!findUser) return res.json({ err: `no data found with the id: ${id}` });
+
+    // update name, address and gender
+    if (req.body.name || req.body.address || req.body.gender) {
+      const { name, address, gender } = req.body;
+      const date = new Date();
+
+      if (!name) return res.json({ err: `name field is required` });
+
+      findUser.name = name;
+      if (address) findUser.address = address;
+      else if (address === '') findUser.address = '';
+
+      if (gender) findUser.gender = gender;
+      else if (gender === '') findUser.gender = '';
+
+      findUser.updatedAt = date;
+
+      const updatedProfile = await findUser.save();
+
+      return res.json({ user: updatedProfile });
+    }
+    // update phone number and email
+    else if (req.body.phoneNumber || req.body.email) {
+      const { phoneNumber, email } = req.body;
+      const date = new Date();
+
+      if (!phoneNumber && !email)
+        return res.json({ err: `phoneNumber and Email fields are required` });
+
+      findUser.phoneNumber = phoneNumber;
+      findUser.email = email;
+      findUser.updatedAt = date;
+
+      const updatedProfile = await findUser.save();
+
+      return res.json({ user: updatedProfile });
+    }
+    // update company name, department and position
+    else if (req.body.companyName || req.body.department || req.body.position) {
+      const { companyName, department, position } = req.body;
+      const date = new Date();
+
+      if (companyName) findUser.employeeInfo.companyName = companyName;
+      else if (companyName === '') findUser.employeeInfo.companyName = '';
+
+      if (department) findUser.employeeInfo.department = department;
+      else if (department === '') findUser.employeeInfo.department = '';
+
+      if (position) findUser.employeeInfo.position = position;
+      else if (position === '') findUser.employeeInfo.position = '';
+
+      findUser.updatedAt = date;
+
+      const updatedProfile = await findUser.save();
+
+      return res.json({ user: updatedProfile });
+    }
+    // update school name, course and major
+    else if (req.body.schoolName || req.body.course || req.body.major) {
+      const { schoolName, course, major } = req.body;
+      const date = new Date();
+
+      if (schoolName) findUser.internInfo.schoolName = schoolName;
+      else if (schoolName === '') findUser.internInfo.schoolName = '';
+
+      if (course) findUser.internInfo.course = course;
+      else if (course === '') findUser.internInfo.course = '';
+
+      if (major) findUser.internInfo.major = major;
+      else if (major === '') findUser.internInfo.major = '';
+
+      findUser.updatedAt = date;
+
+      const updatedProfile = await findUser.save();
+
+      return res.json({ user: updatedProfile });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 // log out the user
 // get method | /api/users/validation
 const userLogout = async (req, res, next) => {
@@ -128,6 +236,7 @@ module.exports = {
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
+  updateUserProfileInfo,
   userLogin,
   userLogout,
 };

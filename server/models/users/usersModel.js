@@ -4,11 +4,6 @@ const employeeInfo = {
   hasCompany: {
     type: Boolean,
     required: false,
-    default: false,
-  },
-  listOfCompanies: {
-    type: Array,
-    required: false,
   },
   companyInfo: {
     companyId: {
@@ -20,6 +15,10 @@ const employeeInfo = {
       type: String,
       required: false,
     },
+  },
+  companyName: {
+    type: String,
+    required: false,
   },
   department: {
     type: String,
@@ -35,7 +34,6 @@ const internInfo = {
   hasCompany: {
     type: Boolean,
     required: false,
-    default: false,
   },
   companyInfo: {
     companyId: {
@@ -48,7 +46,7 @@ const internInfo = {
       required: false,
     },
   },
-  school: {
+  schoolName: {
     type: String,
     required: false,
   },
@@ -64,12 +62,10 @@ const internInfo = {
     completed: {
       type: Number,
       required: false,
-      default: 0,
     },
     remaining: {
       type: Number,
       required: false,
-      default: 0,
     },
   },
 };
@@ -98,24 +94,25 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  icon: {
+    type: String,
+    required: false,
+  },
   gender: {
     type: String,
     required: false,
-    default: null,
-  },
-  age: {
-    type: String,
-    required: false,
-    default: null,
   },
   address: {
     type: String,
     required: false,
-    default: null,
   },
   isIntern: {
     type: Boolean,
     required: true,
+  },
+  listOfCompanies: {
+    type: Array,
+    required: false,
   },
   employeeInfo,
   internInfo,

@@ -10,60 +10,55 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Logo from '../../MainLayout/Header/Logo';
 
-const drawerWidth = 240;
-
-const PermanentDrawer = ({ routes, active, pathname }) => {
+const LeftDrawerRoutes = ({
+  routes,
+  leftDrawer,
+  showLeftDrawer,
+  pathname,
+  active,
+}) => {
   // Handles route navigation.
   const navigate = useNavigate();
-  const { id } = useParams();
 
   return (
     <Drawer
-      sx={{
-        display: {
-          xs: 'none',
-          sm: 'none',
-          md: 'none',
-          lg: 'block',
-        },
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-        },
-      }}
-      variant='permanent'
       anchor='left'
-      ModalProps={{
-        keepMounted: true,
-      }}
+      open={leftDrawer}
+      onClose={() => showLeftDrawer(false)}
     >
       <Box
-        width='100%'
-        height='100vh'
+        width={240}
+        height='100%'
         sx={{
           backgroundColor: '#363740',
         }}
       >
-        <Toolbar>
-          <Logo w={30} />
+        <Toolbar
+          sx={{
+            mt: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Logo w={50} />
           <Typography
-            variant='h6'
-            fontWeight='semibold'
-            sx={{ ml: 1, letterSpacing: 0.5, color: '#FFFFFF95' }}
+            variant='h5'
+            fontWeight='normal'
+            sx={{ mt: 1, mb: 2, letterSpacing: 0.5, color: '#FFFFFF95' }}
           >
             TrainNLearn
           </Typography>
         </Toolbar>
 
-        <Divider sx={{ bgcolor: '#FFFFFF50' }} />
+        <List disablePadding>
+          <Divider flexItem sx={{ bgcolor: '#FFFFFF50', height: 1.2, mb: 4 }} />
 
-        <List>
           {routes.map((route) => (
             <ListItem
               key={route?.name}
@@ -71,10 +66,17 @@ const PermanentDrawer = ({ routes, active, pathname }) => {
               sx={{
                 bgcolor: active({ pathname, route }),
                 transition: 'all 400ms linear',
+                '&:first-of-type': {
+                  borderBottom: '1px solid #FFFFFF50',
+                  mb: 0.5,
+                },
               }}
             >
               <ListItemButton
-                onClick={() => navigate(`/room/${id}${route?.path}`)}
+                onClick={() => {
+                  navigate(route?.path);
+                  showLeftDrawer(false);
+                }}
               >
                 <ListItemIcon sx={{ color: '#FFFFFF95' }}>
                   {route?.icon}
@@ -91,4 +93,4 @@ const PermanentDrawer = ({ routes, active, pathname }) => {
     </Drawer>
   );
 };
-export default PermanentDrawer;
+export default LeftDrawerRoutes;

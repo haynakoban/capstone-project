@@ -10,7 +10,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Logo from '../../MainLayout/Header/Logo';
 
@@ -19,7 +19,6 @@ const drawerWidth = 240;
 const PermanentDrawer = ({ routes, active, pathname }) => {
   // Handles route navigation.
   const navigate = useNavigate();
-  const { id } = useParams();
 
   return (
     <Drawer
@@ -61,9 +60,9 @@ const PermanentDrawer = ({ routes, active, pathname }) => {
           </Typography>
         </Toolbar>
 
-        <Divider sx={{ bgcolor: '#FFFFFF50' }} />
+        <Divider sx={{ bgcolor: '#FFFFFF50', mb: 4 }} />
 
-        <List>
+        <List disablePadding>
           {routes.map((route) => (
             <ListItem
               key={route?.name}
@@ -71,11 +70,13 @@ const PermanentDrawer = ({ routes, active, pathname }) => {
               sx={{
                 bgcolor: active({ pathname, route }),
                 transition: 'all 400ms linear',
+                '&:first-of-type': {
+                  borderBottom: '1px solid #FFFFFF50',
+                  mb: 0.5,
+                },
               }}
             >
-              <ListItemButton
-                onClick={() => navigate(`/room/${id}${route?.path}`)}
-              >
+              <ListItemButton onClick={() => navigate(route?.path)}>
                 <ListItemIcon sx={{ color: '#FFFFFF95' }}>
                   {route?.icon}
                 </ListItemIcon>

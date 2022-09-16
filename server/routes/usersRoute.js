@@ -23,6 +23,10 @@ router
   .post(auth, usersController.userLogin);
 
 // get -- get the user information
-router.route('/auth/:id').get(auth, usersController.getUserInfo);
+// put -- update the user profile information
+router
+  .route('/auth/:id')
+  .get(auth, usersController.getUserInfo)
+  .put(auth, usersController.updateUserProfileInfo);
 
 module.exports = router;

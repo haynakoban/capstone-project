@@ -17,12 +17,12 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { StyledContainer } from '../../components/global/StyledContainer';
 import {
+  StyledContainer,
   SearchContainer,
   SearchIconWrapper,
   StyledInputBase,
-} from '../../components/global/Search';
+} from '../../components/global';
 import { rows } from '../member/data';
 import { useState } from 'react';
 

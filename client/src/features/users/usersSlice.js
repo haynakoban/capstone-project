@@ -10,6 +10,7 @@ const initialState = {
   error: null,
 };
 
+// validate if the user is logged in or not
 export const isUserLoggedIn = createAsyncThunk(
   'users/isUserLoggedIn',
   async () => {
@@ -23,6 +24,7 @@ export const isUserLoggedIn = createAsyncThunk(
   }
 );
 
+// log the user out
 export const userLogout = createAsyncThunk('users/userLogout', async () => {
   try {
     const response = await axios.get('/api/users/validation');
@@ -33,11 +35,91 @@ export const userLogout = createAsyncThunk('users/userLogout', async () => {
   }
 });
 
+// fetch the current user information
 export const fetchUserInfo = createAsyncThunk(
   'users/fetchUserInfo',
   async (id) => {
     try {
       const response = await axios.get(`/api/users/auth/${id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// update the current user profile information
+export const updateUserProfileInfo = createAsyncThunk(
+  'users/updateUserProfileInfo',
+  async (initialState) => {
+    const { _id, name, address, gender } = initialState;
+
+    try {
+      const response = await axios.put(`api/users/auth/${_id}`, {
+        name,
+        address,
+        gender,
+      });
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// update the current user contact information
+export const updateUserContactInfo = createAsyncThunk(
+  'users/updateUserContactInfo',
+  async (initialState) => {
+    const { _id, phoneNumber, email } = initialState;
+
+    try {
+      const response = await axios.put(`api/users/auth/${_id}`, {
+        phoneNumber,
+        email,
+      });
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// update the current user company information
+export const updateUserCompanyInfo = createAsyncThunk(
+  'users/updateUserCompanyInfo',
+  async (initialState) => {
+    const { _id, companyName, department, position } = initialState;
+
+    try {
+      const response = await axios.put(`api/users/auth/${_id}`, {
+        companyName,
+        department,
+        position,
+      });
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// update the current user school information
+export const updateUserSchoolInfo = createAsyncThunk(
+  'users/updateUserSchoolInfo',
+  async (initialState) => {
+    const { _id, schoolName, course, major } = initialState;
+
+    try {
+      const response = await axios.put(`api/users/auth/${_id}`, {
+        schoolName,
+        course,
+        major,
+      });
 
       return response.data;
     } catch (e) {
@@ -76,6 +158,26 @@ const usersSlice = createSlice({
         }
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateUserProfileInfo.fulfilled, (state, action) => {
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateUserContactInfo.fulfilled, (state, action) => {
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateUserCompanyInfo.fulfilled, (state, action) => {
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateUserSchoolInfo.fulfilled, (state, action) => {
         if (action.payload.user) {
           state.user = action.payload.user;
         }
