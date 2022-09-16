@@ -23,6 +23,13 @@ import Files from '../view/files';
 import Member from '../view/member';
 import Attendance from '../view/attendance';
 
+import Personalize from '../view/settings';
+import Profile from '../view/settings/Profile';
+import Resume from '../view/settings/Resume';
+import Invitation from '../view/settings/Invitation';
+import Request from '../view/settings/Request';
+import PageNotFound from '../view/404';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -53,6 +60,15 @@ const AppRoutes = () => {
       </Route>
       <Route path='login' element={<LogInPage />} />
       <Route path='signup' element={<SignUpPage />} />
+      <Route path='settings' element={<Personalize />}>
+        <Route index element={<PageNotFound />} />
+        <Route path='account' element={<Profile />} />
+        <Route path='resume' element={<Resume />} />
+        <Route path='invitation' element={<Invitation />} />
+        <Route path='request' element={<Request />} />
+      </Route>
+
+      <Route path='*' element={<PageNotFound />} />
     </Routes>
   );
 };

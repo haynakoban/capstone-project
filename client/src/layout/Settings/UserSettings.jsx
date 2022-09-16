@@ -16,7 +16,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 import { Fragment, useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchUserInfo,
@@ -27,7 +27,7 @@ import {
 
 const UserSettings = () => {
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
@@ -92,7 +92,7 @@ const UserSettings = () => {
                   p={2}
                   textAlign='center'
                   sx={{ color: '#000', cursor: 'pointer' }}
-                  onClick={() => console.log('clicked')}
+                  onClick={() => navigate(`/settings/account`)}
                 >
                   {user && user?.name}
                 </Typography>
@@ -100,11 +100,7 @@ const UserSettings = () => {
 
               <List>
                 <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      console.log('link to resume');
-                    }}
-                  >
+                  <ListItemButton onClick={() => navigate(`/settings/resume`)}>
                     <ListItemIcon sx={{ color: '#000000' }}>
                       <InsertDriveFileOutlinedIcon />
                     </ListItemIcon>
