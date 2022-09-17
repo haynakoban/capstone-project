@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
 
 const employeeInfo = {
-  hasCompany: {
-    type: Boolean,
+  listOfCompanies: {
+    type: Array,
     required: false,
-  },
-  companyInfo: {
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Companies',
@@ -109,10 +107,6 @@ const usersSchema = new mongoose.Schema({
   isIntern: {
     type: Boolean,
     required: true,
-  },
-  listOfCompanies: {
-    type: Array,
-    required: false,
   },
   employeeInfo,
   internInfo,

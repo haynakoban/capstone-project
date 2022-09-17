@@ -1,4 +1,4 @@
-const { Companies } = require('../../models');
+const { Companies, Users } = require('../../models');
 
 // create new room
 // post method | /api/companies
@@ -19,7 +19,17 @@ const createRoom = async (req, res, next) => {
       members,
     });
 
+    const user = await Users.findById({ _id: members });
+
+    if (!user) return res.json({ err: 'cannot find user' });
     if (!company) return res.json({ err: 'error' });
+
+    user.employeeInfo.listOfCompanies.push({
+      companyId: company._id,
+      name: company.name,
+    });
+
+    user.save();
 
     return res.status(201).json({ company });
   } catch (e) {
