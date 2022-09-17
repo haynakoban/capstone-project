@@ -9,6 +9,10 @@ const companiesSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  roomCode: {
+    type: String,
+    required: true,
+  },
   showRoom: {
     type: Boolean,
     required: false,

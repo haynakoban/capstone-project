@@ -12,9 +12,11 @@ router
   .post(auth, companiesController.createRoom);
 
 // get method -- retrieve the company/room information
-// post method -- validate the room name
-router.route('/validate').get(companiesController.getRoomInfo);
-// .post(companiesController.isRoomNameValid);
+// post method -- join to a room
+router
+  .route('/validate')
+  .get(companiesController.getRoomInfo)
+  .post(companiesController.joinRoom);
 
 // get method -- retrieve all my room
 router.route('/:id').get(companiesController.getMyRoom);

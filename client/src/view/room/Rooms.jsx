@@ -1,44 +1,34 @@
 import {
   Alert,
   Box,
-  Button,
   Container,
   Divider,
   Grid,
   IconButton,
-  Modal,
   Snackbar,
   Toolbar,
   Typography,
 } from '@mui/material';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 
 import CardRoom from '../../components/cards/CardRoom';
-import RoomField from '../../components/forms/RoomField';
-import TextInputField from '../../components/forms/TextInputField';
-import DescriptionField from '../../components/forms/DescriptionField';
-import PrivacyField from '../../components/forms/PrivacyField';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from '../../lib/authContext';
 
 import MainLayout from '../../layout/MainLayout';
 import {
-  StyledModalBox,
   SearchContainer,
   SearchIconWrapper,
   StyledInputBase,
 } from '../../components/global';
-import {
-  createNewRoom,
-  getMyRoom,
-  myRooms,
-} from '../../features/companies/companiesSlice';
+import { getMyRoom, myRooms } from '../../features/companies/companiesSlice';
+import CreateRoom from '../../components/room/CreateRoom';
+import JoinRoom from '../../components/room/JoinRoom';
 
 const Rooms = () => {
   const navigate = useNavigate();
@@ -46,32 +36,17 @@ const Rooms = () => {
   const roomList = useSelector(myRooms);
   const { _isUserAuth, _user } = useContext(AuthContext);
 
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [openSuccessSnackBar, setOpenSuccessSnackBar] = useState(false);
+  const [openCreateRoomSnackBar, setOpenCreateRoomSnackBar] = useState(false);
+  const [openJoinRoomSnackBar, setOpenJoinRoomSnackBar] = useState(false);
 
-  // handle modal
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  // handle create room snackbar
+  const handleCreateRoomOpen = () => setOpenCreateRoomSnackBar(true);
+  const handleCreateRoomClose = () => setOpenCreateRoomSnackBar(false);
 
-  // handle success snackbar
-  const handleSuccessOpen = () => setOpenSuccessSnackBar(true);
-  const handleSuccessClose = () => setOpenSuccessSnackBar(false);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      roomName: '',
-      companyName: '',
-      description: '',
-      showRoom: true,
-    },
-  });
+  // handle create room snackbar
+  const handleJoinRoomOpen = () => setOpenJoinRoomSnackBar(true);
+  const handleJoinRoomClose = () => setOpenJoinRoomSnackBar(false);
 
   // if authorize can access this page
   // otherwise redirect to login page
@@ -90,25 +65,6 @@ const Rooms = () => {
     }
   }, [dispatch, _user?._id]);
 
-  const handleFormSubmit = async (data) => {
-    const { roomName, companyName, description, showRoom } = data;
-
-    dispatch(
-      createNewRoom({
-        roomName,
-        companyName,
-        description,
-        showRoom,
-        createdBy: _user?.name,
-        members: _user?._id,
-      })
-    ).unwrap();
-
-    handleSuccessOpen();
-    handleClose();
-    reset({ roomName: '', companyName: '', description: '', showRoom: true });
-  };
-
   const RoomList = roomList.map((room) => (
     <Grid item xs={2} sm={4} md={4} lg={4} key={room?._id}>
       <CardRoom room={room} />
@@ -125,82 +81,29 @@ const Rooms = () => {
         {!_user?.isIntern && (
           <Fragment>
             {/* create room */}
-            <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant='outlined'
-                startIcon={<GroupAddOutlinedIcon />}
-                onClick={handleOpen}
-              >
-                Create Room
-              </Button>
-              <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby='modal-modal-title'
-                aria-describedby='modal-modal-description'
-              >
-                <StyledModalBox
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Toolbar
-                    sx={{ display: 'flex', justifyContent: 'center' }}
-                    disableGutters
-                  >
-                    <Typography variant='h6' component='h6' fontWeight={700}>
-                      Create a new room
-                    </Typography>
-                  </Toolbar>
-                  {/* Room Name */}
-                  <RoomField
-                    errors={errors.roomName?.message}
-                    name='roomName'
-                    label='Room Name'
-                    register={register}
-                    watch={watch}
-                    minlen={4}
-                  />
+            <Toolbar
+              sx={{
+                display: 'flex',
+                justifyContent: {
+                  xs: 'center',
+                  sm: 'flex-end',
+                  md: 'flex-end',
+                },
+                '> button:last-child': { ml: 2 },
+              }}
+            >
+              <CreateRoom
+                name={_user?.name}
+                id={_user?._id}
+                handleCreateRoomOpen={handleCreateRoomOpen}
+              />
 
-                  {/* Company Name */}
-                  <TextInputField
-                    errors={errors.companyName?.message}
-                    name='companyName'
-                    label='Company Name'
-                    register={register}
-                    watch={watch}
-                  />
-
-                  {/* Description of the Room */}
-                  <DescriptionField
-                    name='description'
-                    label='Description'
-                    register={register}
-                    watch={watch}
-                    message={`you can add description later once you decided. This field is optional`}
-                  />
-
-                  <PrivacyField
-                    name='showRoom'
-                    label='Privacy'
-                    register={register}
-                    watch={watch}
-                  />
-
-                  {/* create room */}
-                  <Button
-                    variant='contained'
-                    onClick={handleSubmit(handleFormSubmit)}
-                    type='submit'
-                    sx={{ marginX: 'auto' }}
-                  >
-                    Create
-                  </Button>
-                </StyledModalBox>
-              </Modal>
+              <JoinRoom
+                id={_user?._id}
+                handleJoinRoomOpen={handleJoinRoomOpen}
+              />
             </Toolbar>
+
             <Divider sx={{ bgcolor: '#00000050' }} />
           </Fragment>
         )}
@@ -246,17 +149,31 @@ const Rooms = () => {
         </Box>
       </Container>
       <Snackbar
-        open={openSuccessSnackBar}
+        open={openCreateRoomSnackBar}
         autoHideDuration={6000}
-        onClose={handleSuccessClose}
+        onClose={handleCreateRoomClose}
       >
         <Alert
-          onClose={handleSuccessClose}
+          onClose={handleCreateRoomClose}
           severity='success'
           variant='filled'
           sx={{ width: '100%' }}
         >
           New Room Created
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openJoinRoomSnackBar}
+        autoHideDuration={6000}
+        onClose={handleJoinRoomClose}
+      >
+        <Alert
+          onClose={handleJoinRoomClose}
+          severity='success'
+          variant='filled'
+          sx={{ width: '100%' }}
+        >
+          Successfully Joined in a Room
         </Alert>
       </Snackbar>
     </Fragment>

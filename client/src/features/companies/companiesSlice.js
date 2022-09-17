@@ -51,6 +51,26 @@ export const createNewRoom = createAsyncThunk(
   }
 );
 
+// join room (only for employee)
+export const joinRoom = createAsyncThunk(
+  'companies/joinRoom',
+  async (initialState) => {
+    try {
+      const { companyName, roomCode, id } = initialState;
+
+      const response = await axios.post('api/companies/validate', {
+        companyName,
+        roomCode,
+        id,
+      });
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 // retrieve the list of rooms by using id
 export const getMyRoom = createAsyncThunk(
   'companies/getMyRoom',
@@ -87,12 +107,22 @@ const companiesSlice = createSlice({
         if (action.payload.rooms) {
           state.rooms = action.payload.rooms;
         }
+      })
+      .addCase(joinRoom.fulfilled, (state, action) => {
+        if (action.payload.err) {
+          state.error = action.payload.err;
+        }
+
+        if (action.payload.rooms) {
+          state.rooms.push(action.payload?.rooms);
+        }
       });
   },
 });
 
 export const getRooms = (state) => state.companies.companies;
 export const myRooms = (state) => state.companies.rooms;
+export const getError = (state) => state.companies.error;
 
 // export const roomStatus = (state) => state.companies.status;
 

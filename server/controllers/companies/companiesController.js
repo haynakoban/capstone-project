@@ -1,5 +1,9 @@
 const { Companies, Users } = require('../../models');
 
+const genRoomCode = () => {
+  return require('crypto').randomBytes(10).toString('base64url');
+};
+
 // create new room
 // post method | /api/companies
 const createRoom = async (req, res, next) => {
@@ -12,6 +16,8 @@ const createRoom = async (req, res, next) => {
       [roomName, companyName, createdBy, members].every(Boolean) &&
       (showRoom === true || showRoom === false);
 
+    const roomCode = genRoomCode();
+
     if (!canSave)
       return res.status(400).json({ err: 'required field must be filled' });
 
@@ -21,6 +27,7 @@ const createRoom = async (req, res, next) => {
       companyName,
       description,
       showRoom,
+      roomCode,
       createdBy,
       members,
     });
@@ -32,7 +39,7 @@ const createRoom = async (req, res, next) => {
 
     user.employeeInfo.listOfCompanies.push({
       companyId: company._id,
-      name: company.name,
+      roomName: company.roomName,
     });
 
     user.save();
@@ -91,6 +98,57 @@ const getMyRoom = async (req, res, next) => {
 //   }
 // };
 
+// join a room (for employee)
+// post method | /api/companies/validate
+const joinRoom = async (req, res, next) => {
+  try {
+    const { companyName, roomCode, id } = req.body;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [companyName, roomCode, id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    // join in a company
+    const company = await Companies.findOne({
+      companyName,
+      roomCode,
+    }).exec();
+
+    // check if the user is already in the room
+    const isJoined = company?.members.some((element) => element === id);
+
+    // if user is in the room aldreay return err
+    if (isJoined) return res.json({ err: 'user is already in the room' });
+
+    // validate if the company exist, if not the system will send an error
+    if (!company) return res.json({ err: 'invalid code or company name' });
+
+    // if the user successfully enter the correct code for the room and company name.
+    // this code add the user in the company as member
+    company.members.push(id);
+    company.save();
+
+    // find the user with the id: id
+    const user = await Users.findById({ _id: id });
+
+    if (!user) return res.json({ err: 'cannot find user' });
+
+    // this line of code add the company in the user collection as one of its company
+    user.employeeInfo.listOfCompanies.push({
+      companyId: company._id,
+      roomName: company.roomName,
+    });
+
+    user.save();
+
+    return res.status(201).json({ rooms: company });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // retrieve the room information
 // get method | /api/companies/validate
 const getRoomInfo = async (req, res, next) => {
@@ -105,5 +163,6 @@ module.exports = {
   getMyRoom,
   getRoomInfo,
   getRooms,
+  joinRoom,
   // isRoomNameValid,
 };
