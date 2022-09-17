@@ -15,8 +15,8 @@ const mainTheme = createTheme({
       transparent: '#FEC40050',
     },
     success: {
-      main: '#29CC97',
-      transparent: '#29CC9750',
+      main: '#198754',
+      transparent: '#19875450',
     },
   },
   typography: {
