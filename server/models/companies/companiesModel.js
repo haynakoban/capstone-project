@@ -1,13 +1,21 @@
 const mongoose = require('mongoose');
 
 const companiesSchema = new mongoose.Schema({
-  name: {
+  roomName: {
     type: String,
     required: true,
   },
+  companyName: {
+    type: String,
+    required: false,
+  },
+  showRoom: {
+    type: Boolean,
+    required: false,
+  },
   description: {
     type: String,
-    default: '',
+    required: false,
   },
   image: {
     type: String,

@@ -15,8 +15,11 @@ import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 
-import photo from '../../assets/svg/online_learning_re_qw08.svg';
+import CardRoom from '../../components/cards/CardRoom';
 import RoomField from '../../components/forms/RoomField';
+import TextInputField from '../../components/forms/TextInputField';
+import DescriptionField from '../../components/forms/DescriptionField';
+import PrivacyField from '../../components/forms/PrivacyField';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +30,6 @@ import { AuthContext } from '../../lib/authContext';
 import MainLayout from '../../layout/MainLayout';
 import {
   StyledModalBox,
-  Item,
   SearchContainer,
   SearchIconWrapper,
   StyledInputBase,
@@ -65,6 +67,9 @@ const Rooms = () => {
   } = useForm({
     defaultValues: {
       roomName: '',
+      companyName: '',
+      description: '',
+      showRoom: true,
     },
   });
 
@@ -86,11 +91,14 @@ const Rooms = () => {
   }, [dispatch, _user?._id]);
 
   const handleFormSubmit = async (data) => {
-    const { roomName } = data;
+    const { roomName, companyName, description, showRoom } = data;
 
     dispatch(
       createNewRoom({
-        name: roomName,
+        roomName,
+        companyName,
+        description,
+        showRoom,
         createdBy: _user?.name,
         members: _user?._id,
       })
@@ -98,8 +106,14 @@ const Rooms = () => {
 
     handleSuccessOpen();
     handleClose();
-    reset({ roomName: '' });
+    reset({ roomName: '', companyName: '', description: '', showRoom: true });
   };
+
+  const RoomList = roomList.map((room) => (
+    <Grid item xs={2} sm={4} md={4} lg={4} key={room?._id}>
+      <CardRoom room={room} />
+    </Grid>
+  ));
 
   return (
     <Fragment>
@@ -148,6 +162,31 @@ const Rooms = () => {
                     register={register}
                     watch={watch}
                     minlen={4}
+                  />
+
+                  {/* Company Name */}
+                  <TextInputField
+                    errors={errors.companyName?.message}
+                    name='companyName'
+                    label='Company Name'
+                    register={register}
+                    watch={watch}
+                  />
+
+                  {/* Description of the Room */}
+                  <DescriptionField
+                    name='description'
+                    label='Description'
+                    register={register}
+                    watch={watch}
+                    message={`you can add description later once you decided. This field is optional`}
+                  />
+
+                  <PrivacyField
+                    name='showRoom'
+                    label='Privacy'
+                    register={register}
+                    watch={watch}
                   />
 
                   {/* create room */}
@@ -201,33 +240,7 @@ const Rooms = () => {
               spacing={{ xs: 1, sm: 2, md: 3 }}
               columns={{ xs: 4, sm: 8, md: 12, lg: 16 }}
             >
-              {roomList.map((room) => (
-                <Grid item xs={2} sm={4} md={4} lg={4} key={room?._id}>
-                  <Item>
-                    <img
-                      src={photo}
-                      alt='just a normal'
-                      width={45}
-                      height={45}
-                      className='company_logo'
-                      style={{
-                        alignSelf: 'flex-end',
-                      }}
-                    />
-
-                    <Typography fontWeight={500} fontSize='1.25rem' mt={1}>
-                      {room?.name}
-                    </Typography>
-                    <Button
-                      variant='contained'
-                      sx={{ mt: 2, alignSelf: 'flex-end' }}
-                      onClick={() => navigate(`/room/${room?._id}`)}
-                    >
-                      Dashboard
-                    </Button>
-                  </Item>
-                </Grid>
-              ))}
+              {RoomList}
             </Grid>
           )}
         </Box>

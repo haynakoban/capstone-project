@@ -13,10 +13,8 @@ router
 
 // get method -- retrieve the company/room information
 // post method -- validate the room name
-router
-  .route('/validate')
-  .get(companiesController.getRoomInfo)
-  .post(companiesController.isRoomNameValid);
+router.route('/validate').get(companiesController.getRoomInfo);
+// .post(companiesController.isRoomNameValid);
 
 // get method -- retrieve all my room
 router.route('/:id').get(companiesController.getMyRoom);

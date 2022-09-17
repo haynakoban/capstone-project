@@ -4,7 +4,6 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
-import axios from '../../lib/axiosConfig';
 
 const isValidUsername = (username) =>
   // validate weather the username begin with latter
@@ -12,13 +11,7 @@ const isValidUsername = (username) =>
 
 const RoomField = ({ errors, name, label, minlen, register, watch }) => {
   const handleValidation = async (roomname) => {
-    const result = await axios.post('api/companies/validate', {
-      name: roomname,
-    });
-
-    if (result.data?.err) {
-      return result.data?.err;
-    } else if (isValidUsername(roomname[0])) {
+    if (isValidUsername(roomname[0])) {
       return true;
     } else {
       return 'room name must begin with a letter';
