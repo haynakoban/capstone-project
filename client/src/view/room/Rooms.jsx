@@ -93,7 +93,6 @@ const Rooms = () => {
               }}
             >
               <CreateRoom
-                name={_user?.name}
                 id={_user?._id}
                 handleCreateRoomOpen={handleCreateRoomOpen}
               />

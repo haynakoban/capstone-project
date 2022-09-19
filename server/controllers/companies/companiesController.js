@@ -8,12 +8,11 @@ const genRoomCode = () => {
 // post method | /api/companies
 const createRoom = async (req, res, next) => {
   try {
-    const { roomName, companyName, description, showRoom, createdBy, members } =
-      req.body;
+    const { roomName, companyName, description, showRoom, id } = req.body;
 
     // if one is empty or missing the result return false, otherwise true.
     const canSave =
-      [roomName, companyName, createdBy, members].every(Boolean) &&
+      [roomName, companyName, id].every(Boolean) &&
       (showRoom === true || showRoom === false);
 
     const roomCode = genRoomCode();
@@ -28,11 +27,11 @@ const createRoom = async (req, res, next) => {
       description,
       showRoom,
       roomCode,
-      createdBy,
-      members,
+      createdBy: id,
+      members: [{ id, roles: 'owner' }],
     });
 
-    const user = await Users.findById({ _id: members });
+    const user = await Users.findById({ _id: id });
 
     if (!user) return res.json({ err: 'cannot find user' });
     if (!company) return res.json({ err: 'error' });
@@ -70,7 +69,7 @@ const getMyRoom = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const findCompany = await Companies.find({ members: id });
+    const findCompany = await Companies.find({ 'members.id': id });
 
     if (!findCompany) return res.json({ err: 'room name is taken' });
 
@@ -117,7 +116,7 @@ const joinRoom = async (req, res, next) => {
     }).exec();
 
     // check if the user is already in the room
-    const isJoined = company?.members.some((element) => element === id);
+    const isJoined = company?.members.some((e) => e.id === id);
 
     // if user is in the room aldreay return err
     if (isJoined) return res.json({ err: 'user is already in the room' });
@@ -127,7 +126,7 @@ const joinRoom = async (req, res, next) => {
 
     // if the user successfully enter the correct code for the room and company name.
     // this code add the user in the company as member
-    company.members.push(id);
+    company.members.push({ id, roles: 'member' });
     company.save();
 
     // find the user with the id: id

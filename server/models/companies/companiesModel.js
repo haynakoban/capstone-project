@@ -28,10 +28,20 @@ const companiesSchema = new mongoose.Schema({
   members: {
     type: Array,
     default: [],
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: false,
+    },
+    roles: {
+      type: String,
+      required: false,
+    },
   },
   createdBy: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+    required: false,
   },
   createdAt: {
     type: Date,

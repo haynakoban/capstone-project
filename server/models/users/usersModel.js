@@ -68,6 +68,21 @@ const internInfo = {
   },
 };
 
+const docs = {
+  resume: {
+    type: String,
+    required: false,
+  },
+  cv: {
+    type: String,
+    required: false,
+  },
+  letter: {
+    type: String,
+    required: false,
+  },
+};
+
 const usersSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -110,6 +125,7 @@ const usersSchema = new mongoose.Schema({
   },
   employeeInfo,
   internInfo,
+  docs,
   createdAt: {
     type: Date,
     default: () => Date.now(),

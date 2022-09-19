@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { StyledModalBox } from '../global';
 import { createNewRoom } from '../../features/companies/companiesSlice';
 
-const CreateRoom = ({ name, id, handleCreateRoomOpen }) => {
+const CreateRoom = ({ id, handleCreateRoomOpen }) => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
@@ -46,7 +46,6 @@ const CreateRoom = ({ name, id, handleCreateRoomOpen }) => {
         companyName,
         description,
         showRoom,
-        createdBy: name,
         members: id,
       })
     ).unwrap();
