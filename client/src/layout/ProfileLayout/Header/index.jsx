@@ -3,7 +3,7 @@ import SideDrawerBar from './SideDrawerBar';
 // outlined icons
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import PendingActionsOutlinedIcon from '@mui/icons-material/PendingActionsOutlined';
 
@@ -21,7 +21,7 @@ const routes = [
   {
     name: 'Resume',
     path: '/settings/resume',
-    icon: <ArticleOutlinedIcon />,
+    icon: <InsertDriveFileOutlinedIcon />,
   },
   {
     name: 'Invitation',

@@ -26,22 +26,15 @@ export const createNewRoom = createAsyncThunk(
   'companies/createNewRoom',
   async (initialState) => {
     try {
-      const {
-        roomName,
-        companyName,
-        description,
-        showRoom,
-        createdBy,
-        members,
-      } = initialState;
+      const { roomName, companyName, description, showRoom, members } =
+        initialState;
 
       const response = await axios.post('api/companies', {
         roomName,
         companyName,
         description,
         showRoom,
-        createdBy,
-        members,
+        id: members,
       });
 
       return response.data;
