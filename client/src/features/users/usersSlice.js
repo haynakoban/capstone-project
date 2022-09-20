@@ -53,13 +53,14 @@ export const fetchUserInfo = createAsyncThunk(
 export const updateUserProfileInfo = createAsyncThunk(
   'users/updateUserProfileInfo',
   async (initialState) => {
-    const { _id, name, address, gender } = initialState;
+    const { _id, name, address, gender, isIntern } = initialState;
 
     try {
       const response = await axios.put(`api/users/auth/${_id}`, {
         name,
         address,
         gender,
+        isIntern,
       });
 
       return response.data;
@@ -73,12 +74,13 @@ export const updateUserProfileInfo = createAsyncThunk(
 export const updateUserContactInfo = createAsyncThunk(
   'users/updateUserContactInfo',
   async (initialState) => {
-    const { _id, phoneNumber, email } = initialState;
+    const { _id, phoneNumber, email, isIntern } = initialState;
 
     try {
       const response = await axios.put(`api/users/auth/${_id}`, {
         phoneNumber,
         email,
+        isIntern,
       });
 
       return response.data;
@@ -92,13 +94,14 @@ export const updateUserContactInfo = createAsyncThunk(
 export const updateUserCompanyInfo = createAsyncThunk(
   'users/updateUserCompanyInfo',
   async (initialState) => {
-    const { _id, companyName, department, position } = initialState;
+    const { _id, companyName, department, position, isIntern } = initialState;
 
     try {
       const response = await axios.put(`api/users/auth/${_id}`, {
         companyName,
         department,
         position,
+        isIntern,
       });
 
       return response.data;
@@ -112,13 +115,14 @@ export const updateUserCompanyInfo = createAsyncThunk(
 export const updateUserSchoolInfo = createAsyncThunk(
   'users/updateUserSchoolInfo',
   async (initialState) => {
-    const { _id, schoolName, course, major } = initialState;
+    const { _id, schoolName, course, major, isIntern } = initialState;
 
     try {
       const response = await axios.put(`api/users/auth/${_id}`, {
         schoolName,
         course,
         major,
+        isIntern,
       });
 
       return response.data;

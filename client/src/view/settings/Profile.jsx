@@ -126,54 +126,54 @@ const Profile = () => {
 
           {_user?.isIntern ? (
             <StackContainer>
-              {_user?.internInfo?.schoolName && (
+              {_user?.internInfo?.school?.name && (
                 <StyledStack>
                   <Typography variant='caption'>School Name</Typography>
                   <Typography variant='body1'>
-                    {_user?.internInfo?.schoolName}
+                    {_user?.internInfo?.school?.name}
                   </Typography>
                 </StyledStack>
               )}
-              {_user?.internInfo?.course && (
+              {_user?.internInfo?.school?.course && (
                 <StyledStack>
                   <Typography variant='caption'>Course</Typography>
                   <Typography variant='body1'>
-                    {_user?.internInfo?.course}
+                    {_user?.internInfo?.school?.course}
                   </Typography>
                 </StyledStack>
               )}
-              {_user?.internInfo?.major && (
+              {_user?.internInfo?.school?.major && (
                 <StyledStack borderBottom='1px solid #20212850'>
                   <Typography variant='caption'>Major</Typography>
                   <Typography variant='body1'>
-                    {_user?.internInfo?.major}
+                    {_user?.internInfo?.school?.major}
                   </Typography>
                 </StyledStack>
               )}
             </StackContainer>
           ) : (
             <StackContainer>
-              {_user?.employeeInfo?.companyName && (
+              {_user?.employeeInfo?.company?.name && (
                 <StyledStack>
                   <Typography variant='caption'>Company Name</Typography>
                   <Typography variant='body1'>
-                    {_user?.employeeInfo?.companyName}
+                    {_user?.employeeInfo?.company?.name}
                   </Typography>
                 </StyledStack>
               )}
-              {_user?.employeeInfo?.department && (
+              {_user?.employeeInfo?.company?.department && (
                 <StyledStack>
                   <Typography variant='caption'>Department</Typography>
                   <Typography variant='body1'>
-                    {_user?.employeeInfo?.department}
+                    {_user?.employeeInfo?.company?.department}
                   </Typography>
                 </StyledStack>
               )}
-              {_user?.employeeInfo?.position && (
+              {_user?.employeeInfo?.company?.position && (
                 <StyledStack borderBottom='1px solid #20212850'>
                   <Typography variant='caption'>Position</Typography>
                   <Typography variant='body1'>
-                    {_user?.employeeInfo?.position}
+                    {_user?.employeeInfo?.company?.position}
                   </Typography>
                 </StyledStack>
               )}

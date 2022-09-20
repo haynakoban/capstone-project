@@ -42,7 +42,12 @@ const ContactAction = () => {
     const { phoneNumber, email } = data;
 
     dispatch(
-      updateUserContactInfo({ _id: user?._id, phoneNumber, email })
+      updateUserContactInfo({
+        _id: user?._id,
+        phoneNumber,
+        email,
+        isIntern: user?.isIntern,
+      })
     ).unwrap();
 
     handleClose();

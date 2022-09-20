@@ -9,22 +9,20 @@ const employeeInfo = {
       ref: 'Companies',
       required: false,
     },
+  },
+  company: {
     name: {
       type: String,
       required: false,
     },
-  },
-  companyName: {
-    type: String,
-    required: false,
-  },
-  department: {
-    type: String,
-    required: false,
-  },
-  position: {
-    type: String,
-    required: false,
+    department: {
+      type: String,
+      required: false,
+    },
+    position: {
+      type: String,
+      required: false,
+    },
   },
 };
 
@@ -39,22 +37,20 @@ const internInfo = {
       ref: 'Companies',
       required: false,
     },
+  },
+  school: {
     name: {
       type: String,
       required: false,
     },
-  },
-  schoolName: {
-    type: String,
-    required: false,
-  },
-  course: {
-    type: String,
-    required: false,
-  },
-  major: {
-    type: String,
-    required: false,
+    course: {
+      type: String,
+      required: false,
+    },
+    major: {
+      type: String,
+      required: false,
+    },
   },
   workingHours: {
     completed: {

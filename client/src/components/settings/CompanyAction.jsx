@@ -52,6 +52,7 @@ const ContactAction = () => {
         companyName,
         department,
         position,
+        isIntern: user?.isIntern,
       })
     ).unwrap();
 
