@@ -52,6 +52,7 @@ const ContactAction = () => {
         schoolName,
         course,
         major,
+        isIntern: user?.isIntern,
       })
     ).unwrap();
 

@@ -57,7 +57,13 @@ const ProfileAction = () => {
       setError(false);
 
       dispatch(
-        updateUserProfileInfo({ _id: user?._id, name, address, gender })
+        updateUserProfileInfo({
+          _id: user?._id,
+          name,
+          address,
+          gender,
+          isIntern: user?.isIntern,
+        })
       ).unwrap();
       setValues({
         name: '',

@@ -131,8 +131,15 @@ const getUserInfo = async (req, res, next) => {
 const updateUserProfileInfo = async (req, res, next) => {
   try {
     const id = req.params.id;
+    const { isIntern } = req.body;
 
-    const findUser = await Users.findById(id).exec();
+    let findUser;
+
+    if (isIntern) {
+      findUser = await Users.findById(id, '-employeeInfo').exec();
+    } else {
+      findUser = await Users.findById(id, '-internInfo').exec();
+    }
 
     if (!findUser) return res.json({ err: `no data found with the id: ${id}` });
 
@@ -177,14 +184,14 @@ const updateUserProfileInfo = async (req, res, next) => {
       const { companyName, department, position } = req.body;
       const date = new Date();
 
-      if (companyName) findUser.employeeInfo.companyName = companyName;
-      else if (companyName === '') findUser.employeeInfo.companyName = '';
+      if (companyName) findUser.employeeInfo.company.name = companyName;
+      else if (companyName === '') findUser.employeeInfo.company.name = '';
 
-      if (department) findUser.employeeInfo.department = department;
-      else if (department === '') findUser.employeeInfo.department = '';
+      if (department) findUser.employeeInfo.company.department = department;
+      else if (department === '') findUser.employeeInfo.company.department = '';
 
-      if (position) findUser.employeeInfo.position = position;
-      else if (position === '') findUser.employeeInfo.position = '';
+      if (position) findUser.employeeInfo.company.position = position;
+      else if (position === '') findUser.employeeInfo.company.position = '';
 
       findUser.updatedAt = date;
 
@@ -197,14 +204,14 @@ const updateUserProfileInfo = async (req, res, next) => {
       const { schoolName, course, major } = req.body;
       const date = new Date();
 
-      if (schoolName) findUser.internInfo.schoolName = schoolName;
-      else if (schoolName === '') findUser.internInfo.schoolName = '';
+      if (schoolName) findUser.internInfo.school.name = schoolName;
+      else if (schoolName === '') findUser.internInfo.school.name = '';
 
-      if (course) findUser.internInfo.course = course;
-      else if (course === '') findUser.internInfo.course = '';
+      if (course) findUser.internInfo.school.course = course;
+      else if (course === '') findUser.internInfo.school.course = '';
 
-      if (major) findUser.internInfo.major = major;
-      else if (major === '') findUser.internInfo.major = '';
+      if (major) findUser.internInfo.school.major = major;
+      else if (major === '') findUser.internInfo.school.major = '';
 
       findUser.updatedAt = date;
 
