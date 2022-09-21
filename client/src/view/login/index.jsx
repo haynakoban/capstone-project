@@ -85,8 +85,8 @@ const LogInPage = () => {
               border: '1px solid #00000030',
               width: {
                 xs: '100%',
-                sm: 300,
-                md: 300,
+                sm: 420,
+                md: 420,
               },
               position: 'relative',
             }}

@@ -62,6 +62,19 @@ const internInfo = {
       required: false,
     },
   },
+  request: {
+    type: Array,
+    default: [],
+    company_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Companies',
+      required: false,
+    },
+    requestedAt: {
+      type: Date,
+      required: false,
+    },
+  },
 };
 
 const docs = {

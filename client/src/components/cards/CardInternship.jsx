@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import photo from '../../assets/svg/online_learning_re_qw08.svg';
+import ApplyInternship from '../internship/ApplyInternship';
 
 const CardInternship = ({ room }) => {
   return (
@@ -75,13 +76,7 @@ const CardInternship = ({ room }) => {
             >
               Details
             </Button>
-            <Button
-              variant='contained'
-              color='success'
-              onClick={() => console.log('send file')}
-            >
-              Apply
-            </Button>
+            <ApplyInternship id={room?._id} />
           </Box>
         </CardContent>
       </Box>

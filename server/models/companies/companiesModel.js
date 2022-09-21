@@ -38,6 +38,24 @@ const companiesSchema = new mongoose.Schema({
       required: false,
     },
   },
+  pending: {
+    type: Array,
+    default: [],
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: false,
+    },
+    file_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Uploads',
+      required: false,
+    },
+    requestedAt: {
+      type: Date,
+      required: false,
+    },
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users',
