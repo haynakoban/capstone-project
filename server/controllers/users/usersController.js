@@ -1,5 +1,6 @@
-const { Users } = require('../../models');
+const { Companies, Users } = require('../../models');
 const bcryptjs = require('bcryptjs');
+const { delete_file } = require('../../config/db');
 
 // check if username is valid
 // post method | /api/users/validation
@@ -238,6 +239,53 @@ const userLogout = async (req, res, next) => {
   }
 };
 
+const uploadFile = async (req, res, next) => {
+  try {
+    const { company_id, user_id } = req.body;
+
+    const date = new Date();
+
+    const findCompany = await Companies.findById({ _id: company_id });
+    const findUser = await Users.findById({ _id: user_id }, '-employeeInfo');
+
+    if (!findCompany || !findUser)
+      return res.json({ err: `no compamy found with an id: ${company_id}` });
+
+    // check if the user is already in the appply in this company
+    const isApplied_company = findCompany?.pending.some(
+      (e) => e.user_id === user_id
+    );
+    const isApplied_user = findUser?.internInfo?.request.some(
+      (e) => e.company_id === company_id
+    );
+
+    // if user is in the room aldreay return err
+    if (isApplied_company && isApplied_user)
+      return res.json({
+        err: 'user is already applied in this company',
+        file_id: req.file.id,
+      });
+
+    findCompany.pending.push({
+      user_id,
+      file_id: req.file.id,
+      requestedAt: date,
+    });
+
+    findUser.internInfo.request.push({
+      company_id,
+      requestedAt: date,
+    });
+
+    findCompany.save();
+    findUser.save();
+
+    return res.json({ file: req.file, company: findCompany });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createNewUser,
   getUserInfo,
@@ -246,4 +294,5 @@ module.exports = {
   updateUserProfileInfo,
   userLogin,
   userLogout,
+  uploadFile,
 };

@@ -6,6 +6,7 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 
 import './styles/main.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import theme from './lib/theme';
 import { ThemeProvider } from '@mui/material/styles';
 

@@ -69,6 +69,7 @@ const JoinRoom = ({ id, handleJoinRoomOpen }) => {
         Join Room
       </Button>
       <Modal
+        keepMounted
         open={open}
         onClose={handleClose}
         aria-labelledby='modal-modal-title'

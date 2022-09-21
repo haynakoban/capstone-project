@@ -3105,6 +3105,11 @@
   "resolved" "https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz"
   "version" "1.0.0"
 
+"bootstrap@^5.2.1":
+  "integrity" "sha512-UQi3v2NpVPEi1n35dmRRzBJFlgvWHYwyem6yHhuT6afYF+sziEt46McRbT//kVXZ7b1YUYEVGdXEH74Nx3xzGA=="
+  "resolved" "https://registry.npmjs.org/bootstrap/-/bootstrap-5.2.1.tgz"
+  "version" "5.2.1"
+
 "brace-expansion@^1.1.7":
   "integrity" "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA=="
   "resolved" "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"

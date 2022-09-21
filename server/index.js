@@ -8,6 +8,7 @@ require('dotenv').config();
 
 // db
 require('./config/db');
+require('./config/conn');
 
 // access port
 const ACCESS_PORT = process.env.ACCESS_PORT || 5000;

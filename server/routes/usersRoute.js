@@ -1,4 +1,5 @@
 const express = require('express');
+const { upload, delete_file } = require('../config/conn');
 const router = express.Router();
 const { usersController } = require('../controllers');
 
@@ -28,5 +29,11 @@ router
   .route('/auth/:id')
   .get(auth, usersController.getUserInfo)
   .put(auth, usersController.updateUserProfileInfo);
+
+router
+  .route('/uploads')
+  .post(upload.single('file'), usersController.uploadFile);
+
+router.route('/files/:id').delete(delete_file);
 
 module.exports = router;

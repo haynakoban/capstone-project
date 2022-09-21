@@ -65,6 +65,7 @@ const CreateRoom = ({ id, handleCreateRoomOpen }) => {
         Create Room
       </Button>
       <Modal
+        keepMounted
         open={open}
         onClose={handleClose}
         aria-labelledby='modal-modal-title'
