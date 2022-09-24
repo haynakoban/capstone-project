@@ -1,9 +1,8 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Button, IconButton, Modal, Toolbar, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { StyledModalBox } from '../global';
 
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {

@@ -79,16 +79,49 @@ const internInfo = {
 
 const docs = {
   resume: {
-    type: String,
-    required: false,
+    file_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Uploads',
+      required: false,
+    },
+    file_name: {
+      type: String,
+      required: false,
+    },
+    createdAt: {
+      type: Date,
+      required: false,
+    },
   },
   cv: {
-    type: String,
-    required: false,
+    file_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Uploads',
+      required: false,
+    },
+    file_name: {
+      type: String,
+      required: false,
+    },
+    createdAt: {
+      type: Date,
+      required: false,
+    },
   },
   letter: {
-    type: String,
-    required: false,
+    file_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Uploads',
+      required: false,
+    },
+    file_name: {
+      type: String,
+      required: false,
+    },
+    createdAt: {
+      type: Date,
+      required: false,
+    },
   },
 };
 
