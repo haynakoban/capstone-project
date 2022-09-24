@@ -38,7 +38,7 @@ const companiesSchema = new mongoose.Schema({
       required: false,
     },
   },
-  pending: {
+  request: {
     type: Array,
     default: [],
     user_id: {
@@ -51,7 +51,20 @@ const companiesSchema = new mongoose.Schema({
       ref: 'Uploads',
       required: false,
     },
-    requestedAt: {
+    createdAt: {
+      type: Date,
+      required: false,
+    },
+  },
+  pending: {
+    type: Array,
+    default: [],
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: false,
+    },
+    createdAt: {
       type: Date,
       required: false,
     },

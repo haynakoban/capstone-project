@@ -67,7 +67,12 @@ const ApplyInternship = ({ id }) => {
           }
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() =>
+        setTimeout(() => {
+          handleClose();
+        }, 2000)
+      );
   };
 
   return (

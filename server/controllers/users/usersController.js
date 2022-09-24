@@ -252,10 +252,10 @@ const uploadFile = async (req, res, next) => {
       return res.json({ err: `no compamy found with an id: ${company_id}` });
 
     // check if the user is already in the appply in this company
-    const isApplied_company = findCompany?.pending.some(
+    const isApplied_company = findCompany?.request.some(
       (e) => e.user_id === user_id
     );
-    const isApplied_user = findUser?.internInfo?.request.some(
+    const isApplied_user = findUser?.internInfo?.pending.some(
       (e) => e.company_id === company_id
     );
 
@@ -266,15 +266,16 @@ const uploadFile = async (req, res, next) => {
         file_id: req.file.id,
       });
 
-    findCompany.pending.push({
+    findCompany.request.push({
       user_id,
       file_id: req.file.id,
-      requestedAt: date,
+      createdAt: date,
     });
 
-    findUser.internInfo.request.push({
+    findUser.internInfo.pending.push({
       company_id,
-      requestedAt: date,
+      company_name: findCompany.companyName,
+      createdAt: date,
     });
 
     findCompany.save();
