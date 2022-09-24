@@ -1,12 +1,12 @@
 import { Box, CardMedia, Stack, Typography } from '@mui/material';
 import { StyledContainer } from '../../components/global';
 import photo from '../../assets/sample/logo2_(bnb).png';
-
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
 import ProfileLayout from '../../layout/ProfileLayout';
+import TimeAgo from '../../components/settings/request/TimeAgo';
 
 const Request = () => {
   const navigate = useNavigate();
@@ -21,41 +21,43 @@ const Request = () => {
     }
   }, [_isUserAuth, _user?.isIntern, navigate]);
 
+  let content;
+
+  if (_user?.internInfo?.pending.length <= 0) {
+    content = 'No pending request';
+  } else {
+    content = _user?.internInfo?.pending?.map((req) => (
+      <Box
+        key={req.company_id}
+        sx={{
+          p: 2,
+          mb: 3,
+          border: '1px solid #20212870',
+        }}
+      >
+        <Stack display='flex' direction='row' justifyContent='space-between'>
+          <Box display='flex' flexDirection='column'>
+            <Typography variant='h6' fontWeight={700}>
+              {req.company_name}
+            </Typography>
+            <TimeAgo timestamp={req.createdAt} />
+          </Box>
+
+          <CardMedia
+            component='img'
+            sx={{ width: 51.906 }}
+            image={photo}
+            alt='just a normal'
+            className='company_logo'
+          />
+        </Stack>
+      </Box>
+    ));
+  }
+
   return (
     <ProfileLayout>
-      <StyledContainer width='lg'>
-        {[1, 2, 3, 5, 6].map((_, i) => (
-          <Box
-            key={i}
-            sx={{
-              p: 2,
-              mb: 3,
-              border: '1px solid #20212870',
-            }}
-          >
-            <Stack
-              display='flex'
-              direction='row'
-              justifyContent='space-between'
-            >
-              <Box display='flex' flexDirection='column'>
-                <Typography variant='h6' fontWeight={700}>
-                  Google
-                </Typography>
-                <Typography variant='caption'>7 days ago</Typography>
-              </Box>
-
-              <CardMedia
-                component='img'
-                sx={{ width: 51.906 }}
-                image={photo}
-                alt='just a normal'
-                className='company_logo'
-              />
-            </Stack>
-          </Box>
-        ))}
-      </StyledContainer>
+      <StyledContainer width='lg'>{content}</StyledContainer>
     </ProfileLayout>
   );
 };

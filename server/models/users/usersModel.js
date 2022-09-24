@@ -62,7 +62,7 @@ const internInfo = {
       required: false,
     },
   },
-  request: {
+  pending: {
     type: Array,
     default: [],
     company_id: {
@@ -70,7 +70,28 @@ const internInfo = {
       ref: 'Companies',
       required: false,
     },
-    requestedAt: {
+    company_name: {
+      type: String,
+      required: false,
+    },
+    createdAt: {
+      type: Date,
+      required: false,
+    },
+  },
+  offers: {
+    type: Array,
+    default: [],
+    company_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Companies',
+      required: false,
+    },
+    company_name: {
+      type: String,
+      required: false,
+    },
+    createdAt: {
       type: Date,
       required: false,
     },
