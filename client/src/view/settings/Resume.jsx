@@ -1,5 +1,4 @@
-import { IconButton, Paper, Stack, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Paper, Stack, Typography } from '@mui/material';
 import {
   StackContainer,
   StyledContainer,
@@ -11,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
 import ProfileLayout from '../../layout/ProfileLayout';
+import { ResumeAction } from '../../components/settings';
 
 const Resume = () => {
   const navigate = useNavigate();
@@ -39,28 +39,32 @@ const Resume = () => {
             <Typography variant='h6' fontWeight={700}>
               Resume
             </Typography>
-            <IconButton size='small'>
-              <EditIcon />
-            </IconButton>
+            <ResumeAction />
           </Stack>
 
           <StackContainer>
-            {_user?.docs?.resume && (
+            {_user?.docs?.resume?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>Resume</Typography>
-                <Typography variant='body1'>{_user?.docs?.resume}</Typography>
+                <Typography variant='body1'>
+                  {_user?.docs?.resume?.file_name}
+                </Typography>
               </StyledStack>
             )}
-            {_user?.docs?.cv && (
+            {_user?.docs?.cv?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>CV</Typography>
-                <Typography variant='body1'>{_user?.docs?.cv}</Typography>
+                <Typography variant='body1'>
+                  {_user?.docs?.cv?.file_name}
+                </Typography>
               </StyledStack>
             )}
-            {_user?.docs?.letter && (
+            {_user?.docs?.letter?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>Application Letter</Typography>
-                <Typography variant='body1'>{_user?.docs?.letter}</Typography>
+                <Typography variant='body1'>
+                  {_user?.docs?.letter?.file_name}
+                </Typography>
               </StyledStack>
             )}
           </StackContainer>

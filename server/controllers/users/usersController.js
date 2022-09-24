@@ -286,11 +286,56 @@ const uploadFile = async (req, res, next) => {
   }
 };
 
+const updateUserDocs = async (req, res, next) => {
+  try {
+    const { _id, isIntern } = req.body;
+    const date = new Date();
+
+    let findUser;
+
+    if (isIntern === 'true') {
+      findUser = await Users.findById(_id, '-employeeInfo').exec();
+    } else if (isIntern === 'false') {
+      findUser = await Users.findById(_id, '-internInfo').exec();
+    }
+
+    if (!findUser)
+      return res.json({ err: `no data found with the id: ${_id}` });
+
+    if (req.files?.resume)
+      findUser.docs.resume = {
+        file_id: req.files?.resume[0].id,
+        file_name: req.files?.resume[0].originalname,
+        createdAt: date,
+      };
+    if (req.files?.cv)
+      findUser.docs.cv = {
+        file_id: req.files?.cv[0].id,
+        file_name: req.files?.cv[0].originalname,
+        createdAt: date,
+      };
+    if (req.files?.letter)
+      findUser.docs.letter = {
+        file_id: req.files?.letter[0].id,
+        file_name: req.files?.letter[0].originalname,
+        createdAt: date,
+      };
+
+    findUser.updatedAt = date;
+    const updatedProfile = await findUser.save();
+
+    return res.json({ user: updatedProfile });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createNewUser,
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
+  updateUserDocs,
   updateUserProfileInfo,
   userLogin,
   userLogout,

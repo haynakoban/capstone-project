@@ -144,6 +144,9 @@ const usersSlice = createSlice({
       state.status = 'idle';
       state.error = null;
     },
+    updateUserDocs: (state, action) => {
+      state.user = action.payload;
+    },
   },
   extraReducers(builder) {
     builder
@@ -204,6 +207,6 @@ export const getUserInfo = (state) => state.users.user;
 export const getUserStatus = (state) => state.users.status;
 
 // remove the comment once a code in reducers added.
-export const { resetState } = usersSlice.actions;
+export const { resetState, updateUserDocs } = usersSlice.actions;
 
 export default usersSlice.reducer;
