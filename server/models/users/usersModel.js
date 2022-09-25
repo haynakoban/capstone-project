@@ -4,7 +4,7 @@ const employeeInfo = {
   listOfCompanies: {
     type: Array,
     required: false,
-    companyId: {
+    company_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Companies',
       required: false,
@@ -27,12 +27,8 @@ const employeeInfo = {
 };
 
 const internInfo = {
-  hasCompany: {
-    type: Boolean,
-    required: false,
-  },
   companyInfo: {
-    companyId: {
+    company_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Companies',
       required: false,

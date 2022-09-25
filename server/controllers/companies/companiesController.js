@@ -36,7 +36,7 @@ const createRoom = async (req, res, next) => {
     if (!user) return res.json({ err: 'cannot find user' });
     if (!company) return res.json({ err: 'error' });
 
-    user.employeeInfo.listOfCompanies.push({ companyId: company._id });
+    user.employeeInfo.listOfCompanies.push({ company_id: company._id });
 
     user.save();
 
@@ -132,7 +132,7 @@ const joinRoom = async (req, res, next) => {
     if (!user) return res.json({ err: 'cannot find user' });
 
     // this line of code add the company in the user collection as one of its company
-    user.employeeInfo.listOfCompanies.push({ companyId: company._id });
+    user.employeeInfo.listOfCompanies.push({ company_id: company._id });
 
     user.save();
 

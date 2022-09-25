@@ -12,7 +12,6 @@ import SideDrawerBar from './SideDrawerBar';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FeedOutlinedIcon from '@mui/icons-material/FeedOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 
@@ -31,11 +30,6 @@ const routes = [
     name: 'Tasks',
     path: '/tasks',
     icon: <AssignmentOutlinedIcon />,
-  },
-  {
-    name: 'Files',
-    path: '/files',
-    icon: <InsertDriveFileOutlinedIcon />,
   },
   {
     name: 'Member',
