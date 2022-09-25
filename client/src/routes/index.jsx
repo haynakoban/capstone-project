@@ -19,7 +19,6 @@ import Tasks from '../view/tasks';
 import TasksList from '../view/tasks/TasksList';
 import SingleTask from '../view/tasks/SingleTask';
 
-import Files from '../view/files';
 import Member from '../view/member';
 import Attendance from '../view/attendance';
 
@@ -50,8 +49,6 @@ const AppRoutes = () => {
             <Route index element={<TasksList />} />
             <Route path=':id' element={<SingleTask />} />
           </Route>
-
-          <Route path='files' element={<Files />} />
 
           <Route path='member' element={<Member />} />
 

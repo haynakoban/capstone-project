@@ -1,6 +1,5 @@
 const { Companies, Users } = require('../../models');
 const bcryptjs = require('bcryptjs');
-const { delete_file } = require('../../config/db');
 
 // check if username is valid
 // post method | /api/users/validation

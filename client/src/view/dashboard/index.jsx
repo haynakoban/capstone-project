@@ -42,7 +42,8 @@ const Dashboard = () => {
     <RoomLayout>
       <Box display='flex' flexDirection='column'>
         {/* header */}
-        {/* interns remaining and completed hours */}
+        {/* interns remaining and completed hours or;*/}
+        {/* meet up start button;*/}
         <DashboardHeader />
 
         {/* body */}
