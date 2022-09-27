@@ -143,9 +143,22 @@ const joinRoom = async (req, res, next) => {
 };
 
 // retrieve the room information
-// get method | /api/companies/validate
+// get method | /api/companies/auth/:id
 const getRoomInfo = async (req, res, next) => {
   try {
+    const id = req.params.id;
+
+    const room = await Companies.findById(id);
+
+    if (!room) return res.json({ err: `no room found` });
+
+    const ids = room?.members.map((e) => e.id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+    if (!users) return res.json({ err: `no users found` });
+
+    return res.json({ room, users });
   } catch (e) {
     next(e);
   }

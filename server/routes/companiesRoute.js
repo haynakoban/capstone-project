@@ -21,4 +21,7 @@ router
 // get method -- retrieve all my room
 router.route('/:id').get(companiesController.getMyRoom);
 
+// get method -- get the room info
+router.route('/auth/:id').get(companiesController.getRoomInfo);
+
 module.exports = router;
