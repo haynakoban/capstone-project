@@ -6,36 +6,18 @@ import {
   Collapse,
   Divider,
   IconButton,
-  styled,
-  Typography,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <Typography {...other} />;
-})(({ theme }) => ({
-  cursor: 'pointer',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
-
-const StyledTypography = styled((props) => {
-  const { ...others } = props;
-  return <Typography {...others} />;
-})(() => ({
-  color: 'text.primary',
-  whiteSpace: 'pre-wrap',
-}));
+import { ExpandMore, StyledTypography, TimeAgo } from '../global';
 
 const CardPost = ({ post, handleExpandClick }) => {
   return (
-    <Card elevation={2} key={post.id} sx={{ mb: 3 }}>
+    <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
-            {post?.user[0]?.toUpperCase()}
+            {post?.name?.[0]?.toUpperCase()}
           </Avatar>
         }
         action={
@@ -43,8 +25,8 @@ const CardPost = ({ post, handleExpandClick }) => {
             <MoreVertIcon />
           </IconButton>
         }
-        title={post?.user}
-        subheader={post?.date}
+        title={post?.name}
+        subheader={<TimeAgo timestamp={post?.updatedAt} />}
       />
 
       <CardContent sx={{ px: 3, py: 0 }}>

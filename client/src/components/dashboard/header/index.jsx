@@ -1,40 +1,9 @@
 import { Box, Button } from '@mui/material';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import { Fragment, useContext, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { AuthContext } from '../../../lib/authContext';
+import { Fragment } from 'react';
 import StyledPaperCard from './StyledPaperCard';
 
-const DashboardHeader = () => {
-  const { _user, _isUserAuth } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  useEffect(() => {
-    if (!_isUserAuth) {
-      navigate('/login');
-    }
-  }, [_isUserAuth, navigate]);
-
-  useEffect(() => {
-    if (_user?.isIntern) {
-      if (_user?.internInfo?.companyInfo?.company_id !== id) {
-        navigate('/room');
-      }
-    } else {
-      const res = _user?.employeeInfo?.listOfCompanies?.some(
-        (e) => e.company_id === id
-      );
-      if (!res) navigate('/room');
-    }
-  }, [
-    _user?.isIntern,
-    _user?.internInfo?.companyInfo?.company_id,
-    _user?.employeeInfo?.listOfCompanies,
-    id,
-    navigate,
-  ]);
-
+const DashboardHeader = ({ _user }) => {
   return (
     <Fragment>
       {_user.isIntern ? (
