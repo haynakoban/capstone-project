@@ -17,19 +17,70 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { AuthContext } from '../../lib/authContext';
+import {
+  getCompanyInfo,
+  getRoomInfo,
+} from '../../features/companies/companiesSlice';
+
+import RoomLayout from '../../layout/RoomLayout';
 import {
   StyledContainer,
   SearchContainer,
   SearchIconWrapper,
   StyledInputBase,
 } from '../../components/global';
-import { rows } from '../member/data';
-import { useState } from 'react';
-
-import RoomLayout from '../../layout/RoomLayout';
 
 const Member = () => {
   const [type, setType] = useState('');
+  const [auth, setAuth] = useState(false);
+  const { _user, _isUserAuth } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const room_id = pathname.slice(6).slice(0, 24);
+
+  const dispatch = useDispatch();
+  const roomInfo = useSelector(getCompanyInfo);
+
+  useEffect(() => {
+    dispatch(getRoomInfo(room_id)).unwrap();
+  }, [room_id, dispatch]);
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
+
+  useEffect(() => {
+    if (auth) {
+      if (_user?.employeeInfo?.listOfCompanies?.length > 0) {
+        const res = _user?.employeeInfo?.listOfCompanies?.some(
+          (e) => e.company_id === room_id
+        );
+
+        if (!res) navigate('/room');
+      } else if (_user?.internInfo?.companyInfo?.company_id) {
+        if (_user?.internInfo?.companyInfo?.company_id !== room_id) {
+          navigate('/room');
+        }
+      }
+    } else {
+      setAuth(true);
+    }
+  }, [
+    auth,
+    _user?.isIntern,
+    _user?.internInfo?.companyInfo?.company_id,
+    _user?.employeeInfo?.listOfCompanies,
+    room_id,
+    navigate,
+  ]);
 
   const handleChange = ({ target }) => {
     setType(target.value);
@@ -113,17 +164,19 @@ const Member = () => {
 
             {/* body */}
             <TableBody>
-              {rows.map((row) => (
-                <TableRow hover key={row?.name}>
+              {roomInfo?.members?.map((row) => (
+                <TableRow hover key={row?.id}>
                   <TableCell align='left'>
                     <Avatar sx={{ width: 32, height: 32 }}>
-                      {row?.name[0]}
+                      {row?.name?.[0]}
                     </Avatar>
                   </TableCell>
                   <TableCell align='left' padding='none'>
                     {row?.name}
                   </TableCell>
-                  <TableCell align='right'>{row?.role}</TableCell>
+                  <TableCell align='right' sx={{ textTransform: 'capitalize' }}>
+                    {row?.roles}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

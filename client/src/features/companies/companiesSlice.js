@@ -80,10 +80,28 @@ export const getMyRoom = createAsyncThunk(
   }
 );
 
+// get the current room
+export const getRoomInfo = createAsyncThunk(
+  'companies/getRoomInfo',
+  async (initialState) => {
+    try {
+      const response = await axios.get(`api/companies/auth/${initialState}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const companiesSlice = createSlice({
   name: 'companies',
   initialState,
-  reducers: {},
+  reducers: {
+    EnteredRoomId: (state, action) => {
+      state.company_id = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchRooms.fulfilled, (state, action) => {
@@ -109,14 +127,41 @@ const companiesSlice = createSlice({
         if (action.payload.rooms) {
           state.rooms.push(action.payload?.rooms);
         }
+      })
+      .addCase(getRoomInfo.fulfilled, (state, action) => {
+        if (action.payload.err) {
+          state.error = action.payload.err;
+        }
+
+        if (action.payload.room && action.payload.users) {
+          state.company = action.payload.room;
+
+          const MEMBERS_SIZE = action.payload.room.members.length;
+          const USERS_SIZE = action.payload.users.length;
+
+          const members = action.payload.room.members;
+          const users = action.payload.users;
+
+          for (let i = 0; i < MEMBERS_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (members[i].id === users[j]._id) {
+                state.company.members[i].name = users[j].name;
+              }
+            }
+          }
+        }
       });
   },
 });
 
 export const getRooms = (state) => state.companies.companies;
+export const roomId = (state) => state.companies.company_id;
 export const myRooms = (state) => state.companies.rooms;
 export const getError = (state) => state.companies.error;
+export const getCompanyInfo = (state) => state.companies.company;
 
 // export const roomStatus = (state) => state.companies.status;
+
+export const { EnteredRoomId } = companiesSlice.actions;
 
 export default companiesSlice.reducer;
