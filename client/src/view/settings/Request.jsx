@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
 import ProfileLayout from '../../layout/ProfileLayout';
-import TimeAgo from '../../components/settings/request/TimeAgo';
+import { TimeAgo } from '../../components/global';
 
 const Request = () => {
   const navigate = useNavigate();

@@ -8,9 +8,14 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CardMemberIcon = ({ members }) => {
-  const ListOfMembers = members.map((member) => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const room_path = pathname.slice(0, 30);
+
+  const ListOfMembers = members?.map((member) => {
     return (
       <ListItem key={member.name}>
         <ListItemAvatar>
@@ -53,7 +58,7 @@ const CardMemberIcon = ({ members }) => {
             fontWeight={500}
             sx={{ cursor: 'pointer' }}
             // fix the click event
-            onClick={() => console.log('link to /member')}
+            onClick={() => navigate(`${room_path}/member`)}
           >
             View all
           </Typography>
