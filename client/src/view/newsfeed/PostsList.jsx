@@ -1,6 +1,6 @@
 import { Box, Container } from '@mui/material';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useTransition } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,15 +14,12 @@ import RoomLayout from '../../layout/RoomLayout';
 import CardPost from '../../components/newsfeed/CardPost';
 import CardMemberIcon from '../../components/cards/CardMemberIcon';
 import CreatePostAction from '../../components/newsfeed/CreatePostAction';
-import {
-  fetchPosts,
-  getPostsStatus,
-  selectAllPosts,
-} from '../../features/posts/postsSlice';
+import { fetchPosts, selectAllPosts } from '../../features/posts/postsSlice';
 
 const PostsList = () => {
   const [auth, setAuth] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [isPending, startTransition] = useTransition();
   const { _user, _isUserAuth } = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -31,14 +28,11 @@ const PostsList = () => {
 
   const dispatch = useDispatch();
   const getPosts = useSelector(selectAllPosts);
-  const postStatus = useSelector(getPostsStatus);
   const roomInfo = useSelector(getCompanyInfo);
 
   useEffect(() => {
-    if (postStatus === 'idle') {
-      dispatch(fetchPosts({ company_id: room_id }));
-    }
-  }, [postStatus, getPosts, room_id, dispatch]);
+    dispatch(fetchPosts({ company_id: room_id }));
+  }, [room_id, dispatch]);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
@@ -77,10 +71,17 @@ const PostsList = () => {
 
   useEffect(() => {
     if (getPosts) {
-      const posts = getPosts.map((p) => {
-        return { ...p, isExpanded: false };
+      startTransition(() => {
+        const posts = getPosts.map((p) => {
+          return { ...p, isExpanded: false };
+        });
+
+        const orderedPosts = posts
+          ?.slice()
+          ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+        setPosts(orderedPosts);
       });
-      setPosts(posts);
     }
   }, [getPosts]);
 
@@ -94,10 +95,10 @@ const PostsList = () => {
     newPosts.push(findPost);
 
     newPosts.sort((a, b) => {
-      if (a.id < b.id) {
-        return -1;
-      } else if (b.id < a.id) {
+      if (a.updatedAt < b.updatedAt) {
         return 1;
+      } else if (b.updatedAt < a.updatedAt) {
+        return -1;
       } else {
         return 0;
       }
@@ -107,25 +108,15 @@ const PostsList = () => {
   };
 
   let content;
-  if (postStatus === 'loading') {
-    content = <h4>Loading...</h4>;
-  } else if (postStatus === 'succeeded') {
-    const orderedPosts = posts
-      ?.slice()
-      ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-
-    content = orderedPosts?.map((post) => {
-      return (
-        <CardPost
-          post={post}
-          key={post?._id}
-          handleExpandClick={handleExpandClick}
-        />
-      );
-    });
-  } else if (postStatus === 'failed') {
-    content = <h4>Data not found!</h4>;
-  }
+  content = posts?.map((post) => {
+    return (
+      <CardPost
+        post={post}
+        key={post?._id}
+        handleExpandClick={handleExpandClick}
+      />
+    );
+  });
 
   return (
     <RoomLayout>
@@ -145,7 +136,7 @@ const PostsList = () => {
         >
           <CreatePostAction />
 
-          {content}
+          {isPending ? <h4>Loading...</h4> : content}
         </Container>
 
         {/* members */}

@@ -5,13 +5,16 @@ import {
   CardHeader,
   Collapse,
   Divider,
-  IconButton,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useContext } from 'react';
+import { AuthContext } from '../../lib/authContext';
 
 import { ExpandMore, StyledTypography, TimeAgo } from '../global';
+import PostClickAwayHandler from './PostClickAwayHandler';
 
 const CardPost = ({ post, handleExpandClick }) => {
+  const { _user } = useContext(AuthContext);
+
   return (
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
       <CardHeader
@@ -21,9 +24,9 @@ const CardPost = ({ post, handleExpandClick }) => {
           </Avatar>
         }
         action={
-          <IconButton aria-label='settings'>
-            <MoreVertIcon />
-          </IconButton>
+          _user?._id === post?.user_id ? (
+            <PostClickAwayHandler post={post} />
+          ) : undefined
         }
         title={post?.name}
         subheader={<TimeAgo timestamp={post?.updatedAt} />}

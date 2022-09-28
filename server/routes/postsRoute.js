@@ -5,10 +5,15 @@ const { postsController } = require('../controllers');
 const auth = require('../middlewares/auth_user_cookie');
 
 // post method -- create new post
-// get method - fetch all posts
 router.route('/').post(auth, postsController.createNewPost);
 
 // get method - fetch all posts
-router.route('/:company_id').get(auth, postsController.fetchPosts);
+// put method - update post
+// delete method - delete post
+router
+  .route('/:id')
+  .get(auth, postsController.fetchPosts)
+  .put(auth, postsController.updatePost)
+  .delete(auth, postsController.deletePost);
 
 module.exports = router;

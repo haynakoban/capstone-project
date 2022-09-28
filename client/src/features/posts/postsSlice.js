@@ -38,29 +38,15 @@ export const fetchPosts = createAsyncThunk(
   }
 );
 
-export const selectPostById = createAsyncThunk(
-  'posts/selectPostById',
-  async (initialState) => {
-    try {
-      const response = await axios.get(`/api/posts/${initialState}`);
-
-      return response.data;
-    } catch (e) {
-      return e.message;
-    }
-  }
-);
-
+// update post
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
   async (initialState) => {
-    const { _id, title, body, author } = initialState;
-
     try {
-      const response = await axios.put(`/api/posts/${_id}`, {
-        title,
-        body,
-        author,
+      const { text, id } = initialState;
+
+      const response = await axios.put(`api/posts/${id}`, {
+        text,
       });
 
       return response.data;
@@ -70,13 +56,27 @@ export const updatePost = createAsyncThunk(
   }
 );
 
+// delete post
 export const deletePost = createAsyncThunk(
   'posts/deletePost',
   async (initialState) => {
-    const { _id } = initialState;
-
     try {
-      const response = await axios.delete(`/api/posts/${_id}`);
+      const { id } = initialState;
+
+      const response = await axios.delete(`/api/posts/${id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+export const selectPostById = createAsyncThunk(
+  'posts/selectPostById',
+  async (initialState) => {
+    try {
+      const response = await axios.get(`/api/posts/${initialState}`);
 
       return response.data;
     } catch (e) {
@@ -130,17 +130,15 @@ const postsSlice = createSlice({
         state.post = action.payload;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
-        if (!action.payload?.post?._id) {
-          console.log('update could not complete');
-          console.log(action.payload);
-          return;
+        if (action.payload.post && action.payload.user) {
+          const { _id } = action.payload.post;
+          const { name } = action.payload.user[0];
+
+          const posts = state.posts.filter((post) => post._id !== _id);
+
+          action.payload.post.name = name;
+          state.posts = [...posts, action.payload.post];
         }
-
-        const { _id } = action.payload.post;
-        const posts = state.posts.filter((post) => post._id !== _id);
-        state.posts = [...posts, action.payload.post];
-
-        state.post = action.payload?.post;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         if (action.payload?.err) {
@@ -149,10 +147,12 @@ const postsSlice = createSlice({
           return;
         }
 
-        const { _id } = action.payload;
-        const posts = state.posts.filter((post) => post._id !== _id);
-        state.posts = [...posts];
-        state.post = {};
+        const { msg, id } = action.payload;
+        if (msg && id) {
+          const posts = state.posts.filter((post) => post._id !== id);
+          state.posts = [...posts];
+          state.post = {};
+        }
       });
   },
 });
