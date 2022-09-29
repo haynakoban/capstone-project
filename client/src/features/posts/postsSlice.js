@@ -72,11 +72,16 @@ export const deletePost = createAsyncThunk(
   }
 );
 
+// select single post
 export const selectPostById = createAsyncThunk(
   'posts/selectPostById',
   async (initialState) => {
     try {
-      const response = await axios.get(`/api/posts/${initialState}`);
+      const { id, company_id } = initialState;
+
+      const response = await axios.get(`api/posts/${company_id}/${id}`, {
+        company_id,
+      });
 
       return response.data;
     } catch (e) {
@@ -96,7 +101,7 @@ const postsSlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-
+        state.post = {};
         if (action.payload.posts && action.payload.users) {
           state.posts = action.payload.posts;
 
@@ -127,7 +132,12 @@ const postsSlice = createSlice({
         }
       })
       .addCase(selectPostById.fulfilled, (state, action) => {
-        state.post = action.payload;
+        if (action.payload.post && action.payload.user) {
+          const { name } = action.payload.user[0];
+
+          action.payload.post.name = name;
+          state.post = action.payload.post;
+        }
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         if (action.payload.post && action.payload.user) {
@@ -138,6 +148,7 @@ const postsSlice = createSlice({
 
           action.payload.post.name = name;
           state.posts = [...posts, action.payload.post];
+          state.post = action.payload.post;
         }
       })
       .addCase(deletePost.fulfilled, (state, action) => {

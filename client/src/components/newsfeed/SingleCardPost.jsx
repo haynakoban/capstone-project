@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Collapse,
   Divider,
   IconButton,
   TextField,
@@ -14,15 +13,13 @@ import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
 
 import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
-import { ExpandMore, StyledTypography, TimeAgo } from '../global';
+import { StyledTypography, TimeAgo } from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
 
-const CardPost = ({ post, handleExpandClick }) => {
+const SingleCardPost = ({ post }) => {
   const { _user } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   return (
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
@@ -51,32 +48,9 @@ const CardPost = ({ post, handleExpandClick }) => {
           variant='body1'
           component='pre'
           sx={{ cursor: 'pointer' }}
-          onClick={() => navigate(`${post._id}`)}
         >
-          {!post?.isExpanded && post?.text?.substring(0, 500)}
-          {!post?.isExpanded && post?.text?.length > 500 ? '...' : ''}
-
-          <Collapse in={post?.isExpanded} timeout='auto' unmountOnExit>
-            <StyledTypography variant='body1' component='pre'>
-              {post?.text}
-            </StyledTypography>
-          </Collapse>
+          {post?.text}
         </StyledTypography>
-        <ExpandMore
-          expand={post?.isExpanded}
-          onClick={() => handleExpandClick(post)}
-          aria-expanded={post.isExpanded}
-          aria-label='show more'
-          variant='span'
-          component='span'
-          color='primary.main'
-        >
-          {post?.text?.length > 500
-            ? post?.isExpanded
-              ? 'See less'
-              : 'See more'
-            : ''}
-        </ExpandMore>
       </CardContent>
 
       <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
@@ -151,7 +125,9 @@ const CardPost = ({ post, handleExpandClick }) => {
           </Box>
         </Box>
       </CardContent>
+
+      {/* list of comments */}
     </Card>
   );
 };
-export default CardPost;
+export default SingleCardPost;

@@ -89,17 +89,9 @@ const CreatePostAction = () => {
           <TextField
             variant='standard'
             fullWidth
+            className='comment'
             sx={{
               mb: 2,
-              'textarea::-webkit-scrollbar': {
-                width: '0.4rem',
-              },
-              'textarea::-webkit-scrollbar-thumb': {
-                bgcolor: '#20212880',
-              },
-              'textarea::-webkit-scrollbar-track': {
-                bgcolor: '#20212850',
-              },
               '.css-1aqqp93-MuiInputBase-root-MuiInput-root:after': {
                 borderBottom: 'none',
               },
@@ -114,7 +106,8 @@ const CreatePostAction = () => {
             required
             type='text'
             multiline
-            rows={6}
+            minRows={4}
+            maxRows={20}
             autoComplete='off'
             placeholder='Post your query'
             value={watch('text')}

@@ -4,9 +4,14 @@ import { useForm } from 'react-hook-form';
 
 import { StyledModalBox } from '../global';
 import { deletePost } from '../../features/posts/postsSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const DeletePost = ({ post, handleDeleteModalClose }) => {
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const room_id = pathname.slice(0, 30);
 
   const { handleSubmit, reset } = useForm({
     defaultValues: {
@@ -19,6 +24,7 @@ const DeletePost = ({ post, handleDeleteModalClose }) => {
 
     reset({ id: '' });
     handleDeleteModalClose();
+    navigate(`${room_id}/newsfeed`);
   };
 
   return (

@@ -82,7 +82,6 @@ const Dashboard = () => {
     }
   }, [
     auth,
-    _user?.isIntern,
     _user?.internInfo?.companyInfo?.company_id,
     _user?.employeeInfo?.listOfCompanies,
     room_id,

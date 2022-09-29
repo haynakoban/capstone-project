@@ -16,4 +16,7 @@ router
   .put(auth, postsController.updatePost)
   .delete(auth, postsController.deletePost);
 
+// get method - fetch single post
+router.route('/:company_id/:id').get(auth, postsController.selectPostById);
+
 module.exports = router;
