@@ -1,7 +1,7 @@
 const { Posts, Users } = require('../../models');
 
 // create new post
-// post method | /api/users
+// post method | /api/posts
 const createNewPost = async (req, res, next) => {
   try {
     const { text, user_id, company_id } = req.body;
@@ -26,8 +26,8 @@ const createNewPost = async (req, res, next) => {
   }
 };
 
-// fetch all the posts
-// get method | /api/users/:id
+// fetch all posts
+// get method | /api/posts/:id
 const fetchPosts = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -54,8 +54,34 @@ const fetchPosts = async (req, res, next) => {
   }
 };
 
+// fetch single post
+// get method | /api/posts/:company_id/:id
+const selectPostById = async (req, res, next) => {
+  try {
+    const { company_id, id } = req.params;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [company_id, id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const post = await Posts.findOne({ $and: [{ _id: id }, { company_id }] });
+
+    if (!post) return res.json({ err: 'no data found' });
+
+    const user = await Users.find({ _id: post.user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: `no users found` });
+
+    return res.json({ post, user });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // update the post
-// put method | /api/users/:id
+// put method | /api/posts/:id
 const updatePost = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -88,7 +114,7 @@ const updatePost = async (req, res, next) => {
 };
 
 // delete the post
-// delete method | /api/users/:id
+// delete method | /api/posts/:id
 const deletePost = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -113,5 +139,6 @@ module.exports = {
   createNewPost,
   deletePost,
   fetchPosts,
+  selectPostById,
   updatePost,
 };

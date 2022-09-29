@@ -142,13 +142,13 @@ const SideDrawerBar = ({ routes, content }) => {
       </AppBar>
 
       {/* permanent drawer for large screen - routes */}
-      <PermanentDrawer routes={routes} active={active} pathname={pathname} />
+      <PermanentDrawer routes={routes} active={active} path={pathname} />
 
       {/* temporary left drawer for medium to small screen - routes */}
       <LeftDrawerRoutes
         routes={routes}
         active={active}
-        pathname={pathname}
+        path={pathname}
         showLeftDrawer={showLeftDrawer}
         leftDrawer={leftDrawer}
       />

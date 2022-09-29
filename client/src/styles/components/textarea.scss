@@ -1,0 +1,10 @@
+textarea::-webkit-scrollbar {
+  width: 0.4rem !important;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #20212880 !important;
+}
+textarea::-webkit-scrollbar-track {
+  background-color: #20212850 !important;
+}
