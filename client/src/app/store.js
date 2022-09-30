@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import commentsReducer from '../features/comments/commentsSlice';
 import companiesReducer from '../features/companies/companiesSlice';
 import filesReducer from '../features/files/filesSlice';
 import postsReducer from '../features/posts/postsSlice';
@@ -10,5 +11,6 @@ export const store = configureStore({
     files: filesReducer,
     posts: postsReducer,
     users: usersReducer,
+    comments: commentsReducer,
   },
 });

@@ -33,6 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/users', require('./routes/usersRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
+app.use('/api/comments', require('./routes/commentsRoute'));
 
 httpServer.listen(ACCESS_PORT, () => {
   console.log(`server running on port ${ACCESS_PORT}`);

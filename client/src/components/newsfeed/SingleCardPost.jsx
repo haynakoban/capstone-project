@@ -12,14 +12,114 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState, useTransition } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from '../../lib/authContext';
 
 import { StyledTypography, TimeAgo } from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
+import {
+  addComment,
+  fetchComments,
+  selectAllComments,
+} from '../../features/comments/commentsSlice';
+import CommentsCard from './CommentsCard';
 
 const SingleCardPost = ({ post }) => {
   const { _user } = useContext(AuthContext);
+  const [isPending, startTransition] = useTransition();
+  const dispatch = useDispatch();
+
+  const comments = useSelector(selectAllComments);
+
+  const [commentsList, setCommentsList] = useState([]);
+  const [values, setValues] = useState({
+    text: '',
+    post_id: post?._id,
+    user_id: _user?._id,
+  });
+
+  useEffect(() => {
+    setValues({
+      text: '',
+      post_id: post?._id,
+      user_id: _user?._id,
+    });
+  }, [post?._id, _user?._id]);
+
+  useEffect(() => {
+    if (post?._id) {
+      dispatch(fetchComments({ post_id: post?._id })).unwrap();
+    }
+  }, [post?._id, dispatch]);
+
+  useEffect(() => {
+    if (comments) {
+      startTransition(() => {
+        const orderedPosts = comments
+          ?.slice()
+          ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+        setCommentsList(orderedPosts);
+      });
+    }
+  }, [comments]);
+
+  // handle change
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  // handle event key
+  const handleKeyDown = (event) => {
+    const { text, post_id, user_id } = values;
+
+    if (!text) {
+      return;
+    } else {
+      if (event.shiftKey && event.code === 'Enter') {
+        dispatch(
+          addComment({
+            text,
+            post_id,
+            user_id,
+          })
+        ).unwrap();
+
+        setValues({
+          text: '',
+          post_id: post?._id,
+          user_id: _user?._id,
+        });
+      }
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    const { text, post_id, user_id } = values;
+
+    if (!text) {
+      return;
+    } else {
+      dispatch(
+        addComment({
+          text,
+          post_id,
+          user_id,
+        })
+      ).unwrap();
+      setValues({
+        text: '',
+        post_id: post?._id,
+        user_id: _user?._id,
+      });
+    }
+  };
+
+  let content;
+  content = commentsList?.map((comment) => {
+    return <CommentsCard comment={comment} key={comment?._id} />;
+  });
 
   return (
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
@@ -54,7 +154,7 @@ const SingleCardPost = ({ post }) => {
       </CardContent>
 
       <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
-        <Divider flexItem sx={{ bgcolor: '#202128', height: 1.65 }} />
+        <Divider flexItem sx={{ bgcolor: '#202128', height: '1px' }} />
       </CardContent>
 
       {/* for comments */}
@@ -105,6 +205,10 @@ const SingleCardPost = ({ post }) => {
             maxRows={20}
             autoComplete='off'
             placeholder='Write a comment'
+            name='text'
+            value={values.text}
+            onChange={handleChange('text')}
+            onKeyDown={handleKeyDown}
           />
           <Box
             sx={{
@@ -119,14 +223,23 @@ const SingleCardPost = ({ post }) => {
             <IconButton size='small' sx={{ color: '#202128' }}>
               <ImageIcon />
             </IconButton>
-            <IconButton size='small' sx={{ color: '#202128' }}>
+            <IconButton
+              size='small'
+              sx={{ color: '#202128' }}
+              onClick={handleFormSubmit}
+            >
               <SendIcon />
             </IconButton>
           </Box>
         </Box>
       </CardContent>
 
+      <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
+        <Divider flexItem sx={{ bgcolor: '#202128', height: '1px' }} />
+      </CardContent>
+
       {/* list of comments */}
+      {isPending ? <h4>Loading...</h4> : content}
     </Card>
   );
 };
