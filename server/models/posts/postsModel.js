@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const postsSchema = new mongoose.Schema({
   text: {
     type: String,
-    required: true,
+    required: false,
+  },
+  file_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Uploads',
+    required: false,
   },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,4 +1,10 @@
-import { ExpandMore, Item, StyledTypography } from './ItemGrid';
+import {
+  ExpandMore,
+  Item,
+  StyledBox,
+  StyledPostBox,
+  StyledTypography,
+} from './ItemGrid';
 import { SearchContainer, SearchIconWrapper, StyledInputBase } from './Search';
 import { StyledContainer } from './StyledContainer';
 import { StyledModalBox, StyledStack, StackContainer } from './StyledModal';
@@ -11,6 +17,8 @@ export {
   SearchIconWrapper,
   StackContainer,
   StyledInputBase,
+  StyledBox,
+  StyledPostBox,
   StyledContainer,
   StyledModalBox,
   StyledStack,

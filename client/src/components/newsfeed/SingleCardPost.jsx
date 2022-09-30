@@ -15,7 +15,7 @@ import { useContext, useEffect, useState, useTransition } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from '../../lib/authContext';
 
-import { StyledTypography, TimeAgo } from '../global';
+import { StyledPostBox, StyledTypography, TimeAgo } from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
 import {
   addComment,
@@ -136,21 +136,34 @@ const SingleCardPost = ({ post }) => {
         title={post?.name}
         subheader={<TimeAgo timestamp={post?.updatedAt} />}
       />
-
-      <CardContent
-        sx={{
-          px: 3,
-          py: 0,
-        }}
-      >
-        <StyledTypography
-          variant='body1'
-          component='pre'
-          sx={{ cursor: 'pointer' }}
+      {post?.text && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+          }}
         >
-          {post?.text}
-        </StyledTypography>
-      </CardContent>
+          <StyledTypography
+            variant='body1'
+            component='pre'
+            sx={{ cursor: 'pointer' }}
+          >
+            {post?.text}
+          </StyledTypography>
+        </CardContent>
+      )}
+
+      {post?.filename && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+            mt: 1,
+          }}
+        >
+          <StyledPostBox>{post?.filename}</StyledPostBox>
+        </CardContent>
+      )}
 
       <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
         <Divider flexItem sx={{ bgcolor: '#202128', height: '1px' }} />

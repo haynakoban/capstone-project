@@ -16,7 +16,12 @@ import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
-import { ExpandMore, StyledTypography, TimeAgo } from '../global';
+import {
+  ExpandMore,
+  StyledPostBox,
+  StyledTypography,
+  TimeAgo,
+} from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
 import { useEffect } from 'react';
 import axios from '../../lib/axiosConfig';
@@ -121,43 +126,56 @@ const CardPost = ({ post, handleExpandClick }) => {
         subheader={<TimeAgo timestamp={post?.updatedAt} />}
       />
 
-      <CardContent
-        sx={{
-          px: 3,
-          py: 0,
-        }}
-      >
-        <StyledTypography
-          variant='body1'
-          component='pre'
-          sx={{ cursor: 'pointer' }}
-          onClick={() => navigate(`${post._id}`)}
+      {post?.text && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+          }}
         >
-          {!post?.isExpanded && post?.text?.substring(0, 500)}
-          {!post?.isExpanded && post?.text?.length > 500 ? '...' : ''}
+          <StyledTypography
+            variant='body1'
+            component='pre'
+            sx={{ cursor: 'pointer' }}
+            onClick={() => navigate(`${post._id}`)}
+          >
+            {!post?.isExpanded && post?.text?.substring(0, 500)}
+            {!post?.isExpanded && post?.text?.length > 500 ? '...' : ''}
 
-          <Collapse in={post?.isExpanded} timeout='auto' unmountOnExit>
-            <StyledTypography variant='body1' component='pre'>
-              {post?.text}
-            </StyledTypography>
-          </Collapse>
-        </StyledTypography>
-        <ExpandMore
-          expand={post?.isExpanded}
-          onClick={() => handleExpandClick(post)}
-          aria-expanded={post.isExpanded}
-          aria-label='show more'
-          variant='span'
-          component='span'
-          color='primary.main'
+            <Collapse in={post?.isExpanded} timeout='auto' unmountOnExit>
+              <StyledTypography variant='body1' component='pre'>
+                {post?.text}
+              </StyledTypography>
+            </Collapse>
+          </StyledTypography>
+          <ExpandMore
+            expand={post?.isExpanded}
+            onClick={() => handleExpandClick(post)}
+            aria-expanded={post.isExpanded}
+            aria-label='show more'
+            variant='span'
+            component='span'
+            color='primary.main'
+          >
+            {post?.text?.length > 500
+              ? post?.isExpanded
+                ? 'See less'
+                : 'See more'
+              : ''}
+          </ExpandMore>
+        </CardContent>
+      )}
+      {post?.filename && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+            mt: 1,
+          }}
         >
-          {post?.text?.length > 500
-            ? post?.isExpanded
-              ? 'See less'
-              : 'See more'
-            : ''}
-        </ExpandMore>
-      </CardContent>
+          <StyledPostBox>{post?.filename}</StyledPostBox>
+        </CardContent>
+      )}
 
       <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
         <Divider flexItem sx={{ bgcolor: '#202128', height: '1px' }} />

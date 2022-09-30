@@ -4,24 +4,10 @@ import axios from '../../lib/axiosConfig';
 const initialState = {
   posts: [],
   post: {},
-  latest: {},
+  latest: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
-
-// create new post
-export const addNewPost = createAsyncThunk(
-  'posts/addNewPost',
-  async (initialState) => {
-    try {
-      const response = await axios.post('api/posts', initialState);
-
-      return response.data;
-    } catch (e) {
-      return e.message;
-    }
-  }
-);
 
 // get the posts
 export const fetchPosts = createAsyncThunk(
@@ -108,7 +94,19 @@ export const fetchLatestPost = createAsyncThunk(
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {},
+  reducers: {
+    addNewPost: (state, action) => {
+      if (action.payload?.post && action.payload?.user?.[0]) {
+        action.payload.post.name = action.payload?.user[0]?.name;
+
+        if (action.payload?.filename) {
+          action.payload.post.filename = action.payload?.filename;
+        }
+
+        state.posts.push(action.payload.post);
+      }
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchPosts.pending, (state, action) => {
@@ -122,14 +120,24 @@ const postsSlice = createSlice({
 
           const POSTS_SIZE = action.payload.posts.length;
           const USERS_SIZE = action.payload.users.length;
+          const FILES_SIZE = action.payload?.files?.length;
 
-          const posts = action.payload.posts;
-          const users = action.payload.users;
+          const posts = action.payload?.posts;
+          const users = action.payload?.users;
+          const files = action.payload?.files;
 
           for (let i = 0; i < POSTS_SIZE; i++) {
             for (let j = 0; j < USERS_SIZE; j++) {
               if (posts[i].user_id === users[j]._id) {
                 state.posts[i].name = users[j].name;
+              }
+            }
+          }
+
+          for (let i = 0; i < POSTS_SIZE; i++) {
+            for (let j = 0; j < FILES_SIZE; j++) {
+              if (posts[i].file_id === files[j]._id) {
+                state.posts[i].filename = files[j].filename;
               }
             }
           }
@@ -139,18 +147,16 @@ const postsSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
-        if (action.payload.post && action.payload.user) {
-          action.payload.post.name = action.payload.user[0].name;
-
-          state.posts.push(action.payload.post);
-        }
-      })
       .addCase(selectPostById.fulfilled, (state, action) => {
-        if (action.payload.post && action.payload.user) {
+        if (action.payload.post && action.payload?.user?.[0]) {
           const { name } = action.payload.user[0];
 
           action.payload.post.name = name;
+
+          if (action.payload?.filename) {
+            action.payload.post.filename = action.payload?.filename;
+          }
+
           state.post = action.payload.post;
         }
       })
@@ -181,11 +187,19 @@ const postsSlice = createSlice({
         }
       })
       .addCase(fetchLatestPost.fulfilled, (state, action) => {
-        if (action.payload.post && action.payload.user) {
-          const { name } = action.payload.user[0];
+        if (
+          action.payload?.post.length > 0 &&
+          action.payload?.user.length > 0
+        ) {
+          action.payload.post[0].name = action.payload?.user?.[0]?.name;
 
-          action.payload.post[0].name = name;
-          state.latest = action.payload.post;
+          if (action.payload?.filename) {
+            action.payload.post[0].filename = action.payload?.filename;
+          }
+
+          state.latest = action.payload?.post;
+        } else {
+          state.latest = [];
         }
       });
   },
@@ -197,5 +211,7 @@ export const getPostsError = (state) => state.posts.error;
 export const selectLatestPost = (state) => state.posts.latest;
 
 export const getMyPostById = (state) => state.posts.post;
+
+export const { addNewPost } = postsSlice.actions;
 
 export default postsSlice.reducer;

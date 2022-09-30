@@ -88,6 +88,11 @@ const Dashboard = () => {
     navigate,
   ]);
 
+  let content;
+  if (latest_post.length > 0) {
+    content = <AnnouncementPost post={latest_post} />;
+  }
+
   return (
     <RoomLayout>
       <Box display='flex' flexDirection='column'>
@@ -98,7 +103,7 @@ const Dashboard = () => {
 
         {/* body */}
         {/* announcements */}
-        <AnnouncementPost post={latest_post} />
+        {content}
 
         {/* footer */}
         {/* member and tasks */}
