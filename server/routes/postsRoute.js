@@ -16,6 +16,9 @@ router
   .put(auth, postsController.updatePost)
   .delete(auth, postsController.deletePost);
 
+// get method - fetch latest post
+router.route('/latest/:id').get(auth, postsController.fetchLatestPost);
+
 // get method - fetch single post
 router.route('/:company_id/:id').get(auth, postsController.selectPostById);
 

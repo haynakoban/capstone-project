@@ -1,20 +1,55 @@
 import { List, ListItem, ListItemText } from '@mui/material';
+import { useEffect, useState } from 'react';
 
-const MemberContent = ({ Member }) => {
+const MemberContent = ({ members }) => {
+  const [values, setValues] = useState([
+    {
+      users: 0,
+      roles: 'Member',
+    },
+    {
+      users: 0,
+      roles: 'Owner',
+    },
+    {
+      users: 0,
+      roles: 'All',
+    },
+  ]);
+
+  useEffect(() => {
+    if (members) {
+      setValues([
+        {
+          users: members.filter((m) => m.roles === 'owner').length,
+          roles: 'Owner',
+        },
+        {
+          users: members.filter((m) => m.roles === 'member').length,
+          roles: 'Member',
+        },
+        {
+          users: members.length,
+          roles: 'All',
+        },
+      ]);
+    }
+  }, [members]);
+
   return (
     <List>
-      {Member.map((member) => {
+      {values.map((member) => {
         return (
           <ListItem
-            key={member?.users}
+            key={member?.roles}
             divider
-            secondaryAction={member?.active}
+            secondaryAction={member?.users}
             sx={{
               color: '#9FA2B4',
             }}
           >
             <ListItemText
-              primary={member?.users}
+              primary={member?.roles}
               sx={{
                 color: '#000',
               }}

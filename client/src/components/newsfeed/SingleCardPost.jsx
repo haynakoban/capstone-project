@@ -9,7 +9,6 @@ import {
   TextField,
 } from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
 
 import { useContext, useEffect, useState, useTransition } from 'react';
@@ -219,9 +218,6 @@ const SingleCardPost = ({ post }) => {
           >
             <IconButton size='small' sx={{ color: '#202128' }}>
               <AttachFileIcon />
-            </IconButton>
-            <IconButton size='small' sx={{ color: '#202128' }}>
-              <ImageIcon />
             </IconButton>
             <IconButton
               size='small'

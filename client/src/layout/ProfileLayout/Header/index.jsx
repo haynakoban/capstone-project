@@ -51,11 +51,6 @@ const Header = ({ content }) => {
           path: '/settings/account',
           icon: <SettingsOutlinedIcon />,
         },
-        {
-          name: 'Resume',
-          path: '/settings/resume',
-          icon: <InsertDriveFileOutlinedIcon />,
-        },
       ];
 
   return <SideDrawerBar routes={routes} content={content} />;

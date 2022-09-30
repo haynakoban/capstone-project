@@ -54,6 +54,32 @@ const fetchPosts = async (req, res, next) => {
   }
 };
 
+// fetch latest post
+// get method | /api/posts/latest/:id
+const fetchLatestPost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id)
+      return res.status(400).json({ err: 'company id should be provided' });
+
+    const post = await Posts.find({ company_id: id }).limit(1).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
+
+    if (!post) return res.json({ err: 'no data found' });
+
+    const user = await Users.find({ _id: post[0].user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: `no users found` });
+
+    return res.json({ post, user });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // fetch single post
 // get method | /api/posts/:company_id/:id
 const selectPostById = async (req, res, next) => {
@@ -138,6 +164,7 @@ const deletePost = async (req, res, next) => {
 module.exports = {
   createNewPost,
   deletePost,
+  fetchLatestPost,
   fetchPosts,
   selectPostById,
   updatePost,
