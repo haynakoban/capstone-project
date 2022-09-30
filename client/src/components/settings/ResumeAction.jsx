@@ -8,25 +8,14 @@ import {
   LinearProgress,
   Modal,
   Stack,
-  styled,
   Toolbar,
   Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import { StyledModalBox } from '../global';
+import { StyledModalBox, StyledBox } from '../global';
 import { getUserInfo, updateUserDocs } from '../../features/users/usersSlice';
 import axios from '../../lib/axiosConfig';
-
-const StyledBox = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(0.625, 1.5),
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid #3751FF`,
-  color: '#3751FF',
-  width: '100%',
-  overflow: 'hidden',
-  height: 37,
-}));
 
 const ResumeAction = () => {
   const [open, setOpen] = useState(false);

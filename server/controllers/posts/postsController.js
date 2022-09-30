@@ -1,4 +1,10 @@
 const { Posts, Users } = require('../../models');
+const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
+
+const DB_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/main-sys';
+
+const conn = mongoose.createConnection(DB_URL);
 
 // create new post
 // post method | /api/posts
@@ -7,18 +13,34 @@ const createNewPost = async (req, res, next) => {
     const { text, user_id, company_id } = req.body;
 
     // if one is empty or missing the result return false, otherwise true.
-    const canSave = [text, user_id, company_id].every(Boolean);
+    const canSave = [user_id, company_id].every(Boolean);
 
     if (!canSave)
       return res.status(400).json({ err: 'required field must be filled' });
 
-    const post = await Posts.create({ text, user_id, company_id });
+    const post = await Posts.create({
+      text,
+      file_id: req.file?.id,
+      user_id,
+      company_id,
+    });
 
     if (!post) return res.json({ err: 'cannot create the post' });
 
     const users = await Users.find({ _id: user_id }, 'name').exec();
 
     if (!users) return res.json({ err: `no users found` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find(ObjectId(post?.file_id));
+    const file = await cursor.toArray();
+
+    if (file.length > 0) {
+      return res.json({ post, user: users, filename: file?.[0]?.filename });
+    }
 
     return res.status(201).json({ post, user: users });
   } catch (e) {
@@ -43,10 +65,23 @@ const fetchPosts = async (req, res, next) => {
     if (!posts) return res.json({ err: 'no data found' });
 
     const ids = posts.map((e) => e.user_id);
+    const file_lists = posts.filter((e) => e.file_id !== undefined);
+    const file_ids = file_lists.map((e) => e.file_id);
 
     const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
 
     if (!users) return res.json({ err: `no users found` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find({ _id: { $in: file_ids } });
+    const files = await cursor.toArray();
+
+    if (files.length > 0) {
+      return res.json({ posts, users, files });
+    }
 
     return res.json({ posts, users });
   } catch (e) {
@@ -70,9 +105,20 @@ const fetchLatestPost = async (req, res, next) => {
 
     if (!post) return res.json({ err: 'no data found' });
 
-    const user = await Users.find({ _id: post[0].user_id }, 'name').exec();
+    const user = await Users.find({ _id: post?.[0]?.user_id }, 'name').exec();
 
     if (!user) return res.json({ err: `no users found` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find(ObjectId(post?.[0]?.file_id));
+    const file = await cursor.toArray();
+
+    if (file.length > 0) {
+      return res.json({ post, user, filename: file?.[0]?.filename });
+    }
 
     return res.json({ post, user });
   } catch (e) {
@@ -99,6 +145,17 @@ const selectPostById = async (req, res, next) => {
     const user = await Users.find({ _id: post.user_id }, 'name').exec();
 
     if (!user) return res.json({ err: `no users found` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find(ObjectId(post?.file_id));
+    const file = await cursor.toArray();
+
+    if (file.length > 0) {
+      return res.json({ post, user, filename: file?.[0]?.filename });
+    }
 
     return res.json({ post, user });
   } catch (e) {

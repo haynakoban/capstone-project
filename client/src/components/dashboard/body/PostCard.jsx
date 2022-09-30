@@ -1,7 +1,7 @@
-import { Avatar, Box, Button, Paper } from '@mui/material';
+import { Avatar, Box, Button, CardContent, Paper } from '@mui/material';
 
 import Author from './Author';
-import { TimeAgo } from '../../global';
+import { StyledPostBox, TimeAgo } from '../../global';
 import PostContent from './PostContent';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +27,18 @@ const PostCard = ({ post }) => {
 
       {/* post content */}
       <PostContent text={post?.[0]?.text} />
+
+      {post?.[0]?.filename && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+            mt: 1,
+          }}
+        >
+          <StyledPostBox>{post?.[0]?.filename}</StyledPostBox>
+        </CardContent>
+      )}
 
       {/* redirect the user to the actual post */}
       <Box display='flex' justifyContent='center'>
