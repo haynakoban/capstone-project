@@ -13,16 +13,97 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 
 import { ExpandMore, StyledTypography, TimeAgo } from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
+import { useEffect } from 'react';
+import axios from '../../lib/axiosConfig';
+import CommentsCard from './CommentsCard';
 
 const CardPost = ({ post, handleExpandClick }) => {
   const { _user } = useContext(AuthContext);
+  const [comment, setComment] = useState([]);
+  const [values, setValues] = useState({
+    text: '',
+    post_id: post?._id,
+    user_id: _user?._id,
+  });
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`api/comments/comment/${post._id}`).then((res) => {
+      if (res.data?.comment.length > 0 && res.data?.user.length > 0) {
+        res.data.comment[0].name = res.data.user?.[0].name;
+        setComment(res.data.comment);
+      }
+    });
+  }, [post._id]);
+
+  useEffect(() => {
+    setValues({
+      text: '',
+      post_id: post?._id,
+      user_id: _user?._id,
+    });
+  }, [post?._id, _user?._id]);
+
+  // handle change
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  // handle event key
+  const handleKeyDown = async (event) => {
+    const { text, post_id, user_id } = values;
+
+    if (!text) {
+      return;
+    } else {
+      if (event.shiftKey && event.code === 'Enter') {
+        axios.post('api/comments', { text, post_id, user_id }).then((res) => {
+          if (res.data.comment && res.data.user) {
+            const { name } = res.data.user[0];
+
+            res.data.comment.name = name;
+            setComment((prev) => [...prev, res.data.comment]);
+          }
+        });
+
+        setValues({
+          text: '',
+          post_id: post?._id,
+          user_id: _user?._id,
+        });
+      }
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    const { text, post_id, user_id } = values;
+
+    if (!text) {
+      return;
+    } else {
+      axios.post('api/comments', { text, post_id, user_id }).then((res) => {
+        if (res.data.comment && res.data.user) {
+          const { name } = res.data.user[0];
+
+          res.data.comment.name = name;
+          setComment((prev) => [...prev, res.data.comment]);
+        }
+      });
+
+      setValues({
+        text: '',
+        post_id: post?._id,
+        user_id: _user?._id,
+      });
+    }
+  };
 
   return (
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
@@ -80,7 +161,7 @@ const CardPost = ({ post, handleExpandClick }) => {
       </CardContent>
 
       <CardContent sx={{ px: 3, py: 0, mt: 2 }}>
-        <Divider flexItem sx={{ bgcolor: '#202128', height: 1.65 }} />
+        <Divider flexItem sx={{ bgcolor: '#202128', height: '1px' }} />
       </CardContent>
 
       {/* for comments */}
@@ -131,6 +212,10 @@ const CardPost = ({ post, handleExpandClick }) => {
             maxRows={20}
             autoComplete='off'
             placeholder='Write a comment'
+            name='text'
+            value={values.text}
+            onChange={handleChange('text')}
+            onKeyDown={handleKeyDown}
           />
           <Box
             sx={{
@@ -145,12 +230,22 @@ const CardPost = ({ post, handleExpandClick }) => {
             <IconButton size='small' sx={{ color: '#202128' }}>
               <ImageIcon />
             </IconButton>
-            <IconButton size='small' sx={{ color: '#202128' }}>
+            <IconButton
+              size='small'
+              sx={{ color: '#202128' }}
+              onClick={handleFormSubmit}
+            >
               <SendIcon />
             </IconButton>
           </Box>
         </Box>
       </CardContent>
+
+      {/* some of the comments */}
+      {comment.length > 0 &&
+        comment?.map((comment) => (
+          <CommentsCard comment={comment} key={comment?._id} />
+        ))}
     </Card>
   );
 };
