@@ -11,7 +11,7 @@ const initialState = {
 
 // delete the file
 export const deleteFile = createAsyncThunk(
-  'companies/deleteFile',
+  'files/deleteFile',
   async (initialState) => {
     try {
       const response = await axios.delete(`api/users/files/${initialState}`);

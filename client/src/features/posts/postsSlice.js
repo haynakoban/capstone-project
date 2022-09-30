@@ -4,6 +4,7 @@ import axios from '../../lib/axiosConfig';
 const initialState = {
   posts: [],
   post: {},
+  latest: {},
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -79,9 +80,23 @@ export const selectPostById = createAsyncThunk(
     try {
       const { id, company_id } = initialState;
 
-      const response = await axios.get(`api/posts/${company_id}/${id}`, {
-        company_id,
-      });
+      const response = await axios.get(`api/posts/${company_id}/${id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch latest post
+export const fetchLatestPost = createAsyncThunk(
+  'posts/fetchLatestPost',
+  async (initialState) => {
+    try {
+      const { company_id } = initialState;
+
+      const response = await axios.get(`api/posts/latest/${company_id}`);
 
       return response.data;
     } catch (e) {
@@ -164,6 +179,14 @@ const postsSlice = createSlice({
           state.posts = [...posts];
           state.post = {};
         }
+      })
+      .addCase(fetchLatestPost.fulfilled, (state, action) => {
+        if (action.payload.post && action.payload.user) {
+          const { name } = action.payload.user[0];
+
+          action.payload.post[0].name = name;
+          state.latest = action.payload.post;
+        }
       });
   },
 });
@@ -171,6 +194,7 @@ const postsSlice = createSlice({
 export const selectAllPosts = (state) => state.posts.posts;
 export const getPostsStatus = (state) => state.posts.status;
 export const getPostsError = (state) => state.posts.error;
+export const selectLatestPost = (state) => state.posts.latest;
 
 export const getMyPostById = (state) => state.posts.post;
 

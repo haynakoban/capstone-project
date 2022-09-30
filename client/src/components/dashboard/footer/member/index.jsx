@@ -1,8 +1,11 @@
 import { Box, Paper, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import MemberContent from './MemberContent';
 
 // also accept company name
-const MemberFooter = ({ Member }) => {
+const MemberFooter = ({ room_info }) => {
+  const navigate = useNavigate();
+
   return (
     <Paper elevation={2} sx={{ p: 3 }}>
       <Box display='flex' justifyContent='space-between'>
@@ -22,7 +25,7 @@ const MemberFooter = ({ Member }) => {
           fontWeight={500}
           sx={{ cursor: 'pointer' }}
           // fix the click event
-          onClick={() => console.log('link to /member')}
+          onClick={() => navigate(`member`)}
         >
           View all
         </Typography>
@@ -42,12 +45,12 @@ const MemberFooter = ({ Member }) => {
           color='#000'
           fontWeight={500}
         >
-          TechTalk
+          {room_info?.roomName}
         </Typography>
       </Typography>
 
       {/* list of member in card*/}
-      <MemberContent Member={Member} />
+      <MemberContent members={room_info?.members} />
     </Paper>
   );
 };

@@ -1,32 +1,38 @@
 import { Avatar, Box, Button, Paper } from '@mui/material';
 
 import Author from './Author';
-import TimeAgo from './TimeAgo';
+import { TimeAgo } from '../../global';
 import PostContent from './PostContent';
+import { useNavigate } from 'react-router-dom';
 
-const PostCard = () => {
+const PostCard = ({ post }) => {
+  const navigate = useNavigate();
+
   return (
     <Paper elevation={2} sx={{ mt: 1, p: 3 }}>
       <Box display='flex' alignItems='center'>
         {/* avatar */}
-        <Avatar sx={{ color: '#fff', bgcolor: '#902133' }}>E</Avatar>
+        <Avatar sx={{ color: '#fff', bgcolor: '#902133' }}>
+          {post?.[0]?.name?.[0]?.toUpperCase()}
+        </Avatar>
 
         <Box display='flex' flexDirection='column' ml={1.5}>
           {/* author */}
-          <Author />
+          <Author name={post?.[0]?.name} />
 
           {/* time */}
-          <TimeAgo />
+          <TimeAgo timestamp={post?.[0]?.updatedAt} />
         </Box>
       </Box>
 
       {/* post content */}
-      <PostContent />
+      <PostContent text={post?.[0]?.text} />
 
       {/* redirect the user to the actual post */}
       <Box display='flex' justifyContent='center'>
         <Button
           variant='outlined'
+          onClick={() => navigate(`newsfeed/${post?.[0]?._id}`)}
           sx={{
             mt: 1.5,
             color: '#3751FF',

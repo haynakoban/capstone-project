@@ -20,7 +20,10 @@ const Resume = () => {
     if (!_isUserAuth) {
       navigate('/login');
     }
-  }, [_isUserAuth, navigate]);
+    if (!_user?.isIntern) {
+      navigate('/settings/account');
+    }
+  }, [_isUserAuth, _user?.isIntern, navigate]);
 
   return (
     <ProfileLayout>

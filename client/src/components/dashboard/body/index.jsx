@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import PostCard from './PostCard';
 
-const AnnouncementPost = () => {
+const AnnouncementPost = ({ post }) => {
   return (
     <Box mt={3}>
       <Typography
@@ -12,11 +12,11 @@ const AnnouncementPost = () => {
         textTransform='uppercase'
         pl={3}
       >
-        Announcements :
+        Latest Post :
       </Typography>
 
       {/* the post details */}
-      <PostCard />
+      <PostCard post={post} />
     </Box>
   );
 };

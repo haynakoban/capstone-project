@@ -10,7 +10,7 @@ const initialState = {
 
 // add comment
 export const addComment = createAsyncThunk(
-  'posts/addComment',
+  'comments/addComment',
   async (initialState) => {
     try {
       const response = await axios.post('api/comments', initialState);
@@ -24,7 +24,7 @@ export const addComment = createAsyncThunk(
 
 // fetch all comments
 export const fetchComments = createAsyncThunk(
-  'posts/fetchComments',
+  'comments/fetchComments',
   async (initialState) => {
     try {
       const { post_id } = initialState;
@@ -40,7 +40,7 @@ export const fetchComments = createAsyncThunk(
 
 // fetch a single comment
 // export const fetchSingleComment = createAsyncThunk(
-//   'posts/fetchSingleComment',
+//   'comments/fetchSingleComment',
 //   async (initialState) => {
 //     try {
 //       const { post_id } = initialState;

@@ -9,10 +9,17 @@ import RoomLayout from '../../layout/RoomLayout';
 
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
-import { getRoomInfo } from '../../features/companies/companiesSlice';
+import {
+  getCompanyInfo,
+  getRoomInfo,
+} from '../../features/companies/companiesSlice';
+import {
+  fetchLatestPost,
+  selectLatestPost,
+} from '../../features/posts/postsSlice';
 
 const Tasks = [
   {
@@ -29,21 +36,6 @@ const Tasks = [
   },
 ];
 
-const Member = [
-  {
-    active: '29',
-    users: 'Interns',
-  },
-  {
-    active: '5',
-    users: 'Employers',
-  },
-  {
-    active: '34',
-    users: 'All',
-  },
-];
-
 const Dashboard = () => {
   const [auth, setAuth] = useState(false);
   const { _user, _isUserAuth } = useContext(AuthContext);
@@ -52,7 +44,15 @@ const Dashboard = () => {
   const { pathname } = useLocation();
   const room_id = pathname.slice(6).slice(0, 24);
 
+  const latest_post = useSelector(selectLatestPost);
+  const room_info = useSelector(getCompanyInfo);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (room_id) {
+      dispatch(fetchLatestPost({ company_id: room_id })).unwrap();
+    }
+  }, [room_id, dispatch]);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
@@ -98,11 +98,11 @@ const Dashboard = () => {
 
         {/* body */}
         {/* announcements */}
-        <AnnouncementPost />
+        <AnnouncementPost post={latest_post} />
 
         {/* footer */}
         {/* member and tasks */}
-        <DashboardFooter Tasks={Tasks} Member={Member} />
+        <DashboardFooter Tasks={Tasks} room_info={room_info} />
       </Box>
     </RoomLayout>
   );
