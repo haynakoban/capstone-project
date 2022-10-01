@@ -38,21 +38,39 @@ export const fetchComments = createAsyncThunk(
   }
 );
 
-// fetch a single comment
-// export const fetchSingleComment = createAsyncThunk(
-//   'comments/fetchSingleComment',
-//   async (initialState) => {
-//     try {
-//       const { post_id } = initialState;
+// update comment
+export const updateComment = createAsyncThunk(
+  'comments/updateComment',
+  async (initialState) => {
+    try {
+      const { text, id } = initialState;
 
-//       const response = await axios.get(`api/comments/comment/${post_id}`);
+      const response = await axios.put(`api/comments/${id}`, {
+        text,
+      });
 
-//       return response.data;
-//     } catch (e) {
-//       return e.message;
-//     }
-//   }
-// );
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// delete comment
+export const deleteComment = createAsyncThunk(
+  'comments/deleteComment',
+  async (initialState) => {
+    try {
+      const { id } = initialState;
+
+      const response = await axios.delete(`/api/comments/${id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
 
 const commentsSlice = createSlice({
   name: 'comments',
@@ -87,6 +105,36 @@ const commentsSlice = createSlice({
               }
             }
           }
+        }
+      })
+      .addCase(updateComment.fulfilled, (state, action) => {
+        if (action.payload.comment && action.payload.user[0]) {
+          const { _id } = action.payload.comment;
+          const { name } = action.payload.user[0];
+
+          const comments = state.comments.filter(
+            (comment) => comment._id !== _id
+          );
+
+          action.payload.comment.name = name;
+          state.comments = [...comments, action.payload.comment];
+          state.comment = action.payload.comment;
+        }
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          console.log('delete comment could not complete');
+          console.log(action.payload);
+          return;
+        }
+
+        const { msg, id } = action.payload;
+        if (msg && id) {
+          const comments = state.comments.filter(
+            (comment) => comment._id !== id
+          );
+          state.comments = [...comments];
+          state.comment = {};
         }
       });
   },

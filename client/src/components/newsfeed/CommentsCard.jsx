@@ -1,14 +1,8 @@
-import {
-  Avatar,
-  Box,
-  CardContent,
-  IconButton,
-  Typography,
-} from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Avatar, Box, CardContent, Typography } from '@mui/material';
 
 import { useContext } from 'react';
 import { AuthContext } from '../../lib/authContext';
+import CommentClickAwayHandler from './CommentClickAwayHandler';
 
 const CommentsCard = ({ comment }) => {
   const { _user } = useContext(AuthContext);
@@ -57,9 +51,7 @@ const CommentsCard = ({ comment }) => {
           {comment?.text}
         </Typography>
         {_user?._id === comment?.user_id ? (
-          <IconButton size='small' sx={{ color: '#202128' }}>
-            <MoreHorizIcon />
-          </IconButton>
+          <CommentClickAwayHandler comment={comment} />
         ) : undefined}
       </Box>
     </CardContent>

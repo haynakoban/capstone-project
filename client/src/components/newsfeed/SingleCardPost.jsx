@@ -8,7 +8,6 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 
 import { useContext, useEffect, useState, useTransition } from 'react';
@@ -236,9 +235,6 @@ const SingleCardPost = ({ post }) => {
               justifyContent: 'flex-end',
             }}
           >
-            <IconButton size='small' sx={{ color: '#202128' }}>
-              <AttachFileIcon />
-            </IconButton>
             <IconButton
               size='small'
               sx={{ color: '#202128' }}

@@ -8,7 +8,11 @@ const auth = require('../middlewares/auth_user_cookie');
 router.route('/').post(auth, commentsController.addComment);
 
 // get method - fetch all comments
-router.route('/:id').get(auth, commentsController.fetchComments);
+router
+  .route('/:id')
+  .get(auth, commentsController.fetchComments)
+  .put(auth, commentsController.updateComment)
+  .delete(auth, commentsController.deleteComment);
 
 // get method - fetch single comment
 router.route('/comment/:id').get(auth, commentsController.fetchSingleComment);

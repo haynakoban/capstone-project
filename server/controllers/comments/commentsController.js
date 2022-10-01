@@ -81,8 +81,67 @@ const fetchSingleComment = async (req, res, next) => {
   }
 };
 
+// update a comment
+// put method | api/comments/:id
+const updateComment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [text, id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findComment = await Comments.findById(id).exec();
+
+    if (!findComment)
+      return res.json({ err: `no data found with the id: ${id}` });
+
+    const user = await Users.find({ _id: findComment?.user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: `no users found` });
+
+    findComment.text = text;
+    findComment.updatedAt = date;
+
+    const updatedComment = await findComment.save();
+
+    return res.json({ comment: updatedComment, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// delete a comment
+// delete method | api/comments/:id
+const deleteComment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findComment = await Comments.findByIdAndDelete(id).exec();
+
+    if (!findComment)
+      return res.json({ err: `no data found with the id: ${id}` });
+
+    return res.json({ msg: 'success', id: findComment?._id });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addComment,
+  deleteComment,
   fetchComments,
   fetchSingleComment,
+  updateComment,
 };
