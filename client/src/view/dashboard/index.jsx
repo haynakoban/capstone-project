@@ -1,9 +1,9 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 import DashboardHeader from '../../components/dashboard/header';
-import AnnouncementPost from '../../components/dashboard/body';
+import PostCard from '../../components/dashboard/body/PostCard';
 import DashboardFooter from '../../components/dashboard/footer';
 import RoomLayout from '../../layout/RoomLayout';
 
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   let content;
   if (latest_post.length > 0) {
-    content = <AnnouncementPost post={latest_post} />;
+    content = <PostCard post={latest_post} />;
   }
 
   return (
@@ -103,7 +103,21 @@ const Dashboard = () => {
 
         {/* body */}
         {/* announcements */}
-        {content}
+        <Box mt={3}>
+          <Typography
+            variant='body1'
+            component='div'
+            letterSpacing={1}
+            fontWeight={600}
+            textTransform='uppercase'
+            pl={3}
+          >
+            Latest Post :
+          </Typography>
+
+          {/* the post details */}
+          {content}
+        </Box>
 
         {/* footer */}
         {/* member and tasks */}

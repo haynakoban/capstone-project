@@ -190,6 +190,21 @@ const updatePost = async (req, res, next) => {
 
     const updatedPost = await findPost.save();
 
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find(ObjectId(updatedPost?.file_id));
+    const file = await cursor.toArray();
+
+    if (file.length > 0) {
+      return res.json({
+        post: updatedPost,
+        user: users,
+        filename: file?.[0]?.filename,
+      });
+    }
+
     return res.json({ post: updatedPost, user: users });
   } catch (error) {
     next(error);
@@ -211,6 +226,12 @@ const deletePost = async (req, res, next) => {
     const findPost = await Posts.findByIdAndDelete(id).exec();
 
     if (!findPost) return res.json({ err: `no data found with the id: ${id}` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    await bucket.delete(ObjectId(findPost?.file_id));
 
     return res.json({ msg: 'success', id: findPost?._id });
   } catch (error) {

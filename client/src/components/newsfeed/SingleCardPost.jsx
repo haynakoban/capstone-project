@@ -146,7 +146,14 @@ const SingleCardPost = ({ post }) => {
           <StyledTypography
             variant='body1'
             component='pre'
-            sx={{ cursor: 'pointer' }}
+            sx={{
+              cursor: 'pointer',
+              hyphens: 'auto',
+              overflowWrap: 'break-word',
+              overflowX: 'auto',
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+            }}
           >
             {post?.text}
           </StyledTypography>
