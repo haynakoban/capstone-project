@@ -1,8 +1,15 @@
-import { Button, Divider, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  Button,
+  CardContent,
+  Divider,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
-import { StyledModalBox } from '../global';
+import { StyledModalBox, StyledPostBox } from '../global';
 import { updatePost } from '../../features/posts/postsSlice';
 
 const UpdatePost = ({ post, handleUpdateModalClose }) => {
@@ -68,12 +75,26 @@ const UpdatePost = ({ post, handleUpdateModalClose }) => {
         required
         type='text'
         multiline
-        rows={6}
+        minRows={4}
+        maxRows={20}
         autoComplete='off'
         placeholder='Post your query'
         value={watch('text')}
         {...register('text', { required: true })}
       />
+
+      {post?.filename && (
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+            mt: 1,
+            mb: 1,
+          }}
+        >
+          <StyledPostBox>{post?.filename}</StyledPostBox>
+        </CardContent>
+      )}
 
       <Divider flexItem sx={{ bgcolor: '#000000', height: 1.2, mb: 2 }} />
 

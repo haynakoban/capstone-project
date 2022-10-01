@@ -136,14 +136,31 @@ const CardPost = ({ post, handleExpandClick }) => {
           <StyledTypography
             variant='body1'
             component='pre'
-            sx={{ cursor: 'pointer' }}
+            sx={{
+              cursor: 'pointer',
+              hyphens: 'auto',
+              overflowWrap: 'break-word',
+              overflowX: 'auto',
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+            }}
             onClick={() => navigate(`${post._id}`)}
           >
             {!post?.isExpanded && post?.text?.substring(0, 500)}
             {!post?.isExpanded && post?.text?.length > 500 ? '...' : ''}
 
             <Collapse in={post?.isExpanded} timeout='auto' unmountOnExit>
-              <StyledTypography variant='body1' component='pre'>
+              <StyledTypography
+                variant='body1'
+                component='pre'
+                sx={{
+                  hyphens: 'auto',
+                  overflowWrap: 'break-word',
+                  overflowX: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                }}
+              >
                 {post?.text}
               </StyledTypography>
             </Collapse>

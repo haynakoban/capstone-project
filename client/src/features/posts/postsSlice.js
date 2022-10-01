@@ -161,11 +161,16 @@ const postsSlice = createSlice({
         }
       })
       .addCase(updatePost.fulfilled, (state, action) => {
+        console.log(action.payload);
         if (action.payload.post && action.payload.user) {
           const { _id } = action.payload.post;
           const { name } = action.payload.user[0];
 
           const posts = state.posts.filter((post) => post._id !== _id);
+
+          if (action.payload?.filename) {
+            action.payload.post.filename = action.payload?.filename;
+          }
 
           action.payload.post.name = name;
           state.posts = [...posts, action.payload.post];
