@@ -1,4 +1,4 @@
-const { Posts, Users } = require('../../models');
+const { Comments, Posts, Users } = require('../../models');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -231,7 +231,11 @@ const deletePost = async (req, res, next) => {
       bucketName: 'uploads',
     });
 
-    await bucket.delete(ObjectId(findPost?.file_id));
+    if (findPost?.file_id) {
+      await bucket.delete(ObjectId(findPost?.file_id));
+    }
+
+    await Comments.deleteMany({ post_id: findPost._id });
 
     return res.json({ msg: 'success', id: findPost?._id });
   } catch (error) {
