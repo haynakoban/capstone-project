@@ -123,7 +123,7 @@ const joinRoom = async (req, res, next) => {
 
     // if the user successfully enter the correct code for the room and company name.
     // this code add the user in the company as member
-    company.members.push({ id, roles: 'member' });
+    company.members.push({ id, roles: 'owner' });
     company.save();
 
     // find the user with the id: id
