@@ -108,14 +108,21 @@ const UserSettings = () => {
               </Paper>
 
               <List>
-                <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate(`/settings/resume`)}>
-                    <ListItemIcon sx={{ color: '#000000' }}>
-                      <InsertDriveFileOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary='Resume' sx={{ color: '#000000' }} />
-                  </ListItemButton>
-                </ListItem>
+                {user?.isIntern && (
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => navigate(`/settings/resume`)}
+                    >
+                      <ListItemIcon sx={{ color: '#000000' }}>
+                        <InsertDriveFileOutlinedIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary='Resume'
+                        sx={{ color: '#000000' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                )}
                 <ListItem disablePadding>
                   <ListItemButton onClick={onUserLogout}>
                     <ListItemIcon sx={{ color: '#000000' }}>

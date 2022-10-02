@@ -30,10 +30,11 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // routes
-app.use('/api/users', require('./routes/usersRoute'));
+app.use('/api/comments', require('./routes/commentsRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
-app.use('/api/comments', require('./routes/commentsRoute'));
+app.use('/api/tasks', require('./routes/tasksRoute'));
+app.use('/api/users', require('./routes/usersRoute'));
 
 httpServer.listen(ACCESS_PORT, () => {
   console.log(`server running on port ${ACCESS_PORT}`);
