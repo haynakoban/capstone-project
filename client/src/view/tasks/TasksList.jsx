@@ -70,15 +70,31 @@ const TasksList = () => {
 
   useEffect(() => {
     if (tasksList) {
-      startTransition(() => {
-        const tasks = tasksList
-          ?.slice()
-          ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      if (_user?.isIntern) {
+        startTransition(() => {
+          const tasks = tasksList.filter((p) => {
+            return p.assignedTo.some((id) => id === _user?._id);
+          });
 
-        setTasks(tasks);
-      });
+          const orderedTasks = tasks
+            ?.slice()
+            ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+          setTasks(orderedTasks);
+        });
+      } else {
+        startTransition(() => {
+          const tasks = tasksList.filter((p) => p.createdBy === _user?._id);
+
+          const orderedTasks = tasks
+            ?.slice()
+            ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+          setTasks(orderedTasks);
+        });
+      }
     }
-  }, [tasksList, dispatch]);
+  }, [_user?._id, _user?.isIntern, tasksList, dispatch]);
 
   const ListOfTasks = tasks.map((task) => {
     return <TaskCard task={task} key={task._id} />;

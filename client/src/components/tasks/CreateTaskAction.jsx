@@ -132,53 +132,58 @@ const CreateTaskAction = ({ members }) => {
     }
 
     data.assignedTo = assigned_id;
-    const list_of_files = Array.from(data.ref_files);
 
-    if (list_of_files?.length > 0) {
-      const fileListArr = [...data.ref_files];
-      fileListArr.splice(6);
+    if (data.assignedTo.length === 0) {
+      handleOpenAssignTo();
+    } else {
+      const list_of_files = Array.from(data.ref_files);
 
-      for (const file of fileListArr) {
-        fd.append('ref_files', file);
-      }
-    }
+      if (list_of_files?.length > 0) {
+        const fileListArr = [...data.ref_files];
+        fileListArr.splice(6);
 
-    fd.append('title', title);
-    fd.append('description', description);
-
-    for (const user_id of data.assignedTo) {
-      fd.append('assignedTo', user_id);
-    }
-
-    fd.append('createdBy', createdBy);
-    fd.append('company_id', company_id);
-    fd.append('dueDate', dueDate);
-    fd.append('closesDate', closesDate);
-
-    // create task with axios
-    axios
-      .post('api/tasks', fd, options)
-      .then((res) => {
-        if (res.data?.task && res.data?.user?.[0]) {
-          dispatch(addNewTask(res.data));
+        for (const file of fileListArr) {
+          fd.append('ref_files', file);
         }
-      })
-      .catch((err) => console.error(err))
-      .finally(() =>
-        setTimeout(() => {
-          handleClose();
-          reset({
-            title: '',
-            description: '',
-            ref_files: [],
-            assignedTo: [],
-            createdBy: user?._id,
-            company_id: room_id,
-            dueDate: moment(),
-            closesDate: moment(),
-          });
-        }, 2000)
-      );
+      }
+
+      fd.append('title', title);
+      fd.append('description', description);
+
+      for (const user_id of data.assignedTo) {
+        fd.append('assignedTo', user_id);
+      }
+
+      fd.append('createdBy', createdBy);
+      fd.append('company_id', company_id);
+      fd.append('dueDate', dueDate);
+      fd.append('closesDate', closesDate);
+
+      // create task with axios
+      axios
+        .post('api/tasks', fd, options)
+        .then((res) => {
+          if (res.data?.task && res.data?.user?.[0]) {
+            dispatch(addNewTask(res.data));
+          }
+        })
+        .catch((err) => console.error(err))
+        .finally(() =>
+          setTimeout(() => {
+            handleClose();
+            reset({
+              title: '',
+              description: '',
+              ref_files: [],
+              assignedTo: [],
+              createdBy: user?._id,
+              company_id: room_id,
+              dueDate: moment(),
+              closesDate: moment(),
+            });
+          }, 2000)
+        );
+    }
   };
 
   const filterMember = membersOnly?.map((m) => {
