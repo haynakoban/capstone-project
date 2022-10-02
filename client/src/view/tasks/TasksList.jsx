@@ -5,7 +5,7 @@ import CardStatusTask from '../../components/cards/CardStatusTask';
 import TaskCard from '../../components/tasks/TaskCard';
 import RoomLayout from '../../layout/RoomLayout';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useTransition } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,14 +16,12 @@ import {
 } from '../../features/companies/companiesSlice';
 
 import { pendingTasks, completedTasks } from './dummy';
+import { fetchTasks, selectAllTasks } from '../../features/tasks/tasksSlice';
 
 const TasksList = () => {
-  const tasks = completedTasks.concat(pendingTasks);
-  const ListOfTasks = tasks.map((task) => {
-    return <TaskCard task={task} key={task.text} />;
-  });
-
   const [auth, setAuth] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [isPending, startTransition] = useTransition();
   const { _user, _isUserAuth } = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -32,9 +30,12 @@ const TasksList = () => {
 
   const dispatch = useDispatch();
   const roomInfo = useSelector(getCompanyInfo);
+  const tasksList = useSelector(selectAllTasks);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
+
+    dispatch(fetchTasks({ company_id: room_id })).unwrap();
   }, [room_id, dispatch]);
 
   useEffect(() => {
@@ -67,6 +68,22 @@ const TasksList = () => {
     navigate,
   ]);
 
+  useEffect(() => {
+    if (tasksList) {
+      startTransition(() => {
+        const tasks = tasksList
+          ?.slice()
+          ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+        setTasks(tasks);
+      });
+    }
+  }, [tasksList, dispatch]);
+
+  const ListOfTasks = tasks.map((task) => {
+    return <TaskCard task={task} key={task._id} />;
+  });
+
   return (
     <RoomLayout>
       <Box display='flex' justifyContent='space-between'>
@@ -85,7 +102,7 @@ const TasksList = () => {
         >
           {!_user?.isIntern && <CreateTaskAction members={roomInfo?.members} />}
 
-          {ListOfTasks}
+          {isPending ? <h4>Loading...</h4> : ListOfTasks}
         </Container>
 
         {/* list of tasks */}

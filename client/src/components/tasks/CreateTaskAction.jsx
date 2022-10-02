@@ -23,21 +23,23 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import axios from '../../lib/axiosConfig';
 import moment from 'moment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers';
 
 import { Fragment, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
 import { StyledPostBox, StyledModalBox } from '../global';
 import { getUserInfo } from '../../features/users/usersSlice';
-import axios from '../../lib/axiosConfig';
+import { addNewTask } from '../../features/tasks/tasksSlice';
 
 const CreateTaskAction = ({ members }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserInfo);
 
   const { pathname } = useLocation();
@@ -157,7 +159,9 @@ const CreateTaskAction = ({ members }) => {
     axios
       .post('api/tasks', fd, options)
       .then((res) => {
-        console.log(res.data);
+        if (res.data?.task && res.data?.user?.[0]) {
+          dispatch(addNewTask(res.data));
+        }
       })
       .catch((err) => console.error(err))
       .finally(() =>
