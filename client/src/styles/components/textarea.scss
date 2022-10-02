@@ -8,3 +8,14 @@ textarea::-webkit-scrollbar-thumb {
 textarea::-webkit-scrollbar-track {
   background-color: #20212850 !important;
 }
+
+.comment::-webkit-scrollbar {
+  width: 0.4rem !important;
+}
+
+.comment::-webkit-scrollbar-thumb {
+  background-color: #20212880 !important;
+}
+.comment::-webkit-scrollbar-track {
+  background-color: #20212850 !important;
+}
