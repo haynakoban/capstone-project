@@ -7,18 +7,26 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { TimeAgo } from '../global';
+import { format } from 'date-fns';
 
 const TaskCard = ({ task }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { pathname } = useLocation();
+
+  const DateFormatter = (date) => {
+    const d = new Date(`${date}`);
+
+    return `${format(d, 'MMMM d, yyyy hh:mm a')}`;
+  };
 
   return (
-    <Card elevation={2} sx={{ mb: 3 }}>
+    <Card elevation={2} sx={{ mb: 3 }} key={task._id}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
-            {task?.assignedBy[0]?.toUpperCase()}
+            {task?.name?.[0]?.toUpperCase()}
           </Avatar>
         }
         action={
@@ -27,18 +35,19 @@ const TaskCard = ({ task }) => {
               display: { xs: 'none', sm: 'flex' },
               flexDirection: 'column',
               justifyContent: 'center',
+              alignItems: 'flex-end',
             }}
           >
             <Typography variant='body2' fontWeight={700}>
-              Due {task?.date?.due}
+              Due {DateFormatter(task?.date?.due)}
             </Typography>
             <Typography variant='body2' fontWeight={700}>
-              Closes {task?.date?.closes}
+              Closes {DateFormatter(task?.date?.closes)}
             </Typography>
           </Toolbar>
         }
-        title={task?.assignedBy}
-        subheader='about an hour ago'
+        title={task?.name}
+        subheader={<TimeAgo timestamp={task?.updatedAt} />}
       />
       <CardContent
         sx={{
@@ -52,10 +61,10 @@ const TaskCard = ({ task }) => {
         }}
       >
         <Typography variant='body2' fontWeight={700}>
-          Due {task?.date?.due}
+          Due {DateFormatter(task?.date?.due)}
         </Typography>
         <Typography variant='body2' fontWeight={700}>
-          Closes {task?.date?.closes}
+          Closes {DateFormatter(task?.date?.closes)}
         </Typography>
       </CardContent>
 
@@ -66,13 +75,13 @@ const TaskCard = ({ task }) => {
         }}
       >
         <Typography variant='h6' fontWeight={700} mb={2}>
-          {task?.text}
+          {task?.title}
         </Typography>
 
         <Button
           variant='outlined'
           sx={{ px: '23px' }}
-          onClick={() => navigate(`/room/${id}/tasks/${task?.id}`)}
+          onClick={() => navigate(`${pathname}/${task?._id}`)}
         >
           View Task
         </Button>
