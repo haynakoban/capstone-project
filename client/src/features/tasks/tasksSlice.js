@@ -66,6 +66,7 @@ const tasksSlice = createSlice({
         if (action.payload.submitted_on) {
           action.payload.task.submitted_on = action.payload.submitted_on;
         }
+
         action.payload.task.name = state.task?.name;
         action.payload.task.filename = state.task?.filename;
 

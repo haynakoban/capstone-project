@@ -155,7 +155,7 @@ const SingleTaskCard = ({ task }) => {
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
-            E
+            {task?.name?.[0]?.toUpperCase()}
           </Avatar>
         }
         action={
