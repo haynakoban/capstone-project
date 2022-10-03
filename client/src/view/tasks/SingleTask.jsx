@@ -1,14 +1,86 @@
 import { Box, Container, IconButton } from '@mui/material';
-import CardStatusTask from '../../components/cards/CardStatusTask';
-import SingleTaskCard from '../../components/tasks/SingleTaskCard';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { useNavigate, useParams } from 'react-router-dom';
+
 import { pendingTasks, completedTasks } from './dummy';
 import RoomLayout from '../../layout/RoomLayout';
+import CardStatusTask from '../../components/cards/CardStatusTask';
+import SingleTaskCard from '../../components/tasks/SingleTaskCard';
+
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { AuthContext } from '../../lib/authContext';
+import { getRoomInfo } from '../../features/companies/companiesSlice';
+import { getTaskById, selectSingleTask } from '../../features/tasks/tasksSlice';
 
 const SingleTask = () => {
+  const [auth, setAuth] = useState(false);
+  const { _user, _isUserAuth } = useContext(AuthContext);
+
   const navigate = useNavigate();
   const { id } = useParams();
+  const { pathname } = useLocation();
+  const room_id = pathname.slice(6).slice(0, 24);
+
+  const dispatch = useDispatch();
+  const task = useSelector(getTaskById);
+
+  useEffect(() => {
+    if (_user?._id) {
+      dispatch(
+        selectSingleTask({ company_id: room_id, id, user_id: _user?._id })
+      );
+    }
+  }, [_user?._id, id, room_id, dispatch]);
+
+  useEffect(() => {
+    dispatch(getRoomInfo(room_id)).unwrap();
+  }, [room_id, dispatch]);
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
+
+  useEffect(() => {
+    if (auth) {
+      if (_user?.employeeInfo?.listOfCompanies?.length > 0) {
+        const res = _user?.employeeInfo?.listOfCompanies?.some(
+          (e) => e.company_id === room_id
+        );
+
+        if (!res) navigate('/room');
+      } else if (_user?.internInfo?.companyInfo?.company_id) {
+        if (_user?.internInfo?.companyInfo?.company_id !== room_id) {
+          navigate('/room');
+        }
+      }
+    } else {
+      setAuth(true);
+    }
+  }, [
+    auth,
+    _user?.internInfo?.companyInfo?.company_id,
+    _user?.employeeInfo?.listOfCompanies,
+    room_id,
+    navigate,
+  ]);
+
+  useEffect(() => {
+    if (_user?._id && (task?.createdBy || task?.assignedTo?.length > 0)) {
+      const res =
+        task?.assignedTo?.some((e) => e === _user?._id) ||
+        task?.createdBy === _user?._id
+          ? true
+          : false;
+
+      if (!res) {
+        navigate(`/room/${room_id}/tasks`);
+      }
+    }
+  }, [room_id, _user?._id, task?.assignedTo, task?.createdBy, navigate]);
 
   return (
     <RoomLayout>
@@ -31,12 +103,12 @@ const SingleTask = () => {
             sx={{ mb: 2 }}
             size='large'
             // get the company id
-            onClick={() => navigate(`/room/${id}/tasks`)}
+            onClick={() => navigate(`/room/${room_id}/tasks`)}
           >
             <ArrowBackIosNewIcon />
           </IconButton>
 
-          <SingleTaskCard />
+          {task && <SingleTaskCard task={task} />}
         </Container>
 
         {/* list of tasks */}

@@ -24,6 +24,24 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
+// select single task
+export const selectSingleTask = createAsyncThunk(
+  'tasks/selectSingleTask',
+  async (initialState) => {
+    try {
+      const { id, user_id, company_id } = initialState;
+
+      const response = await axios.get(
+        `api/tasks/${company_id}/${user_id}/${id}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -37,45 +55,104 @@ const tasksSlice = createSlice({
         state.tasks.push(action.payload.task);
       }
     },
-  },
-  extraReducers(builder) {
-    builder.addCase(fetchTasks.fulfilled, (state, action) => {
-      state.task = {};
-      if (action.payload.tasks.length > 0 && action.payload.users.length > 0) {
-        state.tasks = action.payload.tasks;
+    submitTask: (state, action) => {
+      if (action.payload?.task) {
+        action.payload.task.s_task = action.payload.s_task;
 
-        const TASKS_SIZE = action.payload.tasks.length;
-        const USERS_SIZE = action.payload.users.length;
-        //   const FILES_SIZE = action.payload?.files?.length;
-
-        const tasks = action.payload?.tasks;
-        const users = action.payload?.users;
-        //   const files = action.payload?.files;
-
-        for (let i = 0; i < TASKS_SIZE; i++) {
-          for (let j = 0; j < USERS_SIZE; j++) {
-            if (tasks[i].createdBy === users[j]._id) {
-              state.tasks[i].name = users[j].name;
-            }
-          }
+        if (action.payload?.filename?.length > 0) {
+          action.payload.task.s_filename = action.payload?.filename;
         }
 
-        //     for (let i = 0; i < POSTS_SIZE; i++) {
-        //       for (let j = 0; j < FILES_SIZE; j++) {
-        //         if (posts[i].file_id === files[j]._id) {
-        //           state.posts[i].filename = files[j].filename;
-        //         }
-        //       }
-        //     }
-      } else {
-        state.tasks = [];
+        if (action.payload.submitted_on) {
+          action.payload.task.submitted_on = action.payload.submitted_on;
+        }
+
+        state.task = action.payload.task;
       }
-    });
+    },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.task = {};
+        if (
+          action.payload.tasks.length > 0 &&
+          action.payload.users.length > 0
+        ) {
+          state.tasks = action.payload.tasks;
+
+          const TASKS_SIZE = action.payload.tasks.length;
+          const USERS_SIZE = action.payload.users.length;
+          //   const FILES_SIZE = action.payload?.files?.length;
+
+          const tasks = action.payload?.tasks;
+          const users = action.payload?.users;
+          //   const files = action.payload?.files;
+
+          for (let i = 0; i < TASKS_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (tasks[i].createdBy === users[j]._id) {
+                state.tasks[i].name = users[j].name;
+              }
+            }
+          }
+
+          //     for (let i = 0; i < POSTS_SIZE; i++) {
+          //       for (let j = 0; j < FILES_SIZE; j++) {
+          //         if (posts[i].file_id === files[j]._id) {
+          //           state.posts[i].filename = files[j].filename;
+          //         }
+          //       }
+          //     }
+        } else {
+          state.tasks = [];
+        }
+      })
+      .addCase(selectSingleTask.fulfilled, (state, action) => {
+        console.log(action.payload);
+        if (action.payload.task && action.payload?.user?.[0]) {
+          const { name } = action.payload.user[0];
+
+          action.payload.task.name = name;
+          action.payload.task.s_task = action.payload.s_task;
+
+          // ref_files
+          if (action.payload?.files?.length > 0) {
+            const FILES_SIZE = action.payload?.files.length;
+
+            let file_name = [];
+            for (let i = 0; i < FILES_SIZE; i++) {
+              file_name[i] = action.payload?.files[i].filename;
+            }
+
+            action.payload.task.filename = file_name;
+          }
+
+          // submitted files by user
+          if (action.payload?.s_files?.length > 0) {
+            const FILES_SIZE = action.payload?.s_files.length;
+
+            let file_name = [];
+            for (let i = 0; i < FILES_SIZE; i++) {
+              file_name[i] = action.payload?.s_files[i].filename;
+            }
+
+            action.payload.task.s_filename = file_name;
+          }
+
+          if (action.payload.submitted_on) {
+            action.payload.task.submitted_on = action.payload.submitted_on;
+          }
+
+          state.task = action.payload.task;
+        }
+      });
   },
 });
 
 export const selectAllTasks = (state) => state.tasks.tasks;
+export const getTaskById = (state) => state.tasks.task;
 
-export const { addNewTask } = tasksSlice.actions;
+export const { addNewTask, submitTask } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

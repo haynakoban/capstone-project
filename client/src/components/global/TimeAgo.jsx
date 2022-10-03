@@ -6,8 +6,11 @@ const TimeAgo = ({ timestamp }) => {
 
   if (timestamp) {
     const date = parseISO(timestamp);
-    const timePeriod = formatDistanceToNow(date);
-    timeAgo = `${timePeriod} ago`;
+    const timePeriod = formatDistanceToNow(date, {
+      addSuffix: true,
+      includeSeconds: true,
+    }).replace('about ', '');
+    timeAgo = `${timePeriod}`;
   }
 
   return (

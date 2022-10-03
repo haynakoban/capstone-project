@@ -49,7 +49,7 @@ export const StyledPostBox = styled(Box)(({ theme }) => ({
   color: '#202128',
   width: '100%',
   overflow: 'hidden',
-  height: '37 !important',
-  maxHeight: '37 !important',
+  height: '37px !important',
+  maxHeight: '37px !important',
   marginLeft: '0 !important',
 }));

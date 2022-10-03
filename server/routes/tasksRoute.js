@@ -10,9 +10,19 @@ router
   .route('/')
   .post(upload.array('ref_files', 6), tasksController.createNewTask);
 
+// post method -- submit task
+router
+  .route('/submit')
+  .post(upload.array('ref_files', 6), tasksController.submitTask);
+
 // get method - fetch all tasks
 router.route('/:id').get(auth, tasksController.fetchTasks);
 // .put(auth, postsController.updatePost)
 // .delete(auth, postsController.deletePost);
+
+// get method - fetch single task
+router
+  .route('/:company_id/:user_id/:id')
+  .get(auth, tasksController.selectTaskById);
 
 module.exports = router;
