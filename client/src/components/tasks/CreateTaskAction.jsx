@@ -303,7 +303,6 @@ const CreateTaskAction = ({ members }) => {
 
           {/* Reference Materials: */}
           <Stack
-            direction='row'
             justifyContent='flex-start'
             flexDirection='column'
             alignItems='flex-start'
@@ -501,6 +500,7 @@ const CreateTaskAction = ({ members }) => {
             onClick={handleSubmit(handleFormSubmit)}
             type='submit'
             sx={{ marginX: 'auto' }}
+            {...(progress > 0 && { disabled: true })}
           >
             Create
           </Button>

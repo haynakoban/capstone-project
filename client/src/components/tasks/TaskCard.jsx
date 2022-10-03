@@ -57,7 +57,7 @@ const TaskCard = ({ task }) => {
           display: { xs: 'flex', sm: 'none' },
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'flex-end',
+          alignItems: 'flex-start',
         }}
       >
         <Typography variant='body2' fontWeight={700}>

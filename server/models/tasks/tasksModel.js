@@ -15,22 +15,26 @@ const tasksSchema = new mongoose.Schema({
     ref: 'Uploads',
     required: false,
   },
-  submitted_file: {
+  submitted_by: {
     type: Array,
     default: [],
-    files: {
-      type: Array,
-      default: [],
-      file_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Uploads',
-        required: false,
-      },
-    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Users',
       required: true,
+    },
+    submitted_task_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tasks',
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: () => Date.now(),
+    },
+    updatedAt: {
+      type: Date,
+      default: () => Date.now(),
     },
   },
   assignedTo: {
