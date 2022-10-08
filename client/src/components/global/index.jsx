@@ -4,6 +4,7 @@ import {
   StyledBox,
   StyledPostBox,
   StyledTypography,
+  StyledTypography2,
 } from './ItemGrid';
 import { SearchContainer, SearchIconWrapper, StyledInputBase } from './Search';
 import { StyledContainer } from './StyledContainer';
@@ -23,5 +24,6 @@ export {
   StyledModalBox,
   StyledStack,
   StyledTypography,
+  StyledTypography2,
   TimeAgo,
 };

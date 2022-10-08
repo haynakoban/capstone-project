@@ -20,6 +20,9 @@ router.route('/:id').get(auth, tasksController.fetchTasks);
 // .put(auth, postsController.updatePost)
 // .delete(auth, postsController.deletePost);
 
+// delete method - undo a task and delete files
+router.route('/:id/:user_id').delete(auth, tasksController.undoSubmitTask);
+
 // get method - fetch single task
 router
   .route('/:company_id/:user_id/:id')
