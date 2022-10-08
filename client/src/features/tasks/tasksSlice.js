@@ -42,6 +42,22 @@ export const selectSingleTask = createAsyncThunk(
   }
 );
 
+// undo and delete file in task
+export const undoSubmitTask = createAsyncThunk(
+  'tasks/undoSubmitTask',
+  async (initialState) => {
+    try {
+      const { id, user_id } = initialState;
+
+      const response = await axios.delete(`api/tasks/${id}/${user_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -149,6 +165,9 @@ const tasksSlice = createSlice({
 
           state.task = action.payload.task;
         }
+      })
+      .addCase(undoSubmitTask.fulfilled, (state, action) => {
+        state.task = { ...state.task, s_task: action.payload.s_task };
       });
   },
 });

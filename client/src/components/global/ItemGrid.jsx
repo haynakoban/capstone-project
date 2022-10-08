@@ -21,6 +21,16 @@ export const StyledTypography = styled((props) => {
   whiteSpace: 'pre-wrap',
 }));
 
+export const StyledTypography2 = styled((props) => {
+  const { ...others } = props;
+  return <Typography {...others} />;
+})(({ theme }) => ({
+  color: theme.palette.text.primary,
+  whiteSpace: 'pre-wrap',
+  fontWeight: 500,
+  marginBottom: 24,
+}));
+
 export const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <Typography {...other} />;

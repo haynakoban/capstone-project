@@ -8,7 +8,6 @@ import {
   IconButton,
   LinearProgress,
   Stack,
-  styled,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,21 +16,12 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { format, isPast } from 'date-fns';
-import { StyledPostBox, TimeAgo } from '../global';
-import { AuthContext } from '../../lib/authContext';
-import { submitTask } from '../../features/tasks/tasksSlice';
-import axios from '../../lib/axiosConfig';
 
-const StyledTypography = styled((props) => {
-  const { ...others } = props;
-  return <Typography {...others} />;
-})(({ theme }) => ({
-  color: theme.palette.text.primary,
-  whiteSpace: 'pre-wrap',
-  fontWeight: 500,
-  marginBottom: 24,
-}));
+import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
+import { AuthContext } from '../../lib/authContext';
+import { submitTask, undoSubmitTask } from '../../features/tasks/tasksSlice';
+import axios from '../../lib/axiosConfig';
+import { DateFormatter, isDatePast } from '../../lib/DateFormatter';
 
 const SingleTaskCard = ({ task }) => {
   const { _user } = useContext(AuthContext);
@@ -113,18 +103,6 @@ const SingleTaskCard = ({ task }) => {
       );
   };
 
-  const DateFormatter = (date) => {
-    const d = new Date(`${date}`);
-
-    return `${format(d, 'MMMM d, yyyy hh:mm a')}`;
-  };
-
-  const isDatePast = (date) => {
-    const d = new Date(`${date}`);
-
-    return isPast(d);
-  };
-
   const to_Array = Array.from(watch('ref_files'));
   const get_file = to_Array?.map((e, index) => {
     return (
@@ -149,6 +127,10 @@ const SingleTaskCard = ({ task }) => {
       </Fragment>
     );
   });
+
+  const check_date = task?.date?.due && task?.date?.closes;
+  const checkClosesDate = isDatePast(task?.date?.closes);
+  const isTaskClosed = check_date && checkClosesDate;
 
   return (
     <Card elevation={2} sx={{ mb: 3 }}>
@@ -176,7 +158,7 @@ const SingleTaskCard = ({ task }) => {
           alignItems: 'flex-start',
         }}
       >
-        {task?.date?.closes && isDatePast(task?.date?.closes) ? (
+        {isTaskClosed ? (
           <Fragment>
             <Typography
               variant='body2'
@@ -218,9 +200,9 @@ const SingleTaskCard = ({ task }) => {
 
         {/* description */}
         {task?.description && (
-          <StyledTypography variant='body1' component='pre'>
+          <StyledTypography2 variant='body1' component='pre'>
             {task?.description}
-          </StyledTypography>
+          </StyledTypography2>
         )}
 
         {/* reference material - optional */}
@@ -247,7 +229,7 @@ const SingleTaskCard = ({ task }) => {
           </Fragment>
         )}
 
-        {task?.date?.closes && isDatePast(task?.date?.closes) ? (
+        {isTaskClosed ? (
           <Typography
             variant='body1'
             fontWeight={700}
@@ -391,7 +373,13 @@ const SingleTaskCard = ({ task }) => {
                   variant='contained'
                   color='secondary'
                   sx={{ px: '23px' }}
-                  onClick={() => setIsTaskSubmitted(false)}
+                  // if click the undo, delete the file that has been submitted
+                  onClick={() => {
+                    dispatch(
+                      undoSubmitTask({ id: task?._id, user_id: _user?._id })
+                    );
+                    setIsTaskSubmitted(false);
+                  }}
                   {...(progress > 0 && { disabled: true })}
                 >
                   Undo
