@@ -16,8 +16,10 @@ router
   .post(upload.array('ref_files', 6), tasksController.submitTask);
 
 // get method - fetch all tasks
-router.route('/:id').get(auth, tasksController.fetchTasks);
-// .put(auth, postsController.updatePost)
+router
+  .route('/:id')
+  .get(auth, tasksController.fetchTasks)
+  .put(auth, tasksController.updateTask);
 // .delete(auth, postsController.deletePost);
 
 // delete method - undo a task and delete files

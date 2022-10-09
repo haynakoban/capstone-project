@@ -310,10 +310,44 @@ const undoSubmitTask = async (req, res, next) => {
   }
 };
 
+// update task
+// put method | /api/tasks
+const updateTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title, description, assignedTo, dueDate, closesDate } = req.body;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, title, assignedTo, dueDate, closesDate].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findTask = await Tasks.findById(id).exec();
+
+    if (!findTask) return res.json({ err: `no data found with the id: ${id}` });
+
+    findTask.title = title;
+    findTask.description = description;
+    findTask.assignedTo = assignedTo;
+    findTask.date.due = dueDate;
+    findTask.date.closes = closesDate;
+    findTask.updatedAt = date;
+
+    const saveTask = await findTask.save();
+
+    return res.json({ task: saveTask });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNewTask,
   fetchTasks,
   selectTaskById,
   submitTask,
   undoSubmitTask,
+  updateTask,
 };

@@ -5,23 +5,22 @@ import {
   Card,
   CardContent,
   CardHeader,
-  IconButton,
   LinearProgress,
   Stack,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import axios from '../../lib/axiosConfig';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 
-import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
 import { AuthContext } from '../../lib/authContext';
+import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
 import { submitTask, undoSubmitTask } from '../../features/tasks/tasksSlice';
-import axios from '../../lib/axiosConfig';
 import { DateFormatter, isDatePast } from '../../lib/DateFormatter';
+import TaskClickAwayHandler from './TaskClickAwayHandler';
 
 const SingleTaskCard = ({ task }) => {
   const { _user } = useContext(AuthContext);
@@ -99,7 +98,7 @@ const SingleTaskCard = ({ task }) => {
             user_id: _user?._id,
             ref_files: [],
           });
-        }, 1000)
+        }, 500)
       );
   };
 
@@ -141,9 +140,9 @@ const SingleTaskCard = ({ task }) => {
           </Avatar>
         }
         action={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
+          _user?._id === task?.createdBy ? (
+            <TaskClickAwayHandler task={task} />
+          ) : undefined
         }
         title={task?.name}
         subheader={<TimeAgo timestamp={task?.updatedAt} />}
