@@ -90,7 +90,7 @@ const CreatePostAction = () => {
               company_id: room_id,
             });
             handleClose();
-          }, 1000)
+          }, 500)
         );
     }
   };
@@ -206,6 +206,7 @@ const CreatePostAction = () => {
             onClick={handleSubmit(handleFormSubmit)}
             type='submit'
             sx={{ marginX: 'auto' }}
+            {...(progress > 0 && { disabled: true })}
           >
             Post
           </Button>

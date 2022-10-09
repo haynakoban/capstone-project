@@ -89,6 +89,36 @@ const tasksSlice = createSlice({
         state.task = action.payload.task;
       }
     },
+    updateTask: (state, action) => {
+      if (action.payload?.task) {
+        const {
+          assignedTo,
+          company_id,
+          createdAt,
+          createdBy,
+          date: { closes, due },
+          description,
+          submitted_by,
+          title,
+          updatedAt,
+          _id,
+        } = action.payload.task;
+
+        state.task = {
+          ...state.task,
+          assignedTo,
+          company_id,
+          createdAt,
+          createdBy,
+          date: { closes, due },
+          description,
+          submitted_by,
+          title,
+          updatedAt,
+          _id,
+        };
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -175,6 +205,6 @@ const tasksSlice = createSlice({
 export const selectAllTasks = (state) => state.tasks.tasks;
 export const getTaskById = (state) => state.tasks.task;
 
-export const { addNewTask, submitTask } = tasksSlice.actions;
+export const { addNewTask, submitTask, updateTask } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

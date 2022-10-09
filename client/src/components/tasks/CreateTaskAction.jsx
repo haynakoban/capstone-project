@@ -37,6 +37,7 @@ import { useForm } from 'react-hook-form';
 import { StyledPostBox, StyledModalBox } from '../global';
 import { getUserInfo } from '../../features/users/usersSlice';
 import { addNewTask } from '../../features/tasks/tasksSlice';
+import { AssignedUser } from './AssignedUser';
 
 const CreateTaskAction = ({ members }) => {
   const dispatch = useDispatch();
@@ -181,27 +182,10 @@ const CreateTaskAction = ({ members }) => {
               dueDate: moment(),
               closesDate: moment(),
             });
-          }, 2000)
+          }, 500)
         );
     }
   };
-
-  const filterMember = membersOnly?.map((m) => {
-    let name;
-
-    for (let [key, value] of Object.entries(checked)) {
-      if (value && key === m.id) {
-        name = m.name;
-      }
-    }
-    if (name) return name;
-
-    return null;
-  });
-
-  const removeNull = filterMember.filter((e) => e !== null);
-
-  const assigned_to = removeNull.join(', ');
 
   const to_Array = Array.from(watch('ref_files'));
   const get_file = to_Array?.map((e, index) => {
@@ -369,7 +353,9 @@ const CreateTaskAction = ({ members }) => {
                 className='comment'
                 sx={{ maxHeight: 100, overflowY: 'auto' }}
               >
-                <Typography>{assigned_to}</Typography>
+                <Typography>
+                  {AssignedUser({ membersOnly, checked })}
+                </Typography>
               </AccordionDetails>
             </Accordion>
             <Box display='flex' justifyContent='space-between' width='100%'>

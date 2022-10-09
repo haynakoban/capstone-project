@@ -82,7 +82,7 @@ const ContactAction = () => {
             disableGutters
           >
             <Typography variant='h6' component='h6' fontWeight={700}>
-              Edit Your Contact
+              Edit Your Company Information
             </Typography>
           </Toolbar>
 
