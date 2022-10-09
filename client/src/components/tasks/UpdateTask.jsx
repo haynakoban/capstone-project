@@ -147,7 +147,7 @@ const UpdateTask = ({ task, handleUpdateModalClose }) => {
     if (data.assignedTo.length === 0) {
       handleOpenAssignTo();
     } else {
-      // create task with axios
+      // update task with axios
       axios
         .put(`api/tasks/${data.id}`, data, options)
         .then((res) => {

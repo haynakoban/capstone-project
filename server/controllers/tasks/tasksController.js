@@ -311,7 +311,7 @@ const undoSubmitTask = async (req, res, next) => {
 };
 
 // update task
-// put method | /api/tasks
+// put method | /api/tasks/:id
 const updateTask = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -343,8 +343,64 @@ const updateTask = async (req, res, next) => {
   }
 };
 
+// delete task
+// delete method | /api/tasks/:id
+const deleteTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findTask = await Tasks.findByIdAndDelete(id).exec();
+
+    if (!findTask) return res.json({ err: `no data found with the id: ${id}` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    if (findTask?.ref_files?.length > 0) {
+      file_id = findTask?.ref_files?.map((f) => f);
+
+      for (const file of file_id) {
+        await bucket.delete(file._id);
+      }
+    }
+
+    if (findTask?.submitted_by?.length > 0) {
+      file_id = findTask?.submitted_by?.map((f) => f?.submitted_task_id);
+
+      for (const file of file_id) {
+        const find_file = await TasksSubmitted.findByIdAndDelete({
+          _id: file,
+        });
+
+        if (!find_file)
+          return res.json({ err: `no data found with the id: ${id}` });
+
+        if (find_file?.files?.length > 0) {
+          submitted_file_id = find_file?.files?.map((f) => f);
+
+          for (const file of submitted_file_id) {
+            await bucket.delete(file._id);
+          }
+        }
+      }
+    }
+
+    return res.json({ msg: 'success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNewTask,
+  deleteTask,
   fetchTasks,
   selectTaskById,
   submitTask,
