@@ -158,7 +158,6 @@ const tasksSlice = createSlice({
         }
       })
       .addCase(selectSingleTask.fulfilled, (state, action) => {
-        console.log(action.payload);
         if (action.payload.task && action.payload?.user?.[0]) {
           const { name } = action.payload.user[0];
 

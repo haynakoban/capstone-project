@@ -31,7 +31,7 @@ const DeleteComment = ({ comment, handleDeleteModalClose }) => {
     >
       <Toolbar sx={{ display: 'flex', flexDirection: 'column' }} disableGutters>
         <Typography variant='body1' color='text.primary' component='div'>
-          Are you sure you want to delete this post?
+          Are you sure you want to delete this comment?
         </Typography>
         <Typography
           variant='subtitle1'

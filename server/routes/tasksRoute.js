@@ -19,8 +19,8 @@ router
 router
   .route('/:id')
   .get(auth, tasksController.fetchTasks)
-  .put(auth, tasksController.updateTask);
-// .delete(auth, postsController.deletePost);
+  .put(auth, tasksController.updateTask)
+  .delete(auth, tasksController.deleteTask);
 
 // delete method - undo a task and delete files
 router.route('/:id/:user_id').delete(auth, tasksController.undoSubmitTask);
