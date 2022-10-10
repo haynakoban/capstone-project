@@ -1,20 +1,25 @@
-import { Box, Tab, Tabs } from '@mui/material';
-import RoomLayout from '../../layout/RoomLayout';
+import { Box, Tab, Tabs } from "@mui/material";
+import RoomLayout from "../../layout/RoomLayout";
 
-import { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../lib/authContext';
-import { StyledContainer } from '../../components/global';
-import { useSelector } from 'react-redux';
-import { getCompanyInfo } from '../../features/companies/companiesSlice';
-import { a11yProps, TabPanel } from '../../components/company_settings/';
-import Request from '../../components/company_settings/Request';
+import { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../lib/authContext";
+import { StyledContainer } from "../../components/global";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getCompanyInfo,
+  getRoomInfo,
+} from "../../features/companies/companiesSlice";
+import { a11yProps, TabPanel } from "../../components/company_settings/";
+import Request from "../../components/company_settings/Request";
+import Pending from "../../components/company_settings/Pending";
 
 const CompanySettings = () => {
   const { _user, _isUserAuth } = useContext(AuthContext);
   const [auth, setAuth] = useState(false);
   const [value, setValue] = useState(0);
 
+  const dispatch = useDispatch();
   const roomInfo = useSelector(getCompanyInfo);
 
   const navigate = useNavigate();
@@ -26,8 +31,12 @@ const CompanySettings = () => {
   };
 
   useEffect(() => {
+    dispatch(getRoomInfo(room_id)).unwrap();
+  }, [room_id, dispatch]);
+
+  useEffect(() => {
     if (!_isUserAuth) {
-      navigate('/login');
+      navigate("/login");
     }
     if (_user?._id && _user?.isIntern) {
       navigate(`/room/${room_id}`);
@@ -41,10 +50,10 @@ const CompanySettings = () => {
           (e) => e.company_id === room_id
         );
 
-        if (!res) navigate('/room');
+        if (!res) navigate("/room");
       } else if (_user?.internInfo?.companyInfo?.company_id) {
         if (_user?.internInfo?.companyInfo?.company_id !== room_id) {
-          navigate('/room');
+          navigate("/room");
         }
       }
     } else {
@@ -60,27 +69,35 @@ const CompanySettings = () => {
 
   return (
     <RoomLayout>
-      <StyledContainer width='md'>
-        <Box sx={{ width: '100%' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <StyledContainer width="md">
+        <Box sx={{ width: "100%" }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
               value={value}
               onChange={handleChange}
-              aria-label='basic tabs example'
+              aria-label="basic tabs example"
             >
-              <Tab label='Request' {...a11yProps(0)} />
-              <Tab label='Pending' {...a11yProps(1)} />
+              <Tab label="Request" {...a11yProps(0)} />
+              <Tab label="Pending" {...a11yProps(1)} />
             </Tabs>
           </Box>
           <TabPanel value={value} index={0}>
             {roomInfo?.request?.length > 0
-              ? roomInfo?.request?.map((req) => (
-                  <Request req={req} key={req.user_id} />
-                ))
-              : 'No Request'}
+              ? roomInfo?.request
+                  ?.slice(0)
+                  .reverse()
+                  ?.map((req) => (
+                    <Request req={req} key={req.user_id} room={roomInfo} />
+                  ))
+              : "No Request"}
           </TabPanel>
           <TabPanel value={value} index={1}>
-            Pending
+            {roomInfo?.pending?.length > 0
+              ? roomInfo?.pending
+                  ?.slice(0)
+                  .reverse()
+                  ?.map((pen) => <Pending pen={pen} key={pen.user_id} />)
+              : "No Pending"}
           </TabPanel>
         </Box>
       </StyledContainer>

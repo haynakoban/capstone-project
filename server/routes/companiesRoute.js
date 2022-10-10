@@ -18,6 +18,9 @@ router
   .get(companiesController.getRoomInfo)
   .post(companiesController.joinRoom);
 
+// get method -- get the room info
+router.route('/auth/:id').get(companiesController.getRoomInfo);
+
 // get method -- retrieve all my room
 // put method -- add company description
 router
@@ -25,7 +28,8 @@ router
   .get(companiesController.getMyRoom)
   .put(auth, companiesController.addDescription);
 
-// get method -- get the room info
-router.route('/auth/:id').get(companiesController.getRoomInfo);
+// put method -- accept intern request
+// delete method -- delete intern request
+router.route('/:id/:user_id').put(auth, companiesController.acceptIntern);
 
 module.exports = router;

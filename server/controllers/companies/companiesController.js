@@ -160,11 +160,16 @@ const getRoomInfo = async (req, res, next) => {
 
     const ids = room?.members.map((e) => e.id);
     const req_ids = room?.request.map((e) => e.user_id);
+    const pen_ids = room?.pending.map((e) => e.user_id);
     const req_file_ids = room?.request.map((e) => e.file_id);
 
     const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
     const req_users = await Users.find(
       { _id: { $in: req_ids } },
+      'name'
+    ).exec();
+    const pen_users = await Users.find(
+      { _id: { $in: pen_ids } },
       'name'
     ).exec();
 
@@ -178,7 +183,7 @@ const getRoomInfo = async (req, res, next) => {
     if (!users) return res.json({ err: `no users found` });
     if (!req_users) return res.json({ err: `no users found` });
 
-    return res.json({ room, users, req_users, files });
+    return res.json({ room, users, req_users, pen_users, files });
   } catch (e) {
     next(e);
   }
@@ -208,7 +213,73 @@ const addDescription = async (req, res, next) => {
   }
 };
 
+// accept intern request
+// put method | /api/companies/:id/:user_id
+const acceptIntern = async (req, res, next) => {
+  try {
+    const { id, user_id } = req.params;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, user_id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const room = await Companies.findById(id);
+
+    if (!room) return res.json({ err: `no room found` });
+
+    const updatedRequestList = room?.request?.filter(
+      (res) => res?.user_id !== user_id
+    );
+
+    room.request = updatedRequestList;
+    room.pending?.push({ user_id, createdAt: date });
+
+    const updatedRoom = await room.save();
+
+    const ids = room?.members.map((e) => e.id);
+    const pen_ids = room?.pending.map((e) => e.user_id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+    const pen_users = await Users.find(
+      { _id: { $in: pen_ids } },
+      'name'
+    ).exec();
+
+    if (updatedRequestList?.length > 0) {
+      const req_file_ids = updatedRequestList.map((e) => e.file_id);
+      const req_ids = room?.request.map((e) => e.user_id);
+      const req_users = await Users.find(
+        { _id: { $in: req_ids } },
+        'name'
+      ).exec();
+
+      const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: 'uploads',
+      });
+
+      const cursor = bucket.find({ _id: { $in: req_file_ids } });
+      const files = await cursor.toArray();
+
+      return res.json({
+        room: updatedRoom,
+        users,
+        files,
+        req_users,
+        pen_users,
+      });
+    }
+
+    return res.json({ room: updatedRoom, users, pen_users });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
+  acceptIntern,
   addDescription,
   createRoom,
   getMyRoom,

@@ -94,6 +94,22 @@ export const getRoomInfo = createAsyncThunk(
   }
 );
 
+// accept intern
+export const acceptIntern = createAsyncThunk(
+  'companies/acceptIntern',
+  async (initialState) => {
+    try {
+      const { id, user_id } = initialState;
+
+      const response = await axios.put(`api/companies/${id}/${user_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const companiesSlice = createSlice({
   name: 'companies',
   initialState,
@@ -150,17 +166,21 @@ const companiesSlice = createSlice({
           state.company = action.payload.room;
 
           const MEMBERS_SIZE = action.payload.room.members.length;
+          const REQUEST_SIZE = action.payload?.room?.request?.length;
+          const PENDING_SIZE = action.payload?.room?.pending?.length;
           const USERS_SIZE = action.payload.users.length;
 
-          const REQ_MEMBERS_SIZE = action.payload.room.request.length;
           const REQ_USERS_SIZE = action.payload.req_users.length;
+          const PEN_USERS_SIZE = action.payload.pen_users.length;
           const REQ_FILE_SIZE = action.payload.files.length;
 
           const members = action.payload.room.members;
           const users = action.payload.users;
 
           const req_members = action.payload.room.request;
+          const pen_members = action.payload.room.pending;
           const req_users = action.payload.req_users;
+          const pen_users = action.payload.pen_users;
           const req_files = action.payload.files;
 
           for (let i = 0; i < MEMBERS_SIZE; i++) {
@@ -172,7 +192,7 @@ const companiesSlice = createSlice({
           }
 
           // adding the name
-          for (let i = 0; i < REQ_MEMBERS_SIZE; i++) {
+          for (let i = 0; i < REQUEST_SIZE; i++) {
             for (let j = 0; j < REQ_USERS_SIZE; j++) {
               if (req_members[i].user_id === req_users[j]._id) {
                 state.company.request[i].name = req_users[j].name;
@@ -180,10 +200,105 @@ const companiesSlice = createSlice({
             }
           }
           // adding the filename
-          for (let i = 0; i < REQ_MEMBERS_SIZE; i++) {
+          for (let i = 0; i < REQUEST_SIZE; i++) {
             for (let j = 0; j < REQ_FILE_SIZE; j++) {
               if (req_members[i].file_id === req_files[j]._id) {
                 state.company.request[i].filename = req_files[j].filename;
+              }
+            }
+          }
+
+          // pending: adding the name
+          for (let i = 0; i < PENDING_SIZE; i++) {
+            for (let j = 0; j < PEN_USERS_SIZE; j++) {
+              if (pen_members[i].user_id === pen_users[j]._id) {
+                state.company.pending[i].name = pen_users[j].name;
+              }
+            }
+          }
+        }
+      })
+      .addCase(acceptIntern.fulfilled, (state, action) => {
+        const { room, users, pen_users } = action.payload;
+        if (action.payload.err) {
+          state.error = action.payload.err;
+        }
+
+        if (room && users && pen_users && action.payload.files) {
+          state.company = action.payload.room;
+
+          const MEMBERS_SIZE = action.payload.room.members.length;
+          const REQUEST_SIZE = action.payload?.room?.request?.length;
+          const PENDING_SIZE = action.payload?.room?.pending?.length;
+          const USERS_SIZE = users.length;
+          const REQ_USERS_SIZE = action.payload.req_users.length;
+          const PEN_USERS_SIZE = pen_users.length;
+          const FILE_SIZE = action.payload.files.length;
+
+          const members = action.payload?.room.members;
+          const request = action.payload?.room?.request;
+          const pending = action.payload?.room?.pending;
+          const req_users = action.payload.req_users;
+          const files = action.payload.files;
+
+          for (let i = 0; i < MEMBERS_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (members[i].id === users[j]._id) {
+                state.company.members[i].name = users[j].name;
+              }
+            }
+          }
+
+          // request: adding the name
+          for (let i = 0; i < REQUEST_SIZE; i++) {
+            for (let j = 0; j < REQ_USERS_SIZE; j++) {
+              if (request[i].user_id === req_users[j]._id) {
+                state.company.request[i].name = req_users[j].name;
+              }
+            }
+          }
+
+          // request: adding the filename
+          for (let i = 0; i < REQUEST_SIZE; i++) {
+            for (let j = 0; j < FILE_SIZE; j++) {
+              if (request[i].file_id === files[j]._id) {
+                state.company.request[i].filename = files[j].filename;
+              }
+            }
+          }
+
+          // pending: adding the name
+          for (let i = 0; i < PENDING_SIZE; i++) {
+            for (let j = 0; j < PEN_USERS_SIZE; j++) {
+              if (pending[i].user_id === pen_users[j]._id) {
+                state.company.pending[i].name = pen_users[j].name;
+              }
+            }
+          }
+        } else if (room && users && pen_users) {
+          state.company = action.payload.room;
+
+          const MEMBERS_SIZE = action.payload.room.members.length;
+          const USERS_SIZE = users.length;
+          const PENDING_SIZE = action.payload?.room?.pending?.length;
+          const PEN_USERS_SIZE = pen_users.length;
+
+          const members = action.payload?.room.members;
+          const pending = action.payload?.room?.pending;
+
+          for (let i = 0; i < MEMBERS_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (members[i].id === users[j]._id) {
+                state.company.members[i].name = users[j].name;
+              }
+            }
+          }
+
+          // pending: adding the name
+          for (let i = 0; i < PENDING_SIZE; i++) {
+            for (let j = 0; j < PEN_USERS_SIZE; j++) {
+              if (pending[i].user_id === pen_users[j]._id) {
+                state.company.pending[i].name = pen_users[j].name;
               }
             }
           }
