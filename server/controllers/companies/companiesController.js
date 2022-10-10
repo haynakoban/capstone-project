@@ -230,14 +230,44 @@ const acceptIntern = async (req, res, next) => {
 
     if (!room) return res.json({ err: `no room found` });
 
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
     const updatedRequestList = room?.request?.filter(
       (res) => res?.user_id !== user_id
     );
+
+    const find_file_id = room?.request?.filter(
+      (res) => res?.user_id === user_id
+    );
+
+    bucket.delete(find_file_id?.[0]?.file_id);
 
     room.request = updatedRequestList;
     room.pending?.push({ user_id, createdAt: date });
 
     const updatedRoom = await room.save();
+
+    const findUser = await Users.findById(
+      { _id: user_id },
+      '-employeeInfo'
+    ).exec();
+
+    if (!findUser) return res.json({ err: `no user found` });
+
+    const pending = findUser?.internInfo?.pending?.filter(
+      (p) => p.company_id !== id
+    );
+
+    findUser.internInfo.pending = pending;
+    findUser?.internInfo?.offers?.push({
+      company_id: room?._id,
+      company_name: room?.companyName,
+      createdAt: date,
+    });
+
+    await findUser.save();
 
     const ids = room?.members.map((e) => e.id);
     const pen_ids = room?.pending.map((e) => e.user_id);
@@ -255,10 +285,6 @@ const acceptIntern = async (req, res, next) => {
         { _id: { $in: req_ids } },
         'name'
       ).exec();
-
-      const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
-        bucketName: 'uploads',
-      });
 
       const cursor = bucket.find({ _id: { $in: req_file_ids } });
       const files = await cursor.toArray();
