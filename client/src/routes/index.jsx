@@ -22,6 +22,9 @@ import SingleTask from '../view/tasks/SingleTask';
 import Member from '../view/member';
 import Attendance from '../view/attendance';
 
+import Description from '../view/description';
+import CompanySettings from '../view/company_settings';
+
 import Personalize from '../view/settings';
 import Profile from '../view/settings/Profile';
 import Resume from '../view/settings/Resume';
@@ -53,6 +56,10 @@ const AppRoutes = () => {
           <Route path='member' element={<Member />} />
 
           <Route path='attendance' element={<Attendance />} />
+
+          <Route path='description' element={<Description />} />
+
+          <Route path='settings' element={<CompanySettings />} />
         </Route>
       </Route>
       <Route path='login' element={<LogInPage />} />

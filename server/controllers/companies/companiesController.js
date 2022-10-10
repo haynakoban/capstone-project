@@ -1,4 +1,10 @@
 const { Companies, Users } = require('../../models');
+const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
+
+const DB_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/main-sys';
+
+const conn = mongoose.createConnection(DB_URL);
 
 const genRoomCode = () => {
   return require('crypto').randomBytes(10).toString('base64url');
@@ -153,18 +159,57 @@ const getRoomInfo = async (req, res, next) => {
     if (!room) return res.json({ err: `no room found` });
 
     const ids = room?.members.map((e) => e.id);
+    const req_ids = room?.request.map((e) => e.user_id);
+    const req_file_ids = room?.request.map((e) => e.file_id);
 
     const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+    const req_users = await Users.find(
+      { _id: { $in: req_ids } },
+      'name'
+    ).exec();
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    const cursor = bucket.find({ _id: { $in: req_file_ids } });
+    const files = await cursor.toArray();
 
     if (!users) return res.json({ err: `no users found` });
+    if (!req_users) return res.json({ err: `no users found` });
 
-    return res.json({ room, users });
+    return res.json({ room, users, req_users, files });
   } catch (e) {
     next(e);
   }
 };
 
+// add company description
+// put method | /api/companies/:id
+const addDescription = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { description } = req.body;
+
+    if (!id) return res.json({ err: `invalid room id` });
+
+    const room = await Companies.findById(id);
+
+    if (!room) return res.json({ err: `no room found` });
+
+    if (description === '') room.description = '';
+    else room.description = description;
+
+    const updatedRoom = await room.save();
+
+    return res.json({ room: updatedRoom });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
+  addDescription,
   createRoom,
   getMyRoom,
   getRoomInfo,

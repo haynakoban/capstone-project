@@ -101,6 +101,19 @@ const companiesSlice = createSlice({
     EnteredRoomId: (state, action) => {
       state.company_id = action.payload;
     },
+    addDescription: (state, action) => {
+      if (action.payload?.description === '') {
+        state.company = {
+          ...state.company,
+          description: '',
+        };
+      } else {
+        state.company = {
+          ...state.company,
+          description: action.payload?.description,
+        };
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -139,13 +152,38 @@ const companiesSlice = createSlice({
           const MEMBERS_SIZE = action.payload.room.members.length;
           const USERS_SIZE = action.payload.users.length;
 
+          const REQ_MEMBERS_SIZE = action.payload.room.request.length;
+          const REQ_USERS_SIZE = action.payload.req_users.length;
+          const REQ_FILE_SIZE = action.payload.files.length;
+
           const members = action.payload.room.members;
           const users = action.payload.users;
+
+          const req_members = action.payload.room.request;
+          const req_users = action.payload.req_users;
+          const req_files = action.payload.files;
 
           for (let i = 0; i < MEMBERS_SIZE; i++) {
             for (let j = 0; j < USERS_SIZE; j++) {
               if (members[i].id === users[j]._id) {
                 state.company.members[i].name = users[j].name;
+              }
+            }
+          }
+
+          // adding the name
+          for (let i = 0; i < REQ_MEMBERS_SIZE; i++) {
+            for (let j = 0; j < REQ_USERS_SIZE; j++) {
+              if (req_members[i].user_id === req_users[j]._id) {
+                state.company.request[i].name = req_users[j].name;
+              }
+            }
+          }
+          // adding the filename
+          for (let i = 0; i < REQ_MEMBERS_SIZE; i++) {
+            for (let j = 0; j < REQ_FILE_SIZE; j++) {
+              if (req_members[i].file_id === req_files[j]._id) {
+                state.company.request[i].filename = req_files[j].filename;
               }
             }
           }
@@ -162,6 +200,6 @@ export const getCompanyInfo = (state) => state.companies.company;
 
 // export const roomStatus = (state) => state.companies.status;
 
-export const { EnteredRoomId } = companiesSlice.actions;
+export const { addDescription, EnteredRoomId } = companiesSlice.actions;
 
 export default companiesSlice.reducer;

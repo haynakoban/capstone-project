@@ -16,6 +16,8 @@ router
   .post(upload.array('ref_files', 6), tasksController.submitTask);
 
 // get method - fetch all tasks
+// put method - update task
+// delete method - delete task
 router
   .route('/:id')
   .get(auth, tasksController.fetchTasks)

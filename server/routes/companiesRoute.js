@@ -19,7 +19,11 @@ router
   .post(companiesController.joinRoom);
 
 // get method -- retrieve all my room
-router.route('/:id').get(companiesController.getMyRoom);
+// put method -- add company description
+router
+  .route('/:id')
+  .get(companiesController.getMyRoom)
+  .put(auth, companiesController.addDescription);
 
 // get method -- get the room info
 router.route('/auth/:id').get(companiesController.getRoomInfo);
