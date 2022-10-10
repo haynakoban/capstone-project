@@ -10,7 +10,11 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../lib/authContext';
 
 import Logo from '../../MainLayout/Header/Logo';
 
@@ -21,6 +25,28 @@ const PermanentDrawer = ({ routes, active, path }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const room_id = pathname.slice(6).slice(0, 24);
+  const [settings, setSettings] = useState([]);
+
+  const { _user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (_user?._id) {
+      const s = !_user?.isIntern && [
+        {
+          name: 'Description',
+          path: '/description',
+          icon: <DescriptionOutlinedIcon />,
+        },
+        {
+          name: 'Settings',
+          path: '/settings',
+          icon: <SettingsOutlinedIcon />,
+        },
+      ];
+
+      setSettings(s);
+    }
+  }, [_user?._id, _user?.isIntern]);
 
   return (
     <Drawer
@@ -87,6 +113,34 @@ const PermanentDrawer = ({ routes, active, path }) => {
               </ListItemButton>
             </ListItem>
           ))}
+
+          {settings?.length > 0 && (
+            <Divider flexItem sx={{ bgcolor: '#FFFFFF50', height: 1.2 }} />
+          )}
+
+          {settings?.length > 0 &&
+            settings?.map((route) => (
+              <ListItem
+                key={route?.name}
+                disablePadding
+                sx={{
+                  bgcolor: active({ path, route }),
+                  transition: 'all 400ms linear',
+                }}
+              >
+                <ListItemButton
+                  onClick={() => navigate(`/room/${room_id}${route?.path}`)}
+                >
+                  <ListItemIcon sx={{ color: '#FFFFFF95' }}>
+                    {route?.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={route?.name}
+                    sx={{ color: '#FFFFFF95' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
         </List>
       </Box>
     </Drawer>

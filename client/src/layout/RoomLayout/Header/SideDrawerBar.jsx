@@ -54,6 +54,10 @@ const SideDrawerBar = ({ routes, content }) => {
       title = 'Member';
     } else if (pathname.includes('attendance')) {
       title = 'Attendance';
+    } else if (pathname.includes('description')) {
+      title = 'Description';
+    } else if (pathname.includes('settings')) {
+      title = 'Settings';
     } else {
       title = 'Dashboard';
     }
