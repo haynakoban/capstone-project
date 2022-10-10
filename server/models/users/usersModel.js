@@ -28,6 +28,10 @@ const employeeInfo = {
 
 const internInfo = {
   companyInfo: {
+    hasCompany: {
+      type: Boolean,
+      default: false,
+    },
     company_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Companies',

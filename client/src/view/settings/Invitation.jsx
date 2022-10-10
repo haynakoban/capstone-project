@@ -23,68 +23,71 @@ const Invitation = () => {
 
   return (
     <ProfileLayout>
-      <StyledContainer width='lg'>
+      <StyledContainer width="lg">
         {/* list of invitation will appear here */}
-        {[1, 2, 3, 4, 5].map((_, i) => (
-          <Box
-            key={i}
-            sx={{
-              p: { xs: 2, sm: 2, md: 3 },
-              mb: 3,
-              border: '1px solid #20212870',
-            }}
-          >
-            <Stack
-              mb={1}
-              display='flex'
-              direction='row'
-              justifyContent='space-between'
-            >
-              <Typography variant='h6' fontWeight={700}>
-                Google
-              </Typography>
-
-              <CardMedia
-                component='img'
-                sx={{ width: 40 }}
-                image={photo}
-                alt='just a normal'
-                className='company_logo'
-              />
-            </Stack>
-
-            <StackContainer>
-              <Typography variant='body1'>
-                Google accepts your application. If you wish to complete your
-                internship program with Google.
-              </Typography>
-              <Typography variant='body1' mt={0.75}>
-                Kindly accept the invitation.
-              </Typography>
-
-              <Box sx={{ mt: { xs: 1, sm: 2 } }}>
-                <Button
-                  variant='contained'
-                  color='success'
-                  sx={{
-                    mr: 2,
-                    color: '#fff',
-                  }}
-                  onClick={() => console.log('join the room')}
+        {_user?.internInfo?.offers?.length > 0
+          ? _user?.internInfo?.offers?.map((offer) => (
+              <Box
+                key={offer?.company_id}
+                sx={{
+                  p: { xs: 2, sm: 2, md: 3 },
+                  mb: 3,
+                  border: '1px solid #20212870',
+                }}
+              >
+                <Stack
+                  mb={1}
+                  display="flex"
+                  direction="row"
+                  justifyContent="space-between"
                 >
-                  Accept
-                </Button>
-                <Button
-                  variant='contained'
-                  color='error'
-                  onClick={() => console.log('delete request')}
-                >
-                  Decline
-                </Button>
+                  <Typography variant="h6" fontWeight={700}>
+                    {offer?.company_name}
+                  </Typography>
+
+                  <CardMedia
+                    component="img"
+                    sx={{ width: 40 }}
+                    image={photo}
+                    alt="just a normal"
+                    className="company_logo"
+                  />
+                </Stack>
+
+                <StackContainer>
+                  <Typography variant="body1">
+                    {offer?.company_name} accepts your application. If you wish
+                    to complete your internship program with{' '}
+                    {offer?.company_name}.
+                  </Typography>
+                  <Typography variant="body1" mt={0.75}>
+                    Kindly accept the invitation.
+                  </Typography>
+
+                  <Box sx={{ mt: { xs: 1, sm: 2 } }}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      sx={{
+                        mr: 2,
+                        color: '#fff',
+                      }}
+                      onClick={() => console.log('join the room')}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => console.log('delete request')}
+                    >
+                      Decline
+                    </Button>
+                  </Box>
+                </StackContainer>
               </Box>
-            </StackContainer>
-          </Box>
-        ))}
+            ))
+          : 'No Offer'}
       </StyledContainer>
     </ProfileLayout>
   );
