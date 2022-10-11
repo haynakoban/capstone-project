@@ -3,14 +3,18 @@ import { StackContainer, StyledContainer } from '../../components/global';
 import photo from '../../assets/sample/logo2_(bnb).png';
 
 import { useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../lib/authContext';
 
+import { AuthContext } from '../../lib/authContext';
 import ProfileLayout from '../../layout/ProfileLayout';
+import { acceptCompanyOffer } from '../../features/users/usersSlice';
 
 const Invitation = () => {
-  const navigate = useNavigate();
   const { _user, _isUserAuth } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!_isUserAuth) {
@@ -21,9 +25,13 @@ const Invitation = () => {
     }
   }, [_isUserAuth, _user?.isIntern, navigate]);
 
+  const handleAccept = ({ user_id, company_id }) => {
+    dispatch(acceptCompanyOffer({ user_id, company_id }));
+  };
+
   return (
     <ProfileLayout>
-      <StyledContainer width="lg">
+      <StyledContainer width='lg'>
         {/* list of invitation will appear here */}
         {_user?.internInfo?.offers?.length > 0
           ? _user?.internInfo?.offers?.map((offer) => (
@@ -37,48 +45,54 @@ const Invitation = () => {
               >
                 <Stack
                   mb={1}
-                  display="flex"
-                  direction="row"
-                  justifyContent="space-between"
+                  display='flex'
+                  direction='row'
+                  justifyContent='space-between'
                 >
-                  <Typography variant="h6" fontWeight={700}>
+                  <Typography variant='h6' fontWeight={700}>
                     {offer?.company_name}
                   </Typography>
 
                   <CardMedia
-                    component="img"
+                    component='img'
                     sx={{ width: 40 }}
                     image={photo}
-                    alt="just a normal"
-                    className="company_logo"
+                    alt='just a normal'
+                    className='company_logo'
                   />
                 </Stack>
 
                 <StackContainer>
-                  <Typography variant="body1">
+                  <Typography variant='body1'>
                     {offer?.company_name} accepts your application. If you wish
                     to complete your internship program with{' '}
                     {offer?.company_name}.
                   </Typography>
-                  <Typography variant="body1" mt={0.75}>
+                  <Typography variant='body1' mt={0.75}>
                     Kindly accept the invitation.
                   </Typography>
 
                   <Box sx={{ mt: { xs: 1, sm: 2 } }}>
                     <Button
-                      variant="contained"
-                      color="success"
+                      variant='contained'
+                      color='success'
                       sx={{
                         mr: 2,
                         color: '#fff',
                       }}
-                      onClick={() => console.log('join the room')}
+                      {...(!_user?._id && { disabled: true })}
+                      onClick={() =>
+                        handleAccept({
+                          user_id: _user?._id,
+                          company_id: offer?.company_id,
+                        })
+                      }
                     >
                       Accept
                     </Button>
                     <Button
-                      variant="contained"
-                      color="error"
+                      variant='contained'
+                      color='error'
                       onClick={() => console.log('delete request')}
                     >
                       Decline

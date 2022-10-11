@@ -2,7 +2,7 @@ const { Comments, Posts, Users } = require('../../models');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 
-const DB_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/main-sys';
+const DB_URL = process.env.MONGO_URL;
 
 const conn = mongoose.createConnection(DB_URL);
 
