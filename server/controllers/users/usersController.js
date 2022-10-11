@@ -1,5 +1,11 @@
 const { Companies, Users } = require('../../models');
 const bcryptjs = require('bcryptjs');
+const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
+
+const DB_URL = process.env.MONGO_URL;
+
+const conn = mongoose.createConnection(DB_URL);
 
 // check if username is valid
 // post method | /api/users/validation
@@ -238,6 +244,8 @@ const userLogout = async (req, res, next) => {
   }
 };
 
+// apply for internship
+// post method | /api/users/uploads
 const uploadFile = async (req, res, next) => {
   try {
     const { company_id, user_id } = req.body;
@@ -286,6 +294,8 @@ const uploadFile = async (req, res, next) => {
   }
 };
 
+// update the user documents under the resume settings
+// put method | /api/users/uploads
 const updateUserDocs = async (req, res, next) => {
   try {
     const { _id, isIntern } = req.body;
@@ -330,7 +340,90 @@ const updateUserDocs = async (req, res, next) => {
   }
 };
 
+// accept company offer and delete other request
+// put method | /api/users/:user_id/:company_id
+const acceptCompanyOffer = async (req, res, next) => {
+  try {
+    const { user_id, company_id } = req.params;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [user_id, company_id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const room = await Companies.findById(company_id).exec();
+    if (!room) return res.json({ err: `no room found` });
+
+    // add the user in company
+    room.members?.push({ id: user_id, roles: 'member' });
+    if (room?.pending?.length > 0) {
+      const pop_user = room.pending?.filter((u) => u.user_id != user_id);
+      room.pending = pop_user;
+    }
+    room.updatedAt = date;
+    const updatedRoom = await room?.save();
+
+    const user = await Users.findById({ _id: user_id }, '-employeeInfo').exec();
+    if (!user) return res.json({ err: `no user found` });
+
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    if (user?.internInfo?.pending?.length > 0) {
+      cp_id = user?.internInfo?.pending?.map((f) => f.company_id);
+
+      const find_room = await Companies.find({ _id: { $in: cp_id } }).exec();
+
+      for (const new_room of find_room) {
+        const delete_file = new_room.request?.filter(
+          (u) => u.user_id == user_id
+        );
+        const req_pop_user = new_room.request?.filter(
+          (u) => u.user_id != user_id
+        );
+
+        await bucket.delete(ObjectId(delete_file?.[0]?.file_id));
+
+        new_room.request = req_pop_user;
+        new_room.updatedAt = date;
+        await new_room?.save();
+      }
+    }
+
+    if (user?.internInfo?.offers?.length > 0) {
+      cp_id = user?.internInfo?.offers?.map((f) => f.company_id);
+
+      const find_room = await Companies.find({ _id: { $in: cp_id } }).exec();
+
+      for (const new_room of find_room) {
+        const pen_pop_user = new_room.pending?.filter(
+          (u) => u.user_id != user_id
+        );
+        new_room.pending = pen_pop_user;
+
+        new_room.updatedAt = date;
+        await new_room?.save();
+      }
+    }
+
+    // remove all the user request
+    user.internInfo.companyInfo.hasCompany = true;
+    user.internInfo.companyInfo.company_id = room?._id;
+    user.internInfo.pending = [];
+    user.internInfo.offers = [];
+    user.updatedAt = date;
+    const updatedUser = await user.save();
+
+    res.json({ room: updatedRoom, user: updatedUser });
+  } catch (e) {
+    next(e);
+  }
+};
 module.exports = {
+  acceptCompanyOffer,
   createNewUser,
   getUserInfo,
   isUsernameValid,

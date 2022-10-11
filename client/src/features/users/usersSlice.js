@@ -132,6 +132,22 @@ export const updateUserSchoolInfo = createAsyncThunk(
   }
 );
 
+// accept company offer
+export const acceptCompanyOffer = createAsyncThunk(
+  'users/acceptCompanyOffer',
+  async (initialState) => {
+    try {
+      const { user_id, company_id } = initialState;
+
+      const response = await axios.put(`api/users/${user_id}/${company_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -195,6 +211,11 @@ const usersSlice = createSlice({
       })
       .addCase(updateUserSchoolInfo.fulfilled, (state, action) => {
         if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(acceptCompanyOffer.fulfilled, (state, action) => {
+        if (action.payload.user && action.payload.room) {
           state.user = action.payload.user;
         }
       });

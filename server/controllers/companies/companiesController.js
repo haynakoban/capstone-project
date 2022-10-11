@@ -1,8 +1,7 @@
 const { Companies, Users } = require('../../models');
 const mongoose = require('mongoose');
-const ObjectId = require('mongodb').ObjectId;
 
-const DB_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/main-sys';
+const DB_URL = process.env.MONGO_URL;
 
 const conn = mongoose.createConnection(DB_URL);
 
@@ -44,7 +43,7 @@ const createRoom = async (req, res, next) => {
 
     user.employeeInfo.listOfCompanies.push({ company_id: company._id });
 
-    user.save();
+    await user.save();
 
     return res.status(201).json({ company });
   } catch (e) {
