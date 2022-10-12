@@ -258,16 +258,19 @@ const uploadFile = async (req, res, next) => {
     if (!findCompany || !findUser)
       return res.json({ err: `no compamy found with an id: ${company_id}` });
 
-    // check if the user is already in the appply in this company
-    const isApplied_company = findCompany?.request.some(
-      (e) => e.user_id === user_id
+    // check if the user is already in the apply in this company
+    const req_apply = findCompany?.request?.some((e) => e.user_id === user_id);
+    const pen_apply = findCompany?.pending?.some((e) => e.user_id === user_id);
+
+    const pen_apply_user = findUser?.internInfo?.pending?.some(
+      (e) => e.company_id == company_id
     );
-    const isApplied_user = findUser?.internInfo?.pending.some(
-      (e) => e.company_id === company_id
+    const offer_apply_user = findUser?.internInfo?.offers?.some(
+      (e) => e.company_id == company_id
     );
 
     // if user is in the room aldreay return err
-    if (isApplied_company && isApplied_user)
+    if ((req_apply || pen_apply) && (pen_apply_user || offer_apply_user))
       return res.json({
         err: 'user is already applied in this company',
         file_id: req.file.id,
@@ -422,9 +425,53 @@ const acceptCompanyOffer = async (req, res, next) => {
     next(e);
   }
 };
+
+// delete company offer
+// delete method | /api/users/:user_id/:company_id
+const declineCompanyOffer = async (req, res, next) => {
+  try {
+    const { user_id, company_id } = req.params;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [user_id, company_id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const room = await Companies.findById(company_id).exec();
+    if (!room) return res.json({ err: `no room found` });
+
+    if (room?.pending?.length > 0) {
+      const pop_user = room.pending?.filter((u) => u.user_id != user_id);
+      room.pending = pop_user;
+    }
+    room.updatedAt = date;
+    const updatedRoom = await room?.save();
+
+    const user = await Users.findById({ _id: user_id }, '-employeeInfo').exec();
+    if (!user) return res.json({ err: `no user found` });
+
+    if (user?.internInfo?.offers?.length > 0) {
+      const pop_user = user?.internInfo?.offers?.filter(
+        (u) => u.company_id != company_id
+      );
+      user.internInfo.offers = pop_user;
+    }
+
+    user.updatedAt = date;
+    const updatedUser = await user?.save();
+
+    return res.json({ user: updatedUser, room: updatedRoom });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   acceptCompanyOffer,
   createNewUser,
+  declineCompanyOffer,
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
