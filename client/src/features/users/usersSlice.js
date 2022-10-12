@@ -148,6 +148,22 @@ export const acceptCompanyOffer = createAsyncThunk(
   }
 );
 
+// decline company offer
+export const declineCompanyOffer = createAsyncThunk(
+  'users/declineCompanyOffer',
+  async (initialState) => {
+    try {
+      const { user_id, company_id } = initialState;
+
+      const response = await axios.delete(`api/users/${user_id}/${company_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -215,6 +231,11 @@ const usersSlice = createSlice({
         }
       })
       .addCase(acceptCompanyOffer.fulfilled, (state, action) => {
+        if (action.payload.user && action.payload.room) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(declineCompanyOffer.fulfilled, (state, action) => {
         if (action.payload.user && action.payload.room) {
           state.user = action.payload.user;
         }

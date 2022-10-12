@@ -50,6 +50,7 @@ router.route('/files/:id').delete(delete_file);
 // delete method - decline company offer
 router
   .route('/:user_id/:company_id')
-  .put(auth, usersController.acceptCompanyOffer);
+  .put(auth, usersController.acceptCompanyOffer)
+  .delete(auth, usersController.declineCompanyOffer);
 
 module.exports = router;
