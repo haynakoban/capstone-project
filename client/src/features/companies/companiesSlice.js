@@ -94,7 +94,7 @@ export const getRoomInfo = createAsyncThunk(
   }
 );
 
-// accept intern
+// accept intern request
 export const acceptIntern = createAsyncThunk(
   'companies/acceptIntern',
   async (initialState) => {
@@ -102,6 +102,22 @@ export const acceptIntern = createAsyncThunk(
       const { id, user_id } = initialState;
 
       const response = await axios.put(`api/companies/${id}/${user_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// decline intern request
+export const declineInternRequest = createAsyncThunk(
+  'companies/declineInternRequest',
+  async (initialState) => {
+    try {
+      const { id, user_id } = initialState;
+
+      const response = await axios.delete(`api/companies/${id}/${user_id}`);
 
       return response.data;
     } catch (e) {
@@ -302,6 +318,17 @@ const companiesSlice = createSlice({
               }
             }
           }
+        }
+      })
+      .addCase(declineInternRequest.fulfilled, (state, action) => {
+        if (action.payload.company_id && action.payload.user_id) {
+          const { user_id } = action.payload;
+
+          const company = state.company?.request?.filter(
+            (c) => c.user_id !== user_id
+          );
+
+          state.company = { ...state.company, request: company };
         }
       });
   },
