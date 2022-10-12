@@ -1,5 +1,6 @@
 const { Companies, Users } = require('../../models');
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
 
 const DB_URL = process.env.MONGO_URL;
 
@@ -303,10 +304,59 @@ const acceptIntern = async (req, res, next) => {
   }
 };
 
+// decline intern request
+// delete method | /api/companies/:id/:user_id
+const declineInternRequest = async (req, res, next) => {
+  try {
+    const { id, user_id } = req.params;
+    const date = new Date();
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, user_id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const room = await Companies.findById(id);
+    if (!room) return res.json({ err: `no room found` });
+
+    const user = await Users.findById({ _id: user_id }, '-employeeInfo').exec();
+    if (!user) return res.json({ err: `no user found` });
+
+    if (room?.request?.length > 0) {
+      const delete_file = room?.request?.filter((p) => p?.user_id == user_id);
+      const pop_user = room?.request?.filter((p) => p?.user_id != user_id);
+
+      await bucket.delete(ObjectId(delete_file?.[0]?.file_id));
+
+      room.request = pop_user;
+    }
+    room.updatedAt = date;
+    await room?.save();
+
+    if (user?.internInfo?.pending?.length > 0) {
+      const pop_user = user?.internInfo?.pending?.filter(
+        (u) => u.company_id != id
+      );
+      user.internInfo.pending = pop_user;
+    }
+    user.updatedAt = date;
+    await user?.save();
+
+    return res.json({ company_id: id, user_id });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptIntern,
   addDescription,
   createRoom,
+  declineInternRequest,
   getMyRoom,
   getRoomInfo,
   getRooms,

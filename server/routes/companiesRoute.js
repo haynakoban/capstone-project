@@ -29,7 +29,10 @@ router
   .put(auth, companiesController.addDescription);
 
 // put method -- accept intern request
-// delete method -- delete intern request
-router.route('/:id/:user_id').put(auth, companiesController.acceptIntern);
+// delete method -- decline intern request
+router
+  .route('/:id/:user_id')
+  .put(auth, companiesController.acceptIntern)
+  .delete(auth, companiesController.declineInternRequest);
 
 module.exports = router;
