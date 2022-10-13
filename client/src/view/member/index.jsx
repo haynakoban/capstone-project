@@ -34,6 +34,7 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from '../../components/global';
+import avatarTheme from '../../lib/avatar';
 
 const Member = () => {
   const [type, setType] = useState('');
@@ -166,7 +167,15 @@ const Member = () => {
               {roomInfo?.members?.map((row) => (
                 <TableRow hover key={row?.id}>
                   <TableCell align='left'>
-                    <Avatar sx={{ width: 32, height: 32 }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: avatarTheme({
+                          name: row?.name?.[0]?.toLowerCase(),
+                        }),
+                      }}
+                    >
                       {row?.name?.[0]}
                     </Avatar>
                   </TableCell>

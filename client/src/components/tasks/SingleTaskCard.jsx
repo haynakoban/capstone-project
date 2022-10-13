@@ -20,6 +20,7 @@ import { AuthContext } from '../../lib/authContext';
 import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
 import { submitTask, undoSubmitTask } from '../../features/tasks/tasksSlice';
 import { DateFormatter, isDatePast } from '../../lib/DateFormatter';
+import avatarTheme from '../../lib/avatar';
 import TaskClickAwayHandler from './TaskClickAwayHandler';
 
 const SingleTaskCard = ({ task }) => {
@@ -135,7 +136,14 @@ const SingleTaskCard = ({ task }) => {
     <Card elevation={2} sx={{ mb: 3 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: task?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
             {task?.name?.[0]?.toUpperCase()}
           </Avatar>
         }

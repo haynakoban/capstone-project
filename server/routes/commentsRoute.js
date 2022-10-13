@@ -8,6 +8,8 @@ const auth = require('../middlewares/auth_user_cookie');
 router.route('/').post(auth, commentsController.addComment);
 
 // get method - fetch all comments
+// put method - update comment
+// delete method - delete comment
 router
   .route('/:id')
   .get(auth, commentsController.fetchComments)

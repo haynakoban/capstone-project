@@ -11,6 +11,7 @@ import {
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
+import avatarTheme from '../../lib/avatar';
 
 import {
   ExpandMore,
@@ -28,7 +29,14 @@ const CardPost = ({ post, handleExpandClick }) => {
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: post?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
             {post?.name?.[0]?.toUpperCase()}
           </Avatar>
         }

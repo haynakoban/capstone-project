@@ -1,4 +1,4 @@
-const { Tasks, TasksSubmitted, Users } = require('../../models');
+const { Notifications, Tasks, TasksSubmitted, Users } = require('../../models');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -49,18 +49,15 @@ const createNewTask = async (req, res, next) => {
 
     if (!user) return res.json({ err: `no users found` });
 
-    // const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
-    //   bucketName: 'uploads',
-    // });
+    const notif = await Notifications.create({
+      type: 'Task',
+      recipient: req.body?.assignedTo,
+      createdBy: ObjectId(createdBy),
+      company_id: ObjectId(company_id),
+      task_id: task?._id,
+    });
 
-    // const cursor = bucket.find(ObjectId(task?.ref_files));
-    // const file = await cursor.toArray();
-
-    // if (file.length > 0) {
-    //   return res.json({ post, user, filename: file?.[0]?.filename });
-    // }
-
-    return res.status(201).json({ task, user });
+    return res.status(201).json({ task, user, notif });
   } catch (e) {
     next(e);
   }

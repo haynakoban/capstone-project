@@ -8,8 +8,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TimeAgo } from '../global';
 import { format } from 'date-fns';
+import { TimeAgo } from '../global';
+import avatarTheme from '../../lib/avatar';
 
 const TaskCard = ({ task }) => {
   const navigate = useNavigate();
@@ -25,7 +26,14 @@ const TaskCard = ({ task }) => {
     <Card elevation={2} sx={{ mb: 3 }} key={task._id}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: task?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
             {task?.name?.[0]?.toUpperCase()}
           </Avatar>
         }
