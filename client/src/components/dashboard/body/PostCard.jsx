@@ -9,6 +9,7 @@ import {
 
 import { StyledPostBox, StyledTypography, TimeAgo } from '../../global';
 import { useNavigate } from 'react-router-dom';
+import avatarTheme from '../../../lib/avatar';
 
 const PostCard = ({ post }) => {
   const navigate = useNavigate();
@@ -17,7 +18,14 @@ const PostCard = ({ post }) => {
     <Card elevation={2} key={post?.[0]._id} sx={{ mb: 3 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: post?.[0]?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
             {post?.[0]?.name?.[0]?.toUpperCase()}
           </Avatar>
         }

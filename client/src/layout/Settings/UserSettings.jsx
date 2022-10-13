@@ -25,6 +25,7 @@ import {
   resetState,
   userLogout,
 } from '../../features/users/usersSlice';
+import avatarTheme from '../../lib/avatar';
 
 const UserSettings = () => {
   const dispatch = useDispatch();
@@ -74,7 +75,15 @@ const UserSettings = () => {
             sx={{ outline: 'none', p: 0 }}
             onClick={handleClick}
           >
-            <Avatar>{user && user?.name?.[0]?.toUpperCase()}</Avatar>
+            <Avatar
+              sx={{
+                bgcolor: avatarTheme({
+                  name: user?.name?.[0]?.toLowerCase(),
+                }),
+              }}
+            >
+              {user && user?.name?.[0]?.toUpperCase()}
+            </Avatar>
           </IconButton>
 
           {/* handle the settings modal */}

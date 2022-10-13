@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Badge,
   Box,
   Button,
   CssBaseline,
@@ -13,8 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChatIcon from '@mui/icons-material/Chat';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+// import ChatIcon from '@mui/icons-material/Chat';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
@@ -28,6 +26,7 @@ import {
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';
 import UserSettings from '../../Settings/UserSettings';
+import Notification from '../../Settings/Notification';
 
 const NavigationBar = () => {
   const authRoute = [
@@ -217,25 +216,18 @@ const NavigationBar = () => {
             ) : (
               <Fragment>
                 {/* if authorized show this */}
-                {/* chat icon */}
-                <IconButton
+                {/* chat icon*/}
+                {/* <IconButton
                   sx={{ color: '#000000', bgcolor: '#00000015', mr: 1.5 }}
                   aria-label='message icon'
                 >
                   <Badge color='error' badgeContent={0} max={99}>
                     <ChatIcon />
                   </Badge>
-                </IconButton>
+                </IconButton> */}
 
                 {/* notification icon */}
-                <IconButton
-                  sx={{ color: '#00000090', bgcolor: '#00000015', mr: 1.5 }}
-                  aria-label='message icon'
-                >
-                  <Badge color='error' badgeContent={0} max={99}>
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
+                <Notification />
 
                 {/* user settings */}
                 <UserSettings />

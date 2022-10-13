@@ -72,19 +72,19 @@ const CreateTaskAction = ({ members }) => {
     },
   });
 
-  useEffect(() => {
-    if (user?._id && room_id) {
-      setValue('createdBy', user?._id);
-      setValue('company_id', room_id);
-    }
-  }, [user?._id, room_id, setValue]);
-
   const handleChange = (event) => {
     setChecked({
       ...checked,
       [event.target.name]: event.target.checked,
     });
   };
+
+  useEffect(() => {
+    if (user?._id && room_id) {
+      setValue('createdBy', user?._id);
+      setValue('company_id', room_id);
+    }
+  }, [user?._id, room_id, setValue]);
 
   useEffect(() => {
     const m = members?.filter((member) => member.roles === 'member');

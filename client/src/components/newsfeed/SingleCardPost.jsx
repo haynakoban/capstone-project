@@ -22,6 +22,7 @@ import {
   selectAllComments,
 } from '../../features/comments/commentsSlice';
 import CommentsCard from './CommentsCard';
+import avatarTheme from '../../lib/avatar';
 
 const SingleCardPost = ({ post }) => {
   const { _user } = useContext(AuthContext);
@@ -123,7 +124,14 @@ const SingleCardPost = ({ post }) => {
     <Card elevation={2} key={post._id} sx={{ mb: 3 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'primary.main' }} aria-label='recipe'>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: post?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
             {post?.name?.[0]?.toUpperCase()}
           </Avatar>
         }
@@ -185,7 +193,15 @@ const SingleCardPost = ({ post }) => {
           alignItems: 'flex-start',
         }}
       >
-        <Avatar sx={{ bgcolor: 'primary.main', mr: 1 }} aria-label='recipe'>
+        <Avatar
+          sx={{
+            bgcolor: avatarTheme({
+              name: _user?.name?.[0]?.toLowerCase(),
+            }),
+            mr: 1,
+          }}
+          aria-label='recipe'
+        >
           {_user?.name?.[0]?.toUpperCase()}
         </Avatar>
         <Box

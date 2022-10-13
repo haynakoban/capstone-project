@@ -42,6 +42,7 @@ const io = new Server(httpServer, {
 // routes
 app.use('/api/comments', require('./routes/commentsRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
+app.use('/api/notifications', require('./routes/notificationsRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
 app.use('/api/tasks', require('./routes/tasksRoute'));
 app.use('/api/users', require('./routes/usersRoute'));
@@ -50,7 +51,9 @@ global.onlineUsers = new Map();
 
 // socket.io : connection
 io.on('connection', (socket) => {
-  console.log(socket.id);
+  // socket.on('join_room', (data) => {
+  //   socket.join(data);
+  // });
 
   socket.on('disconnect', () => console.log('user logout: ', socket.id));
 });

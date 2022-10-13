@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Badge,
   Box,
   CssBaseline,
   IconButton,
@@ -8,8 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChatIcon from '@mui/icons-material/Chat';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+// import ChatIcon from '@mui/icons-material/Chat';
 
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -17,6 +15,7 @@ import { useEffect, useState } from 'react';
 import LeftDrawerRoutes from '../Drawer/LeftDrawerRoutes';
 import PermanentDrawer from '../Drawer/PermanentDrawer';
 import SettingsModal from '../../Settings/UserSettings';
+import Notification from '../../Settings/Notification';
 
 const drawerWidth = 240;
 
@@ -113,24 +112,17 @@ const SideDrawerBar = ({ routes, content }) => {
 
           <Box display='flex' alignItems='center'>
             {/* chat icon */}
-            <IconButton
+            {/* <IconButton
               sx={{ color: '#000000', bgcolor: '#00000015', mr: 1.5 }}
               aria-label='message icon'
             >
               <Badge color='error' badgeContent={0} max={99}>
                 <ChatIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* notification icon */}
-            <IconButton
-              sx={{ color: '#00000090', bgcolor: '#00000015', mr: 1.5 }}
-              aria-label='message icon'
-            >
-              <Badge color='error' badgeContent={0} max={99}>
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <Notification />
 
             {/* user icon */}
             {/* settings modal for small screen - user */}
