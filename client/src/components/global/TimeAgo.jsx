@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { parseISO, formatDistanceToNow } from 'date-fns';
 
-const TimeAgo = ({ timestamp }) => {
+const TimeAgo = ({ timestamp, color = 'text.primary' }) => {
   let timeAgo = '';
 
   if (timestamp) {
@@ -14,7 +14,7 @@ const TimeAgo = ({ timestamp }) => {
   }
 
   return (
-    <Typography variant='caption' title={timestamp}>
+    <Typography variant='caption' title={timestamp} color={color}>
       {timeAgo}
     </Typography>
   );

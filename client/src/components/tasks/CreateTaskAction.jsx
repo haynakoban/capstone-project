@@ -29,7 +29,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -38,8 +38,11 @@ import { StyledPostBox, StyledModalBox } from '../global';
 import { getUserInfo } from '../../features/users/usersSlice';
 import { addNewTask } from '../../features/tasks/tasksSlice';
 import { AssignedUser } from './AssignedUser';
+import { AuthContext } from '../../lib/authContext';
 
 const CreateTaskAction = ({ members }) => {
+  const { socket } = useContext(AuthContext);
+
   const dispatch = useDispatch();
   const user = useSelector(getUserInfo);
 
@@ -166,6 +169,8 @@ const CreateTaskAction = ({ members }) => {
         .then((res) => {
           if (res.data?.task && res.data?.user?.[0]) {
             dispatch(addNewTask(res.data));
+
+            socket?.current?.emit('send_notif', res?.data);
           }
         })
         .catch((err) => console.error(err))

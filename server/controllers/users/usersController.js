@@ -120,13 +120,19 @@ const getUserInfo = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const user = await Users.findById(id);
+    const user = await Users.findById(id, 'isIntern');
 
     if (!user) return res.json({ err: `no user found` });
 
-    return res.json({
-      user: user,
-    });
+    if (user.isIntern) {
+      const find_user = await Users.findById(id, '-employeeInfo');
+
+      return res.json({ user: find_user });
+    } else {
+      const find_user = await Users.findById(id, '-internInfo');
+
+      return res.json({ user: find_user });
+    }
   } catch (error) {
     next(error);
   }

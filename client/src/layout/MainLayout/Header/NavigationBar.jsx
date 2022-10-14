@@ -15,13 +15,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 // import ChatIcon from '@mui/icons-material/Chat';
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  getUserInfo,
-  isUserAuthorized,
-  isUserLoggedIn,
-} from '../../../features/users/usersSlice';
+import { Fragment, useContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { AuthContext } from '../../../lib/authContext';
+import { isUserLoggedIn } from '../../../features/users/usersSlice';
 
 import Logo from './Logo';
 import SideDrawer from './SideDrawer';
@@ -29,6 +27,7 @@ import UserSettings from '../../Settings/UserSettings';
 import Notification from '../../Settings/Notification';
 
 const NavigationBar = () => {
+  const { _user, _isUserAuth } = useContext(AuthContext);
   const authRoute = [
     {
       name: 'Log In',
@@ -41,28 +40,8 @@ const NavigationBar = () => {
   ];
   const [pageTitle, setPageTitle] = useState('Dashboard');
   const [leftDrawer, showLeftDrawer] = useState(false);
-
-  // is user authorize
-  const isUserAuthorize = useSelector(isUserAuthorized);
-  const user = useSelector(getUserInfo);
-
-  const routes = user?.isIntern
-    ? [
-        {
-          name: 'Internship',
-          path: '/internship',
-        },
-        {
-          name: 'Room',
-          path: '/room',
-        },
-      ]
-    : [
-        {
-          name: 'Room',
-          path: '/room',
-        },
-      ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [routes, setRoutes] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -101,6 +80,38 @@ const NavigationBar = () => {
     document.title = `TrainNLearn | ${title}`;
     setPageTitle(title);
   }, [pageTitle, pathname]);
+
+  // handle routes
+  useEffect(() => {
+    if (_user?._id) {
+      if (_user?.internInfo) {
+        setRoutes([
+          {
+            name: 'Internship',
+            path: '/internship',
+          },
+          {
+            name: 'Room',
+            path: '/room',
+          },
+        ]);
+      } else if (_user?.employeeInfo) {
+        setRoutes([
+          {
+            name: 'Room',
+            path: '/room',
+          },
+        ]);
+      }
+    }
+  }, [_user?._id, _user?.internInfo, _user?.employeeInfo]);
+
+  // handle notification load time
+  useEffect(() => {
+    if (_user?._id) {
+      setIsLoading(true);
+    }
+  }, [_user?._id]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -181,7 +192,7 @@ const NavigationBar = () => {
 
           {/* will show if user logged in */}
           <Box display='flex' alignItems='center'>
-            {!isUserAuthorize ? (
+            {!_isUserAuth ? (
               <Fragment>
                 {/* if authorized dont show it */}
                 <Box
@@ -227,7 +238,7 @@ const NavigationBar = () => {
                 </IconButton> */}
 
                 {/* notification icon */}
-                <Notification />
+                {isLoading && <Notification />}
 
                 {/* user settings */}
                 <UserSettings />
@@ -239,7 +250,7 @@ const NavigationBar = () => {
 
       {/* show drawer */}
       <SideDrawer
-        isUserAuthorize={isUserAuthorize}
+        isUserAuthorize={_isUserAuth}
         routes={routes}
         authRoute={authRoute}
         showLeftDrawer={showLeftDrawer}

@@ -2,13 +2,12 @@ import {
   Avatar,
   Badge,
   Box,
-  //   Button,
   ClickAwayListener,
   IconButton,
   Typography,
-  //   Modal,
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,20 +16,28 @@ import { AuthContext } from '../../lib/authContext';
 import avatarTheme from '../../lib/avatar';
 import {
   getNotifications,
+  getReadNotifs,
+  newNotification,
+  readNotification,
   selectAllNotification,
 } from '../../features/notifications/notificationsSlice';
 import TimeAgo from '../../components/global/TimeAgo';
 
 const Notification = () => {
-  const { _user } = useContext(AuthContext);
+  const { _user, socket } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const listOfNotification = useSelector(getNotifications);
+  const isNotifRead = useSelector(getReadNotifs);
 
   // click away listener
-  const handleClick = () => setOpen((prev) => !prev);
+  const handleClick = () => {
+    setOpen((prev) => !prev);
+    setNotifCount(0);
+  };
   const handleClickAway = () => setOpen(false);
 
   useEffect(() => {
@@ -38,6 +45,21 @@ const Notification = () => {
       dispatch(selectAllNotification(_user?._id));
     }
   }, [_user?._id, dispatch]);
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current?.on('receive_notif', (data) => {
+        dispatch(newNotification(data));
+        setNotifCount((prev) => prev + 1);
+      });
+    }
+  }, [socket, dispatch]);
+
+  useEffect(() => {
+    if (isNotifRead) {
+      setNotifCount(isNotifRead);
+    }
+  }, [isNotifRead]);
 
   return (
     <Fragment>
@@ -52,13 +74,14 @@ const Notification = () => {
             aria-label='notif icon'
             onClick={handleClick}
           >
-            <Badge color='error' badgeContent={0} max={99}>
+            <Badge color='error' badgeContent={notifCount ?? 0} max={99}>
               <NotificationsIcon />
             </Badge>
           </IconButton>
 
           {open ? (
             <Box
+              className='comment'
               sx={{
                 position: 'absolute',
                 top: 42,
@@ -68,6 +91,8 @@ const Notification = () => {
                 width: 320,
                 boxShadow: 10,
                 borderRadius: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 p: 1,
                 bgcolor: 'background.paper',
                 color: '#000',
@@ -87,18 +112,30 @@ const Notification = () => {
                     height={70}
                     maxHeight={70}
                     sx={{
-                      borderRadius: 2,
                       px: 1,
                       cursor: 'pointer',
+                      ...(notif?.recipient
+                        ? { bgcolor: '#f2f2f2' }
+                        : { bgcolor: '#fff' }),
                       '&:hover': {
                         bgcolor: '#f2f2f2',
+                        borderRadius: 2,
                       },
                     }}
-                    onClick={() =>
+                    onClick={() => {
+                      if (notif?.recipient) {
+                        dispatch(
+                          readNotification({
+                            id: notif?._id,
+                            user_id: _user?._id,
+                          })
+                        );
+                      }
+                      handleClick();
                       navigate(
                         `/room/${notif?.company_id}/tasks/${notif?.task_id}`
-                      )
-                    }
+                      );
+                    }}
                   >
                     <Avatar
                       sx={{
@@ -114,19 +151,23 @@ const Notification = () => {
                       mt={1}
                       display='flex'
                       flexDirection='column'
-                      flexGrow={1}
+                      // flexGrow={1}
                     >
                       <Typography
                         variant='body2'
                         fontWeight={700}
                         height={20}
-                        width={240}
                         maxHeight={20}
-                        MaxWidth={240}
                         sx={{
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          ...(notif?.recipient
+                            ? { width: 220 }
+                            : { width: 240 }),
+                          ...(notif?.recipient
+                            ? { maxWidth: 220 }
+                            : { maxWidth: 240 }),
                         }}
                       >
                         {notif?.name} created a task
@@ -136,41 +177,39 @@ const Notification = () => {
                         variant='body2'
                         fontWeight={500}
                         height={20}
-                        width={240}
                         maxHeight={20}
-                        MaxWidth={240}
                         sx={{
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          ...(notif?.recipient
+                            ? { width: 220 }
+                            : { width: 240 }),
+                          ...(notif?.recipient
+                            ? { maxWidth: 220 }
+                            : { maxWidth: 240 }),
                         }}
                       >
                         {notif?.title}
                       </Typography>
-
-                      <TimeAgo timestamp={notif?.updatedAt} />
+                      {notif?.recipient ? (
+                        <TimeAgo
+                          timestamp={notif?.createdAt}
+                          color='primary.main'
+                        />
+                      ) : (
+                        <TimeAgo timestamp={notif?.createdAt} />
+                      )}
                     </Box>
+                    {notif?.recipient ? (
+                      <FiberManualRecordIcon fontSize='small' color='primary' />
+                    ) : null}
                   </Box>
                 ))}
             </Box>
           ) : null}
         </Box>
       </ClickAwayListener>
-
-      {/* delete notification */}
-      {/* <Modal
-        open={deleteModalOpen}
-        onClose={handleDeleteModalClose}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'
-      >
-        <Fragment>
-          <DeleteTask
-            task={task}
-            handleDeleteModalClose={handleDeleteModalClose}
-          />
-        </Fragment>
-      </Modal> */}
     </Fragment>
   );
 };
