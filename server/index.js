@@ -51,9 +51,17 @@ global.onlineUsers = new Map();
 
 // socket.io : connection
 io.on('connection', (socket) => {
-  // socket.on('join_room', (data) => {
-  //   socket.join(data);
+  // socket.on('add_user', (user_id) => {
+  //   onlineUsers?.set(user_id, socket.id);
   // });
+
+  socket.on('join_room', (data) => {
+    socket.join(data);
+  });
+
+  socket.on('send_notif', (data) => {
+    io.to(data?.notif?.company_id).emit('receive_notif', data);
+  });
 
   socket.on('disconnect', () => console.log('user logout: ', socket.id));
 });

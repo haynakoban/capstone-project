@@ -49,9 +49,21 @@ const createNewTask = async (req, res, next) => {
 
     if (!user) return res.json({ err: `no users found` });
 
+    let list_of_recipient;
+    if (Array.isArray(req.body?.assignedTo)) {
+      list_of_recipient = req.body?.assignedTo?.map((e) => {
+        return { recipient_id: e, is_read: false };
+      });
+    } else {
+      list_of_recipient = {
+        recipient_id: req.body?.assignedTo,
+        is_read: false,
+      };
+    }
+
     const notif = await Notifications.create({
       type: 'Task',
-      recipient: req.body?.assignedTo,
+      recipient: list_of_recipient,
       createdBy: ObjectId(createdBy),
       company_id: ObjectId(company_id),
       task_id: task?._id,
