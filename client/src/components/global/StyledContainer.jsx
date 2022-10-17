@@ -11,6 +11,10 @@ const UseStyledContainer = styled((props) => {
   background: '#fff',
 }));
 
-export const StyledContainer = ({ children, width }) => {
-  return <UseStyledContainer maxWidth={width}>{children}</UseStyledContainer>;
+export const StyledContainer = ({ children, width, mt = 0 }) => {
+  return (
+    <UseStyledContainer maxWidth={width} sx={{ mt }}>
+      {children}
+    </UseStyledContainer>
+  );
 };

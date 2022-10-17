@@ -39,3 +39,41 @@ export const StackContainer = styled(Stack)(({ theme }) => ({
     borderBottom: '1px solid #20212850',
   },
 }));
+
+// const PaperStyled = styled(Paper)(() => ({
+//   display: 'flex',
+//   flexDirection: 'column',
+//   justifyContent: 'center',
+//   alignItems: 'center',
+//   textAlign: 'center',
+//   border: '1px solid #FFF',
+//   width: '207.734px !important',
+//   minHeight: '112px !important',
+//   margin: 'auto',
+//   '&:hover': {
+//     border: '1px solid #3751FF',
+//     color: '#3751FF',
+
+//     '> p': {
+//       color: '#3751FF',
+//     },
+//   },
+// }));
+
+// export const StyledPaper = ({ text, hours }) => {
+//   return (
+//     <PaperStyled>
+//       <Typography
+//         paragraph
+//         sx={{
+//           color: '#9FA2B4',
+//         }}
+//       >
+//         {text}
+//       </Typography>
+//       <Typography variant='h4' fontWeight={600}>
+//         {hours}
+//       </Typography>
+//     </PaperStyled>
+//   );
+// };
