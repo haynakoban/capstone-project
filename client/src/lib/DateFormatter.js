@@ -11,3 +11,9 @@ export const isDatePast = (date) => {
 
   return isPast(d);
 };
+
+export const DateToday = () => {
+  const d = new Date();
+
+  return `${format(d, 'MMMM d, yyyy')}`;
+};
