@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '../../lib/axiosConfig';
+import { isDatePast } from '../../lib/DateFormatter';
 
 const initialState = {
   tasks: [],
   task: {},
+  pending_tasks: [],
+  completed_tasks: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -119,6 +122,25 @@ const tasksSlice = createSlice({
         };
       }
     },
+    pendingTasks: (state, action) => {
+      const filter_dates = state.tasks?.filter(
+        (task) => isDatePast(task?.date?.closes) === false
+      );
+
+      let tasksList = [];
+      for (const task of filter_dates) {
+        if (task?.submitted_by?.length > 0) {
+          const task_is_pending = task?.submitted_by?.some(action.payload);
+          if (!task_is_pending) {
+            tasksList?.push(task);
+          }
+        } else {
+          tasksList?.push(task);
+        }
+      }
+
+      state.pending_tasks = tasksList;
+    },
   },
   extraReducers(builder) {
     builder
@@ -203,7 +225,9 @@ const tasksSlice = createSlice({
 
 export const selectAllTasks = (state) => state.tasks.tasks;
 export const getTaskById = (state) => state.tasks.task;
+export const getPendingTasks = (state) => state.tasks.pending_tasks;
 
-export const { addNewTask, submitTask, updateTask } = tasksSlice.actions;
+export const { addNewTask, pendingTasks, submitTask, updateTask } =
+  tasksSlice.actions;
 
 export default tasksSlice.reducer;
