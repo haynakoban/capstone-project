@@ -1,7 +1,6 @@
 import { Box, Container, IconButton } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
-import { pendingTasks, completedTasks } from './dummy';
 import RoomLayout from '../../layout/RoomLayout';
 import CardStatusTask from '../../components/cards/CardStatusTask';
 import SingleTaskCard from '../../components/tasks/SingleTaskCard';
@@ -12,7 +11,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
 import { getRoomInfo } from '../../features/companies/companiesSlice';
-import { getTaskById, selectSingleTask } from '../../features/tasks/tasksSlice';
+import {
+  completedTasks,
+  getCompletedTasks,
+  getPendingTasks,
+  getTaskById,
+  pendingTasks,
+  selectSingleTask,
+} from '../../features/tasks/tasksSlice';
 
 const SingleTask = () => {
   const [auth, setAuth] = useState(false);
@@ -25,12 +31,17 @@ const SingleTask = () => {
 
   const dispatch = useDispatch();
   const task = useSelector(getTaskById);
+  const pending_tasks = useSelector(getPendingTasks);
+  const completed_tasks = useSelector(getCompletedTasks);
 
   useEffect(() => {
     if (_user?._id) {
       dispatch(
         selectSingleTask({ company_id: room_id, id, user_id: _user?._id })
       );
+
+      dispatch(pendingTasks(_user?._id));
+      dispatch(completedTasks(_user?._id));
     }
   }, [_user?._id, id, room_id, dispatch]);
 
@@ -98,7 +109,6 @@ const SingleTask = () => {
             },
           }}
         >
-          {/* {ListOfTasks} */}
           <IconButton
             sx={{ mb: 2 }}
             size='large'
@@ -112,27 +122,52 @@ const SingleTask = () => {
         </Container>
 
         {/* list of tasks */}
-        <Box
-          maxWidth='xs'
-          width={356}
-          sx={{
-            display: {
-              xs: 'none',
-              sm: 'none',
-              md: 'block',
-              lg: 'block',
-            },
-            position: 'relative',
-          }}
-        >
-          <Box position='fixed' width='inherit'>
-            {/* pending - call the card status task */}
-            <CardStatusTask tasks={pendingTasks} name='Pending Tasks' />
-
-            {/* completed - call the card status task */}
-            <CardStatusTask tasks={completedTasks} name='Completed Tasks' />
+        {_user?.internInfo && (
+          <Box
+            maxWidth='xs'
+            width={356}
+            sx={{
+              display: {
+                xs: 'none',
+                sm: 'none',
+                md: 'block',
+                lg: 'block',
+              },
+              position: 'relative',
+            }}
+          >
+            <Box position='fixed' width='inherit'>
+              {/* pending - call the card status task */}
+              {pending_tasks?.length > 0 ? (
+                <CardStatusTask
+                  tasks={pending_tasks?.slice(0, 5)}
+                  name='Pending Tasks'
+                  type='pending'
+                />
+              ) : (
+                <CardStatusTask
+                  no='No Pending Tasks'
+                  name='Pending Tasks'
+                  type='pending'
+                />
+              )}
+              {/* completed - call the card status task */}
+              {completed_tasks?.length > 0 ? (
+                <CardStatusTask
+                  tasks={completed_tasks?.slice(0, 5)}
+                  name='Completed Tasks'
+                  type='completed'
+                />
+              ) : (
+                <CardStatusTask
+                  no='No Tasks Completed'
+                  name='Completed Tasks'
+                  type='completed'
+                />
+              )}
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </RoomLayout>
   );

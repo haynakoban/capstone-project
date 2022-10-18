@@ -407,9 +407,65 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+// fetch submitted tasks - files
+const fetchSubmittedTasks = async (req, res, next) => {
+  try {
+    const { id, company_id } = req.params;
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+      bucketName: 'uploads',
+    });
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, company_id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findTask = await Tasks.findById(id).exec();
+
+    let files = [];
+    let users = [];
+    let findSubmittedTask;
+    if (findTask?.submitted_by?.length > 0) {
+      const file_ids = findTask?.submitted_by?.map((f) => f.submitted_task_id);
+      const user_ids = findTask?.submitted_by?.map((f) => f.user_id);
+
+      findSubmittedTask = await TasksSubmitted.find({
+        _id: { $in: file_ids },
+      });
+
+      users = await Users.find({ _id: { $in: user_ids } }, 'name');
+
+      if (findSubmittedTask?.length > 0) {
+        let files_id = [];
+        for (const submit_task of findSubmittedTask) {
+          if (submit_task?.files?.length > 0) {
+            for (const id of submit_task?.files) {
+              files_id?.push(id);
+            }
+          }
+        }
+
+        const cursor = bucket.find({ _id: { $in: files_id } });
+        files = await cursor.toArray();
+      }
+    }
+
+    return res.json({
+      task: findTask,
+      users,
+      sub_task: findSubmittedTask,
+      files,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNewTask,
   deleteTask,
+  fetchSubmittedTasks,
   fetchTasks,
   selectTaskById,
   submitTask,

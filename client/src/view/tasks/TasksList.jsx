@@ -15,8 +15,14 @@ import {
   getRoomInfo,
 } from '../../features/companies/companiesSlice';
 
-import { pendingTasks, completedTasks } from './dummy';
-import { fetchTasks, selectAllTasks } from '../../features/tasks/tasksSlice';
+import {
+  completedTasks,
+  fetchTasks,
+  getCompletedTasks,
+  getPendingTasks,
+  pendingTasks,
+  selectAllTasks,
+} from '../../features/tasks/tasksSlice';
 
 const TasksList = () => {
   const [auth, setAuth] = useState(false);
@@ -31,12 +37,21 @@ const TasksList = () => {
   const dispatch = useDispatch();
   const roomInfo = useSelector(getCompanyInfo);
   const tasksList = useSelector(selectAllTasks);
+  const pending_tasks = useSelector(getPendingTasks);
+  const completed_tasks = useSelector(getCompletedTasks);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
 
     dispatch(fetchTasks({ company_id: room_id })).unwrap();
   }, [room_id, dispatch]);
+
+  useEffect(() => {
+    if (_user?._id) {
+      dispatch(pendingTasks(_user?._id));
+      dispatch(completedTasks(_user?._id));
+    }
+  }, [_user?._id, room_id, dispatch]);
 
   useEffect(() => {
     if (!_isUserAuth) {
@@ -122,27 +137,52 @@ const TasksList = () => {
         </Container>
 
         {/* list of tasks */}
-        <Box
-          maxWidth='xs'
-          width={356}
-          sx={{
-            display: {
-              xs: 'none',
-              sm: 'none',
-              md: 'block',
-              lg: 'block',
-            },
-            position: 'relative',
-          }}
-        >
-          <Box position='fixed' width='inherit'>
-            {/* pending - call the card status task */}
-            <CardStatusTask tasks={pendingTasks} name='Pending Tasks' />
-
-            {/* completed - call the card status task */}
-            <CardStatusTask tasks={completedTasks} name='Completed Tasks' />
+        {_user?.internInfo && (
+          <Box
+            maxWidth='xs'
+            width={356}
+            sx={{
+              display: {
+                xs: 'none',
+                sm: 'none',
+                md: 'block',
+                lg: 'block',
+              },
+              position: 'relative',
+            }}
+          >
+            <Box position='fixed' width='inherit'>
+              {/* pending - call the card status task */}
+              {pending_tasks?.length > 0 ? (
+                <CardStatusTask
+                  tasks={pending_tasks?.slice(0, 5)}
+                  name='Pending Tasks'
+                  type='pending'
+                />
+              ) : (
+                <CardStatusTask
+                  no='No Pending Tasks'
+                  name='Pending Tasks'
+                  type='pending'
+                />
+              )}
+              {/* completed - call the card status task */}
+              {completed_tasks?.length > 0 ? (
+                <CardStatusTask
+                  tasks={completed_tasks?.slice(0, 5)}
+                  name='Completed Tasks'
+                  type='completed'
+                />
+              ) : (
+                <CardStatusTask
+                  no='No Tasks Completed'
+                  name='Completed Tasks'
+                  type='completed'
+                />
+              )}
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </RoomLayout>
   );

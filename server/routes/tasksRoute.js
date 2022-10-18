@@ -27,6 +27,9 @@ router
 // delete method - undo a task and delete files
 router.route('/:id/:user_id').delete(auth, tasksController.undoSubmitTask);
 
+// get method - fetch all submitted files
+router.route('/:id/:company_id').get(auth, tasksController.fetchSubmittedTasks);
+
 // get method - fetch single task
 router
   .route('/:company_id/:user_id/:id')

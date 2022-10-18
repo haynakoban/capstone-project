@@ -7,6 +7,7 @@ const initialState = {
   task: {},
   pending_tasks: [],
   completed_tasks: [],
+  submitted_tasks: {},
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -53,6 +54,22 @@ export const undoSubmitTask = createAsyncThunk(
       const { id, user_id } = initialState;
 
       const response = await axios.delete(`api/tasks/${id}/${user_id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// get submitted files
+export const getSubmittedTasks = createAsyncThunk(
+  'tasks/getSubmittedTasks',
+  async (initialState) => {
+    try {
+      const { company_id, id } = initialState;
+
+      const response = await axios.get(`api/tasks/${id}/${company_id}`);
 
       return response.data;
     } catch (e) {
@@ -130,7 +147,9 @@ const tasksSlice = createSlice({
       let tasksList = [];
       for (const task of filter_dates) {
         if (task?.submitted_by?.length > 0) {
-          const task_is_pending = task?.submitted_by?.some(action.payload);
+          const task_is_pending = task?.submitted_by?.some(
+            (e) => e.user_id === action.payload
+          );
           if (!task_is_pending) {
             tasksList?.push(task);
           }
@@ -141,11 +160,29 @@ const tasksSlice = createSlice({
 
       state.pending_tasks = tasksList;
     },
+    completedTasks: (state, action) => {
+      let tasksList = [];
+      for (const task of state.tasks) {
+        if (task?.submitted_by?.length > 0) {
+          const task_is_complete = task?.submitted_by?.some(
+            (e) => e.user_id === action.payload
+          );
+          if (task_is_complete) {
+            tasksList?.push(task);
+          }
+        } else if (isDatePast(task?.date?.closes)) {
+          tasksList?.push(task);
+        }
+      }
+
+      state.completed_tasks = tasksList;
+    },
   },
   extraReducers(builder) {
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.task = {};
+        state.submitted_tasks = {};
         if (
           action.payload.tasks.length > 0 &&
           action.payload.users.length > 0
@@ -180,6 +217,7 @@ const tasksSlice = createSlice({
         }
       })
       .addCase(selectSingleTask.fulfilled, (state, action) => {
+        state.submitted_tasks = {};
         if (action.payload.task && action.payload?.user?.[0]) {
           const { name } = action.payload.user[0];
 
@@ -219,6 +257,47 @@ const tasksSlice = createSlice({
       })
       .addCase(undoSubmitTask.fulfilled, (state, action) => {
         state.task = { ...state.task, s_task: action.payload.s_task };
+      })
+      .addCase(getSubmittedTasks.fulfilled, (state, action) => {
+        if (action.payload.task && action.payload?.sub_task) {
+          const { task, users, sub_task, files } = action.payload;
+
+          state.submitted_tasks = task;
+
+          const USERS_SIZE = users?.length;
+          const SUBTASKS_SIZE = sub_task?.length;
+          const FILES_SIZE = files?.length;
+          const SUBMITTED_BY_SIZE = task?.submitted_by?.length;
+
+          for (let i = 0; i < SUBMITTED_BY_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (task?.submitted_by[i]?.user_id === users[j]?._id) {
+                state.submitted_tasks.submitted_by[i].name = users[j]?.name;
+              }
+            }
+          }
+
+          for (let i = 0; i < SUBMITTED_BY_SIZE; i++) {
+            for (let j = 0; j < SUBTASKS_SIZE; j++) {
+              if (
+                task?.submitted_by[i]?.submitted_task_id === sub_task[j]?._id
+              ) {
+                state.submitted_tasks.submitted_by[i].filename = [];
+
+                //  find each file
+                for (const file of sub_task[j]?.files) {
+                  for (let k = 0; k < FILES_SIZE; k++) {
+                    if (file === files?.[k]?._id) {
+                      state.submitted_tasks.submitted_by[i].filename.push(
+                        files[k]?.filename
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       });
   },
 });
@@ -226,8 +305,15 @@ const tasksSlice = createSlice({
 export const selectAllTasks = (state) => state.tasks.tasks;
 export const getTaskById = (state) => state.tasks.task;
 export const getPendingTasks = (state) => state.tasks.pending_tasks;
+export const getCompletedTasks = (state) => state.tasks.completed_tasks;
+export const getSubmittedTask = (state) => state.tasks.submitted_tasks;
 
-export const { addNewTask, pendingTasks, submitTask, updateTask } =
-  tasksSlice.actions;
+export const {
+  addNewTask,
+  completedTasks,
+  pendingTasks,
+  submitTask,
+  updateTask,
+} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

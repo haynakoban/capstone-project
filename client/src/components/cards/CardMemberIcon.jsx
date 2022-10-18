@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import avatarTheme from '../../lib/avatar';
 
 const CardMemberIcon = ({ members }) => {
   const navigate = useNavigate();
@@ -19,7 +20,16 @@ const CardMemberIcon = ({ members }) => {
     return (
       <ListItem key={member.name}>
         <ListItemAvatar>
-          <Avatar>{member?.name[0]?.toUpperCase()}</Avatar>
+          <Avatar
+            sx={{
+              bgcolor: avatarTheme({
+                name: member?.name?.[0]?.toLowerCase(),
+              }),
+            }}
+            aria-label='recipe'
+          >
+            {member?.name?.[0]?.toUpperCase()}
+          </Avatar>
         </ListItemAvatar>
         <ListItemText primary={member?.name} />
       </ListItem>

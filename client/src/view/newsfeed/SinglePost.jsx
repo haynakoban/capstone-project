@@ -1,4 +1,6 @@
-import { Box, Container } from '@mui/material';
+import { Box, Container, IconButton } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -89,6 +91,14 @@ const SinglePost = () => {
             },
           }}
         >
+          <IconButton
+            sx={{ mb: 2 }}
+            size='large'
+            // get the company id
+            onClick={() => navigate(`/room/${room_id}/newsfeed`)}
+          >
+            <ArrowBackIosNewIcon />
+          </IconButton>
           {content}
         </Container>
 
