@@ -6,7 +6,14 @@ import {
   CardContent,
   CardHeader,
   LinearProgress,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,14 +21,20 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from '../../lib/axiosConfig';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
 import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
-import { submitTask, undoSubmitTask } from '../../features/tasks/tasksSlice';
+import {
+  getSubmittedTask,
+  getSubmittedTasks,
+  submitTask,
+  undoSubmitTask,
+} from '../../features/tasks/tasksSlice';
 import { DateFormatter, isDatePast } from '../../lib/DateFormatter';
 import avatarTheme from '../../lib/avatar';
 import TaskClickAwayHandler from './TaskClickAwayHandler';
+import TasksRow from './TasksRow';
 
 const SingleTaskCard = ({ task }) => {
   const { _user } = useContext(AuthContext);
@@ -29,6 +42,7 @@ const SingleTaskCard = ({ task }) => {
   const [isTaskSubmitted, setIsTaskSubmitted] = useState(false);
 
   const dispatch = useDispatch();
+  const get_submitted_task = useSelector(getSubmittedTask);
 
   const { register, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
@@ -50,6 +64,14 @@ const SingleTaskCard = ({ task }) => {
       setIsTaskSubmitted(task?.s_task);
     }
   }, [task?.s_task]);
+
+  useEffect(() => {
+    if (task?.company_id && task?._id) {
+      dispatch(
+        getSubmittedTasks({ company_id: task?.company_id, id: task?._id })
+      );
+    }
+  }, [task?.company_id, task?._id, dispatch]);
 
   const options = {
     onUploadProgress: (p) => {
@@ -133,281 +155,312 @@ const SingleTaskCard = ({ task }) => {
   const isTaskClosed = check_date && checkClosesDate;
 
   return (
-    <Card elevation={2} sx={{ mb: 3 }}>
-      <CardHeader
-        avatar={
-          <Avatar
-            sx={{
-              bgcolor: avatarTheme({
-                name: task?.name?.[0]?.toLowerCase(),
-              }),
-            }}
-            aria-label='recipe'
-          >
-            {task?.name?.[0]?.toUpperCase()}
-          </Avatar>
-        }
-        action={
-          _user?._id === task?.createdBy ? (
-            <TaskClickAwayHandler task={task} />
-          ) : undefined
-        }
-        title={task?.name}
-        subheader={<TimeAgo timestamp={task?.updatedAt} />}
-      />
-      <CardContent
-        sx={{
-          px: 3,
-          py: 0,
-          mb: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-        }}
-      >
-        {isTaskClosed ? (
-          <Fragment>
-            <Typography
-              variant='body2'
-              fontWeight={700}
-              sx={{ color: '#dc3545' }}
-            >
-              Due {task?.date?.due && DateFormatter(task?.date?.due)}
-            </Typography>
-            <Typography
-              variant='body2'
-              fontWeight={700}
-              sx={{ color: '#dc3545' }}
-            >
-              Closes {task?.date?.closes && DateFormatter(task?.date?.closes)}
-            </Typography>
-          </Fragment>
-        ) : (
-          <Fragment>
-            <Typography variant='body2' fontWeight={700}>
-              Due {task?.date?.due && DateFormatter(task?.date?.due)}
-            </Typography>
-            <Typography variant='body2' fontWeight={700}>
-              Closes {task?.date?.closes && DateFormatter(task?.date?.closes)}
-            </Typography>
-          </Fragment>
-        )}
-      </CardContent>
-
-      <CardContent
-        sx={{
-          px: 3,
-          py: 0,
-        }}
-      >
-        {/* title */}
-        <Typography variant='body1' fontWeight={700} mb={2}>
-          {task?.title}
-        </Typography>
-
-        {/* description */}
-        {task?.description && (
-          <StyledTypography2 variant='body1' component='pre'>
-            {task?.description}
-          </StyledTypography2>
-        )}
-
-        {/* reference material - optional */}
-        {task?.filename && (
-          <Fragment>
-            <Typography variant='body1' fontWeight={500} mb={0.5}>
-              Reference Materials:
-            </Typography>
-
-            {/* list of reference files */}
-            <Box
-              mb={1.5}
-              width='100%'
-              className='comment'
+    <Fragment>
+      <Card elevation={2} sx={{ mb: 3 }}>
+        <CardHeader
+          avatar={
+            <Avatar
               sx={{
-                overflow: 'auto',
-                '> div': {
-                  mb: 0.5,
-                },
+                bgcolor: avatarTheme({
+                  name: task?.name?.[0]?.toLowerCase(),
+                }),
               }}
+              aria-label='recipe'
             >
-              {get_ref_file}
-            </Box>
-          </Fragment>
-        )}
+              {task?.name?.[0]?.toUpperCase()}
+            </Avatar>
+          }
+          action={
+            _user?._id === task?.createdBy ? (
+              <TaskClickAwayHandler task={task} />
+            ) : undefined
+          }
+          title={task?.name}
+          subheader={<TimeAgo timestamp={task?.updatedAt} />}
+        />
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+            mb: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}
+        >
+          {isTaskClosed ? (
+            <Fragment>
+              <Typography
+                variant='body2'
+                fontWeight={700}
+                sx={{ color: '#dc3545' }}
+              >
+                Due {task?.date?.due && DateFormatter(task?.date?.due)}
+              </Typography>
+              <Typography
+                variant='body2'
+                fontWeight={700}
+                sx={{ color: '#dc3545' }}
+              >
+                Closes {task?.date?.closes && DateFormatter(task?.date?.closes)}
+              </Typography>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <Typography variant='body2' fontWeight={700}>
+                Due {task?.date?.due && DateFormatter(task?.date?.due)}
+              </Typography>
+              <Typography variant='body2' fontWeight={700}>
+                Closes {task?.date?.closes && DateFormatter(task?.date?.closes)}
+              </Typography>
+            </Fragment>
+          )}
+        </CardContent>
 
-        {isTaskClosed ? (
-          <Typography
-            variant='body1'
-            fontWeight={700}
-            sx={{ color: '#dc3545' }}
-          >
-            Task Closed
+        <CardContent
+          sx={{
+            px: 3,
+            py: 0,
+          }}
+        >
+          {/* title */}
+          <Typography variant='body1' fontWeight={700} mb={2}>
+            {task?.title}
           </Typography>
-        ) : (
-          <Fragment>
-            {/* my work */}
-            {isTaskSubmitted ? (
-              <Stack
-                justifyContent='flex-start'
-                flexDirection='column'
-                alignItems='flex-start'
-                width='100%'
-                mb={1.5}
-              >
-                <Typography
-                  display='inline'
-                  variant='body1'
-                  component='div'
-                  fontWeight={500}
-                  mb={0.5}
-                >
-                  My Work:
-                  <Typography
-                    variant='subtitle2'
-                    component='p'
-                    ml={1}
-                    display='inline'
-                    sx={{ color: '#dc3545' }}
-                  >
-                    Max 6 files
-                  </Typography>
-                </Typography>
 
-                <Box
-                  mb={0.5}
-                  width='100%'
-                  className='comment'
-                  sx={{
-                    overflow: 'auto',
-                    '> div': {
-                      mb: 0.5,
-                    },
-                  }}
-                >
-                  {get_s_file}
-                </Box>
-              </Stack>
-            ) : (
-              <Stack
-                justifyContent='flex-start'
-                flexDirection='column'
-                alignItems='flex-start'
-                width='100%'
-                mb={1.5}
-              >
-                <Typography
-                  display='inline'
-                  variant='body1'
-                  component='div'
-                  fontWeight={500}
-                  mb={0.5}
-                >
-                  My Work:
-                  <Typography
-                    variant='subtitle2'
-                    component='p'
-                    ml={1}
-                    display='inline'
-                    sx={{ color: '#dc3545' }}
-                  >
-                    Max 6 files
-                  </Typography>
-                </Typography>
+          {/* description */}
+          {task?.description && (
+            <StyledTypography2 variant='body1' component='pre'>
+              {task?.description}
+            </StyledTypography2>
+          )}
 
-                <Box
-                  mb={0.5}
-                  width='100%'
-                  className='comment'
-                  sx={{
-                    overflow: 'auto',
-                    '> div': {
-                      mb: 0.5,
-                    },
-                  }}
-                >
-                  {get_file}
-                </Box>
+          {/* reference material - optional */}
+          {task?.filename && (
+            <Fragment>
+              <Typography variant='body1' fontWeight={500} mb={0.5}>
+                Reference Materials:
+              </Typography>
 
-                <Button
-                  variant='outlined'
-                  component='label'
-                  startIcon={<AddIcon />}
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  Add File
-                  <input
-                    hidden
-                    multiple
-                    name='ref_files'
-                    type='file'
-                    accept='.doc,.docx,.pdf,image/*'
-                    {...register('ref_files')}
-                  />
-                </Button>
-              </Stack>
-            )}
-
-            {/* progress bar */}
-            {progress > 0 && (
-              <Box sx={{ width: '100%', alignSelf: 'flex-start', mb: 1.5 }}>
-                <LinearProgress
-                  variant='determinate'
-                  color='success'
-                  value={progress}
-                />
-              </Box>
-            )}
-
-            {isTaskSubmitted ? (
+              {/* list of reference files */}
               <Box
-                display='flex'
-                flexDirection={{ xs: 'column', sm: 'row' }}
-                alignItems={{ xs: 'flex-start', sm: 'center' }}
-                justifyContent='space-between'
-                mt={5}
+                mb={1.5}
+                width='100%'
+                className='comment'
+                sx={{
+                  overflow: 'auto',
+                  '> div': {
+                    mb: 0.5,
+                  },
+                }}
               >
+                {get_ref_file}
+              </Box>
+            </Fragment>
+          )}
+
+          {_user?.employeeInfo ? null : (
+            <Fragment>
+              {isTaskClosed ? (
                 <Typography
-                  variant='body2'
+                  variant='body1'
                   fontWeight={700}
-                  fontStyle='italic'
-                  mb={{ xs: 1, sm: 0 }}
+                  sx={{ color: '#dc3545' }}
                 >
-                  Submitted on{' '}
-                  {task?.submitted_on && DateFormatter(task?.submitted_on)}
+                  Task Closed
                 </Typography>
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  sx={{ px: '23px' }}
-                  // if click the undo, delete the file that has been submitted
-                  onClick={() => {
-                    dispatch(
-                      undoSubmitTask({ id: task?._id, user_id: _user?._id })
-                    );
-                    setIsTaskSubmitted(false);
-                  }}
-                  {...(progress > 0 && { disabled: true })}
-                >
-                  Undo
-                </Button>
-              </Box>
-            ) : (
-              <Box mt={5}>
-                <Button
-                  variant='outlined'
-                  sx={{ px: '23px' }}
-                  onClick={handleSubmit(handleFormSubmit)}
-                  {...(progress > 0 && { disabled: true })}
-                >
-                  Submit
-                </Button>
-              </Box>
-            )}
-          </Fragment>
-        )}
-      </CardContent>
-    </Card>
+              ) : (
+                <Fragment>
+                  {/* my work */}
+                  {isTaskSubmitted ? (
+                    <Stack
+                      justifyContent='flex-start'
+                      flexDirection='column'
+                      alignItems='flex-start'
+                      width='100%'
+                      mb={1.5}
+                    >
+                      <Typography
+                        display='inline'
+                        variant='body1'
+                        component='div'
+                        fontWeight={500}
+                        mb={0.5}
+                      >
+                        My Work:
+                        <Typography
+                          variant='subtitle2'
+                          component='p'
+                          ml={1}
+                          display='inline'
+                          sx={{ color: '#dc3545' }}
+                        >
+                          Max 6 files
+                        </Typography>
+                      </Typography>
+
+                      <Box
+                        mb={0.5}
+                        width='100%'
+                        className='comment'
+                        sx={{
+                          overflow: 'auto',
+                          '> div': {
+                            mb: 0.5,
+                          },
+                        }}
+                      >
+                        {get_s_file}
+                      </Box>
+                    </Stack>
+                  ) : (
+                    <Stack
+                      justifyContent='flex-start'
+                      flexDirection='column'
+                      alignItems='flex-start'
+                      width='100%'
+                      mb={1.5}
+                    >
+                      <Typography
+                        display='inline'
+                        variant='body1'
+                        component='div'
+                        fontWeight={500}
+                        mb={0.5}
+                      >
+                        My Work:
+                        <Typography
+                          variant='subtitle2'
+                          component='p'
+                          ml={1}
+                          display='inline'
+                          sx={{ color: '#dc3545' }}
+                        >
+                          Max 6 files
+                        </Typography>
+                      </Typography>
+
+                      <Box
+                        mb={0.5}
+                        width='100%'
+                        className='comment'
+                        sx={{
+                          overflow: 'auto',
+                          '> div': {
+                            mb: 0.5,
+                          },
+                        }}
+                      >
+                        {get_file}
+                      </Box>
+
+                      <Button
+                        variant='outlined'
+                        component='label'
+                        startIcon={<AddIcon />}
+                        sx={{ textTransform: 'capitalize' }}
+                      >
+                        Add File
+                        <input
+                          hidden
+                          multiple
+                          name='ref_files'
+                          type='file'
+                          accept='.doc,.docx,.pdf,image/*'
+                          {...register('ref_files')}
+                        />
+                      </Button>
+                    </Stack>
+                  )}
+
+                  {/* progress bar */}
+                  {progress > 0 && (
+                    <Box
+                      sx={{ width: '100%', alignSelf: 'flex-start', mb: 1.5 }}
+                    >
+                      <LinearProgress
+                        variant='determinate'
+                        color='success'
+                        value={progress}
+                      />
+                    </Box>
+                  )}
+
+                  {isTaskSubmitted ? (
+                    <Box
+                      display='flex'
+                      flexDirection={{ xs: 'column', sm: 'row' }}
+                      alignItems={{ xs: 'flex-start', sm: 'center' }}
+                      justifyContent='space-between'
+                      mt={5}
+                    >
+                      <Typography
+                        variant='body2'
+                        fontWeight={700}
+                        fontStyle='italic'
+                        mb={{ xs: 1, sm: 0 }}
+                      >
+                        Submitted on{' '}
+                        {task?.submitted_on &&
+                          DateFormatter(task?.submitted_on)}
+                      </Typography>
+                      <Button
+                        variant='contained'
+                        color='secondary'
+                        sx={{ px: '23px' }}
+                        // if click the undo, delete the file that has been submitted
+                        onClick={() => {
+                          dispatch(
+                            undoSubmitTask({
+                              id: task?._id,
+                              user_id: _user?._id,
+                            })
+                          );
+                          setIsTaskSubmitted(false);
+                        }}
+                        {...(progress > 0 && { disabled: true })}
+                      >
+                        Undo
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Box mt={5}>
+                      <Button
+                        variant='outlined'
+                        sx={{ px: '23px' }}
+                        onClick={handleSubmit(handleFormSubmit)}
+                        {...(progress > 0 && { disabled: true })}
+                      >
+                        Submit
+                      </Button>
+                    </Box>
+                  )}
+                </Fragment>
+              )}
+            </Fragment>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* list of submitted task */}
+      {_user?.employeeInfo && (
+        <TableContainer component={Paper}>
+          <Table aria-label='collapsible table'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell align='right' />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {get_submitted_task?.submitted_by?.map((row) => (
+                <TasksRow key={row?.user_id} row={row} />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Fragment>
   );
 };
 export default SingleTaskCard;
