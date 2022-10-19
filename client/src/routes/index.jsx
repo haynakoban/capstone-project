@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import Home from '../view';
 import LogInPage from '../view/login';
 import SignUpPage from '../view/signup';
+import ForgotPassword from '../view/password';
+
 import RoomParent from '../view/room';
 import InternshipList from '../view/internship';
 import RoomWithId from '../view/room/RoomWithId';
@@ -64,6 +66,7 @@ const AppRoutes = () => {
       </Route>
       <Route path='login' element={<LogInPage />} />
       <Route path='signup' element={<SignUpPage />} />
+      <Route path='forgotpassword' element={<ForgotPassword />} />
       <Route path='settings' element={<Personalize />}>
         <Route index element={<PageNotFound />} />
         <Route path='account' element={<Profile />} />

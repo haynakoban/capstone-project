@@ -174,6 +174,7 @@ const LogInPage = () => {
               />
             </FormControl>
 
+            {/* email */}
             <Typography
               variant='subtitle'
               component='p'
@@ -183,8 +184,9 @@ const LogInPage = () => {
               mt={1}
               mb={1.5}
               sx={{ cursor: 'pointer' }}
+              onClick={() => navigate('/forgotpassword')}
             >
-              Forget Password?
+              Forgot Password?
             </Typography>
 
             <Button

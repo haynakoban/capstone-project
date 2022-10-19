@@ -253,17 +253,6 @@ const SignUpPage = () => {
                 watch={watch}
               />
 
-              {/* email otp */}
-
-              {/* phone number
-              <TextInputField
-                errors={errors.phoneNumber?.message}
-                name='phoneNumber'
-                label='Contact Number'
-                register={register}
-                watch={watch}
-              /> */}
-
               <Button
                 variant='contained'
                 onClick={handleSubmit(handleFormSubmit)}
