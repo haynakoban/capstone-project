@@ -29,11 +29,11 @@ const isUsernameValid = async (req, res, next) => {
 // post method | /api/users
 const createNewUser = async (req, res, next) => {
   try {
-    const { name, username, email, isIntern, phoneNumber, password } = req.body;
+    const { name, username, email, isIntern, password } = req.body;
 
     // if one is empty or missing the result return false, otherwise true.
     const canSave =
-      [name, username, email, phoneNumber, password].every(Boolean) &&
+      [name, username, email, password].every(Boolean) &&
       (isIntern === true || isIntern === false);
 
     if (!canSave)
@@ -62,7 +62,6 @@ const createNewUser = async (req, res, next) => {
       username,
       email,
       isIntern,
-      phoneNumber,
       password: hashPassword,
       internInfo: isIntern && userProps,
       employeeInfo: !isIntern && userProps,
