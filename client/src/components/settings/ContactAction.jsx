@@ -1,5 +1,15 @@
 import { Fragment, useEffect, useState } from 'react';
-import { Button, IconButton, Modal, Toolbar, Typography } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputLabel,
+  Modal,
+  OutlinedInput,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { StyledModalBox } from '../global';
 
@@ -10,7 +20,6 @@ import {
   updateUserContactInfo,
 } from '../../features/users/usersSlice';
 
-import TextInputField from '../forms/TextInputField';
 import EmailField from '../forms/EmailField';
 
 const ContactAction = () => {
@@ -75,20 +84,27 @@ const ContactAction = () => {
             disableGutters
           >
             <Typography variant='h6' component='h6' fontWeight={700}>
-              Edit Your Company Information
+              Edit Your Contact Information
             </Typography>
           </Toolbar>
 
           {/* User Information */}
 
           {/* phone number */}
-          <TextInputField
-            errors={errors.phoneNumber?.message}
-            name='phoneNumber'
-            label='Contact Number'
-            register={register}
-            watch={watch}
-          />
+          <FormControl variant='outlined' fullWidth sx={{ mb: 2 }}>
+            <InputLabel htmlFor='Contact Number'>Contact Number</InputLabel>
+            <OutlinedInput
+              autoComplete='off'
+              id='Contact Number'
+              type='text'
+              label='Contact Number'
+              value={watch('phoneNumber')}
+              {...register('phoneNumber')}
+            />
+            <FormHelperText id='Contact Number'>
+              Enter Contact Number
+            </FormHelperText>
+          </FormControl>
 
           {/* email */}
           <EmailField

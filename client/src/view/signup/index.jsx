@@ -49,7 +49,6 @@ const SignUpPage = () => {
       username: '',
       email: '',
       userType: '',
-      phoneNumber: '',
       password: '',
       confirmPassword: '',
     },
@@ -82,8 +81,7 @@ const SignUpPage = () => {
   };
 
   const handleFormSubmit = async (data) => {
-    const { name, username, email, phoneNumber, password, confirmPassword } =
-      data;
+    const { name, username, email, password, confirmPassword } = data;
 
     if (data.userType === 'intern') {
       data.userType = true;
@@ -102,7 +100,6 @@ const SignUpPage = () => {
         username,
         email,
         isIntern: data.userType,
-        phoneNumber,
         password,
       });
 
@@ -256,14 +253,16 @@ const SignUpPage = () => {
                 watch={watch}
               />
 
-              {/* phone number */}
+              {/* email otp */}
+
+              {/* phone number
               <TextInputField
                 errors={errors.phoneNumber?.message}
                 name='phoneNumber'
                 label='Contact Number'
                 register={register}
                 watch={watch}
-              />
+              /> */}
 
               <Button
                 variant='contained'
