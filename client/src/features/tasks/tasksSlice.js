@@ -241,11 +241,14 @@ const tasksSlice = createSlice({
             const FILES_SIZE = action.payload?.s_files.length;
 
             let file_name = [];
+            let file_id = [];
             for (let i = 0; i < FILES_SIZE; i++) {
               file_name[i] = action.payload?.s_files[i].filename;
+              file_id[i] = action.payload?.s_files[i]._id;
             }
 
             action.payload.task.s_filename = file_name;
+            action.payload.task.s_file_id = file_id;
           }
 
           if (action.payload.submitted_on) {
@@ -283,6 +286,7 @@ const tasksSlice = createSlice({
                 task?.submitted_by[i]?.submitted_task_id === sub_task[j]?._id
               ) {
                 state.submitted_tasks.submitted_by[i].filename = [];
+                // state.submitted_tasks.submitted_by[i].id = [];
 
                 //  find each file
                 for (const file of sub_task[j]?.files) {
@@ -291,6 +295,7 @@ const tasksSlice = createSlice({
                       state.submitted_tasks.submitted_by[i].filename.push(
                         files[k]?.filename
                       );
+                      // state.submitted_tasks.submitted_by[i].id.push(file);
                     }
                   }
                 }

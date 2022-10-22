@@ -42,6 +42,7 @@ const io = new Server(httpServer, {
 // routes
 app.use('/api/comments', require('./routes/commentsRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
+app.use('/api/downloads', require('./routes/downloadsRoute'));
 app.use('/api/notifications', require('./routes/notificationsRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
 app.use('/api/tasks', require('./routes/tasksRoute'));

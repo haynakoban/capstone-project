@@ -24,7 +24,12 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
-import { StyledPostBox, StyledTypography2, TimeAgo } from '../global';
+import {
+  DownloadableFile,
+  StyledPostBox,
+  StyledTypography2,
+  TimeAgo,
+} from '../global';
 import {
   getSubmittedTask,
   getSubmittedTasks,
@@ -134,18 +139,20 @@ const SingleTaskCard = ({ task }) => {
     );
   });
 
+  // get reference file
   const get_ref_file = task?.filename?.map((name, index) => {
     return (
       <Fragment key={index}>
-        <StyledPostBox>{name}</StyledPostBox>
+        <DownloadableFile file={name} id={task?.ref_files?.[index]} />
       </Fragment>
     );
   });
 
+  // get submitted file
   const get_s_file = task?.s_filename?.map((name, index) => {
     return (
       <Fragment key={index}>
-        <StyledPostBox>{name}</StyledPostBox>
+        <DownloadableFile file={name} id={task?.s_file_id?.[index]} />
       </Fragment>
     );
   });

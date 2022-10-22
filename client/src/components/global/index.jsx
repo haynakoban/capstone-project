@@ -9,9 +9,12 @@ import {
 import { SearchContainer, SearchIconWrapper, StyledInputBase } from './Search';
 import { StyledContainer } from './StyledContainer';
 import { StackContainer, StyledModalBox, StyledStack } from './StyledModal';
+
 import TimeAgo from './TimeAgo';
+import DownloadableFile from './DownloadableFile';
 
 export {
+  DownloadableFile,
   ExpandMore,
   Item,
   SearchContainer,
