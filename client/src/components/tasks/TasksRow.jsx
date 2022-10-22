@@ -19,7 +19,6 @@ const TasksRow = (props) => {
   const { row } = props;
   const [open, setOpen] = useState(false);
 
-  console.log(row);
   return (
     <Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
