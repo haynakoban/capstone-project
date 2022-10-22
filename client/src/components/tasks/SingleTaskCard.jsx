@@ -456,6 +456,7 @@ const SingleTaskCard = ({ task }) => {
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
+                <TableCell>Date Submitted</TableCell>
                 <TableCell align='right' />
               </TableRow>
             </TableHead>
