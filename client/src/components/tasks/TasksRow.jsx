@@ -12,17 +12,22 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import { Fragment, useState } from 'react';
-import { StyledPostBox } from '../global';
+import { DownloadableFile } from '../global';
+import { DateFormatter } from '../../lib/DateFormatter';
 
 const TasksRow = (props) => {
   const { row } = props;
   const [open, setOpen] = useState(false);
 
+  console.log(row);
   return (
     <Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell component='th' scope='row'>
-          {row.name}
+          {row?.name}
+        </TableCell>
+        <TableCell component='th' scope='row'>
+          {row?.updatedAt && DateFormatter(row?.updatedAt)}
         </TableCell>
         <TableCell align='right'>
           <IconButton
@@ -45,14 +50,14 @@ const TasksRow = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row?.filename?.map((file) => (
+                  {row?.filename?.map((file, index) => (
                     <TableRow key={file}>
                       <TableCell
                         component='th'
                         scope='row'
                         sx={{ cursor: 'pointer' }}
                       >
-                        <StyledPostBox>{file}</StyledPostBox>
+                        <DownloadableFile file={file} id={row?.id?.[index]} />
                       </TableCell>
                     </TableRow>
                   ))}

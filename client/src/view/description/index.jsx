@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 import RoomLayout from '../../layout/RoomLayout';
 import CreateDescription from '../../components/description/CreateDescription';
@@ -6,6 +6,7 @@ import CreateDescription from '../../components/description/CreateDescription';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { AuthContext } from '../../lib/authContext';
 import { StyledContainer } from '../../components/global';
@@ -64,7 +65,48 @@ const Description = () => {
 
   return (
     <RoomLayout>
+      {/* company room code */}
       <StyledContainer width='md'>
+        <Typography variant='body1' fontStyle='oblique'>
+          To Join Room with other Employee
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: { xs: 'center', sm: 'space-between' },
+            alignItems: { xs: 'center', sm: 'space-between' },
+            my: 1,
+            p: 2,
+            borderRadius: '0.9rem !important',
+            border: '1px solid #20212850',
+            hyphens: 'auto',
+            overflowWrap: 'break-word',
+            overflowX: 'auto',
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+          }}
+        >
+          <Typography
+            variant='h6'
+            fontWeight={600}
+            textAlign='center'
+            mb={{ xs: 1, sm: 0 }}
+          >
+            {roomInfo?.companyName}
+          </Typography>
+
+          <CopyToClipboard text={roomInfo?.roomCode}>
+            <Button variant='contained' sx={{ textTransform: 'capitalize' }}>
+              Copy Room Code
+            </Button>
+          </CopyToClipboard>
+        </Box>
+      </StyledContainer>
+
+      {/* company description */}
+      <StyledContainer width='md' mt={3}>
         {roomInfo?.description !== '' ? (
           <Fragment>
             <Box

@@ -286,7 +286,7 @@ const tasksSlice = createSlice({
                 task?.submitted_by[i]?.submitted_task_id === sub_task[j]?._id
               ) {
                 state.submitted_tasks.submitted_by[i].filename = [];
-                // state.submitted_tasks.submitted_by[i].id = [];
+                state.submitted_tasks.submitted_by[i].id = [];
 
                 //  find each file
                 for (const file of sub_task[j]?.files) {
@@ -295,7 +295,7 @@ const tasksSlice = createSlice({
                       state.submitted_tasks.submitted_by[i].filename.push(
                         files[k]?.filename
                       );
-                      // state.submitted_tasks.submitted_by[i].id.push(file);
+                      state.submitted_tasks.submitted_by[i].id.push(file);
                     }
                   }
                 }
