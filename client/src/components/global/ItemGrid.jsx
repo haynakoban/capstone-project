@@ -52,14 +52,20 @@ export const StyledBox = styled(Box)(({ theme }) => ({
 }));
 
 export const StyledPostBox = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(0.625, 1.5),
-  borderRadius: theme.shape.borderRadius,
+  alignItems: 'center',
   background: '#20212815',
   border: `1px solid #202128`,
+  borderRadius: theme.shape.borderRadius,
   color: '#202128',
-  width: '100%',
-  overflow: 'hidden',
+  cursor: 'pointer',
+  display: 'flex',
   height: '37px !important',
-  maxHeight: '37px !important',
+  justifyContent: 'space-between',
   marginLeft: '0 !important',
+  maxHeight: '37px !important',
+  overflow: 'hidden',
+  padding: theme.spacing(0.625, 1.5),
+  position: 'relative',
+  width: '100%',
+  zIndex: '500',
 }));

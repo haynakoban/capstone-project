@@ -14,7 +14,7 @@ import { useContext, useEffect, useState, useTransition } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from '../../lib/authContext';
 
-import { StyledPostBox, StyledTypography, TimeAgo } from '../global';
+import { DownloadableFile, StyledTypography, TimeAgo } from '../global';
 import PostClickAwayHandler from './PostClickAwayHandler';
 import {
   addComment,
@@ -175,7 +175,7 @@ const SingleCardPost = ({ post }) => {
             mt: 1,
           }}
         >
-          <StyledPostBox>{post?.filename}</StyledPostBox>
+          <DownloadableFile file={post?.filename} id={post?.file_id} />
         </CardContent>
       )}
 

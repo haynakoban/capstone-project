@@ -7,7 +7,7 @@ import {
   CardHeader,
 } from '@mui/material';
 
-import { StyledPostBox, StyledTypography, TimeAgo } from '../../global';
+import { DownloadableFile, StyledTypography, TimeAgo } from '../../global';
 import { useNavigate } from 'react-router-dom';
 import avatarTheme from '../../../lib/avatar';
 
@@ -57,7 +57,10 @@ const PostCard = ({ post }) => {
             mt: 1,
           }}
         >
-          <StyledPostBox>{post?.[0]?.filename}</StyledPostBox>
+          <DownloadableFile
+            file={post?.[0]?.filename}
+            id={post?.[0]?.file_id}
+          />
         </CardContent>
       )}
 

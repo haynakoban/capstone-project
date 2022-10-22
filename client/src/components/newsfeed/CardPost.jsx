@@ -14,8 +14,8 @@ import { AuthContext } from '../../lib/authContext';
 import avatarTheme from '../../lib/avatar';
 
 import {
+  DownloadableFile,
   ExpandMore,
-  StyledPostBox,
   StyledTypography,
   TimeAgo,
 } from '../global';
@@ -113,7 +113,7 @@ const CardPost = ({ post, handleExpandClick }) => {
             mt: 1,
           }}
         >
-          <StyledPostBox>{post?.filename}</StyledPostBox>
+          <DownloadableFile file={post?.filename} id={post?.file_id} />
         </CardContent>
       )}
 
