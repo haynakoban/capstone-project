@@ -40,7 +40,7 @@ const Summary = () => {
 
   return (
     <Box>
-      {/* search and download */}
+      {/* result and download */}
       <Toolbar
         sx={{
           display: 'flex',

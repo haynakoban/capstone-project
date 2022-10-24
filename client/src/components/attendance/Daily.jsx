@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   Paper,
   Table,
   TableBody,
@@ -13,10 +14,11 @@ import {
   TableSortLabel,
   TextField,
   Toolbar,
+  Typography,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import moment from 'moment';
@@ -25,9 +27,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import TablePaginationActions from './TablePaginationActions';
+import DailyModal from './DailyModal';
+import { AuthContext } from '../../lib/authContext';
 import { rows } from './data';
 
 const Daily = () => {
+  const { _user } = useContext(AuthContext);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -62,7 +67,7 @@ const Daily = () => {
 
   return (
     <Box>
-      {/* calendar and download */}
+      {/* calendar */}
       <Toolbar
         sx={{
           display: 'flex',
@@ -82,15 +87,32 @@ const Daily = () => {
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
+      </Toolbar>
 
+      <Divider
+        flexItem
+        sx={{ bgcolor: '#202128', height: '1px', mt: { xs: 1.5, sm: 0 } }}
+        variant='middle'
+      />
+
+      {/* result and download */}
+      <Toolbar
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: { xs: 0, sm: 2 },
+        }}
+      >
+        <Typography variant='body1' fontWeight={600}>
+          Result: {rows?.length}
+        </Typography>
         <Button
           color='success'
           variant='contained'
           startIcon={<DownloadIcon />}
           sx={{
             textTransform: 'capitalize',
-            mt: { xs: 1, sm: 0 },
-            alignSelf: { xs: 'flex-end', sm: 'center' },
           }}
           onClick={() => console.log('download result')}
         >
@@ -125,6 +147,11 @@ const Daily = () => {
                 <TableCell component='th' scope='row'>
                   Status
                 </TableCell>
+                {_user?.employeeInfo && (
+                  <TableCell component='th' scope='row'>
+                    Action
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -159,6 +186,12 @@ const Daily = () => {
                   ) : (
                     <TableCell component='th' scope='row'>
                       {row.status}
+                    </TableCell>
+                  )}
+
+                  {_user?.employeeInfo && (
+                    <TableCell component='th' scope='row'>
+                      <DailyModal intern={row} />
                     </TableCell>
                   )}
                 </TableRow>
