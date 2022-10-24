@@ -15,6 +15,25 @@ export const StyledModalBox = styled(Box)(({ theme }) => ({
   background: '#f2f2f2',
 }));
 
+export const StyledModalBoxAttendance = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  top: '20px',
+  left: '50%',
+  transform: 'translate(-50%, 20px)',
+  maxHeight: 600,
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  padding: theme.spacing(2),
+  boxShadow: theme.shadows[2],
+  borderRadius: theme.shape.borderRadius,
+  background: '#f2f2f2',
+  width: '100%',
+
+  [theme.breakpoints.up('sm')]: {
+    width: 500,
+  },
+}));
+
 export const StyledStack = styled(Stack)(({ theme }) => ({
   padding: theme.spacing(1),
   borderTop: '1px solid #20212850',

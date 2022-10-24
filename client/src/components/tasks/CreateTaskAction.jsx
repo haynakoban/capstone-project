@@ -93,8 +93,8 @@ const CreateTaskAction = ({ members }) => {
     const m = members?.filter((member) => member.roles === 'member');
     let property = {};
 
-    for (let i = 0; i < m.length; i++) {
-      const propName = m[i].id;
+    for (let i = 0; i < m?.length; i++) {
+      const propName = m?.[i].id;
       property[propName] = false;
     }
 

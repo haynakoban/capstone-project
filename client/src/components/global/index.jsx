@@ -8,7 +8,12 @@ import {
 } from './ItemGrid';
 import { SearchContainer, SearchIconWrapper, StyledInputBase } from './Search';
 import { StyledContainer } from './StyledContainer';
-import { StackContainer, StyledModalBox, StyledStack } from './StyledModal';
+import {
+  StackContainer,
+  StyledModalBox,
+  StyledModalBoxAttendance,
+  StyledStack,
+} from './StyledModal';
 
 import TimeAgo from './TimeAgo';
 import DownloadableFile from './DownloadableFile';
@@ -25,6 +30,7 @@ export {
   StyledPostBox,
   StyledContainer,
   StyledModalBox,
+  StyledModalBoxAttendance,
   StyledStack,
   StyledTypography,
   StyledTypography2,
