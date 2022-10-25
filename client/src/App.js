@@ -12,6 +12,8 @@ import {
   isUserAuthorized,
   isUserLoggedIn,
 } from './features/users/usersSlice';
+import { createNewDailyAttendance } from './features/attendances/attendancesSlice';
+import { DailyAttendanceDateFormatter } from './lib/DateFormatter';
 
 function App() {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ function App() {
     dispatch(isUserLoggedIn()).unwrap();
   }, [dispatch]);
 
+  // handle socket io and add user
   useEffect(() => {
     if (_user?._id) {
       // handle socket io
@@ -32,6 +35,7 @@ function App() {
     }
   }, [_user?._id]);
 
+  // handle join room
   useEffect(() => {
     if (_user?.internInfo?.companyInfo?.hasCompany) {
       socket.current?.emit(
@@ -50,6 +54,28 @@ function App() {
     _user?.employeeInfo?.listOfCompanies,
     _user?.internInfo?.companyInfo?.company_id,
     socket,
+  ]);
+
+  // handle attendance in time
+  useEffect(() => {
+    if (_user?.internInfo?.companyInfo?.hasCompany) {
+      const date = new Date();
+
+      dispatch(
+        createNewDailyAttendance({
+          id: _user?.internInfo?.companyInfo?.company_id,
+          attendance_date: DailyAttendanceDateFormatter(date),
+          status: 'Present',
+          user_id: _user?._id,
+          in_time: date,
+        })
+      );
+    }
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    _user?.internInfo?.companyInfo?.company_id,
+    _user?._id,
+    dispatch,
   ]);
 
   return (

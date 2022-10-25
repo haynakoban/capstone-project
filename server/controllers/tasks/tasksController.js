@@ -93,23 +93,9 @@ const fetchTasks = async (req, res, next) => {
 
     const ids = tasks.map((e) => e.createdBy);
 
-    // const file_lists = tasks.filter((e) => e.ref_files !== undefined);
-    // const file_ids = file_lists.map((e) => e.file_id);
-
     const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
 
     if (!users) return res.json({ err: `no users found` });
-
-    // const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
-    //   bucketName: 'uploads',
-    // });
-
-    // const cursor = bucket.find({ _id: { $in: file_ids } });
-    // const files = await cursor.toArray();
-
-    // if (files.length > 0) {
-    //   return res.json({ posts, users, files });
-    // }
 
     return res.json({ tasks, users });
   } catch (e) {

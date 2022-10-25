@@ -40,6 +40,7 @@ const io = new Server(httpServer, {
 });
 
 // routes
+app.use('/api/attendances', require('./routes/attendancesRoute'));
 app.use('/api/comments', require('./routes/commentsRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
 app.use('/api/downloads', require('./routes/downloadsRoute'));
