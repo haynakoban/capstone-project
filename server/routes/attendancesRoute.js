@@ -5,7 +5,11 @@ const { attendancesController } = require('../controllers');
 const auth = require('../middlewares/auth_user_cookie');
 
 // post method - create daily attendance
-router.route('/').post(auth, attendancesController.createDailyAttendance);
+// put method - update daily attendance
+router
+  .route('/')
+  .post(auth, attendancesController.createDailyAttendance)
+  .put(auth, attendancesController.updateDailyAttendance);
 
 // get method - fetch daily attendance
 router

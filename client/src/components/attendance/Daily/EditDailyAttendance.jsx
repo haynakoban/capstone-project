@@ -16,24 +16,32 @@ import { TimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+
 import { StyledModalBoxAttendance } from '../../global';
+import { updateDailyAttendance } from '../../../features/attendances/attendancesSlice';
 
 const EditDailyAttendance = ({ intern, handleModalClose }) => {
-  console.log(intern);
+  const dispatch = useDispatch();
 
   const { handleSubmit, register, watch, setValue } = useForm({
     defaultValues: {
-      company_id: '123',
+      _id: intern?._id,
       name: intern?.name,
       attendance_date: intern?.attendance_date,
-      in_time: moment(),
-      out_time: moment(),
+      in_time: intern?.in_time,
+      out_time: moment(''),
       status: intern?.status,
     },
   });
 
+  console.log(watch('in_time'));
+  console.log(watch('out_time'));
+
   const handleFormSubmit = (data) => {
-    console.log(data);
+    dispatch(updateDailyAttendance(data));
+
+    handleModalClose();
   };
 
   return (

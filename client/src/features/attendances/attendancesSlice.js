@@ -24,6 +24,21 @@ export const createNewDailyAttendance = createAsyncThunk(
   }
 );
 
+// update daily attendance
+export const updateDailyAttendance = createAsyncThunk(
+  'attendances/updateDailyAttendance',
+  async (initialState) => {
+    try {
+      const response = await axios.put(`api/attendances`, initialState);
+
+      return response.data;
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  }
+);
+
 // fetch daily attendance
 export const fetchDailyAttendance = createAsyncThunk(
   'attendances/fetchDailyAttendance',
@@ -71,6 +86,19 @@ const attendancesSlice = createSlice({
               }
             }
           }
+        }
+      })
+      .addCase(updateDailyAttendance.fulfilled, (state, action) => {
+        if (action.payload.attendance) {
+          const { _id } = action.payload.attendance;
+
+          action.payload.attendance.name = action.payload.name;
+
+          const attendances = state.daily_attendances.filter(
+            (a) => a?._id !== _id
+          );
+
+          state.daily_attendances = [...attendances, action.payload.attendance];
         }
       });
   },
