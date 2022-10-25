@@ -16,7 +16,7 @@ import { TimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { useForm } from 'react-hook-form';
-import { StyledModalBoxAttendance } from '../global';
+import { StyledModalBoxAttendance } from '../../global';
 
 const EditDailyAttendance = ({ intern, handleModalClose }) => {
   console.log(intern);

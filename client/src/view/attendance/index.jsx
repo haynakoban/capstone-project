@@ -1,21 +1,72 @@
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material';
 import VideocamIcon from '@mui/icons-material/Videocam';
 
+import { useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { a11yProps, TabPanel } from '../../components/company_settings/';
-
-import { useState } from 'react';
-import RoomLayout from '../../layout/RoomLayout';
-
-import { DateToday } from '../../lib/DateFormatter';
-import { StyledContainer } from '../../components/global';
 import { Daily, Monthly, Summary } from '../../components/attendance';
+import { DateToday } from '../../lib/DateFormatter';
+
+import RoomLayout from '../../layout/RoomLayout';
+import { AuthContext } from '../../lib/authContext';
+import {
+  getCompanyInfo,
+  getRoomInfo,
+} from '../../features/companies/companiesSlice';
+import { StyledContainer } from '../../components/global';
 
 const Attendance = () => {
   const [value, setValue] = useState(0);
+  const [auth, setAuth] = useState(false);
+  const { _user, _isUserAuth } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const room_id = pathname.slice(6).slice(0, 24);
+
+  const dispatch = useDispatch();
+  const roomInfo = useSelector(getCompanyInfo);
+
+  useEffect(() => {
+    dispatch(getRoomInfo(room_id)).unwrap();
+  }, [room_id, dispatch]);
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    if (auth) {
+      if (_user?.employeeInfo?.listOfCompanies?.length > 0) {
+        const res = _user?.employeeInfo?.listOfCompanies?.some(
+          (e) => e.company_id === room_id
+        );
+
+        if (!res) navigate('/room');
+      } else if (_user?.internInfo?.companyInfo?.company_id) {
+        if (_user?.internInfo?.companyInfo?.company_id !== room_id) {
+          navigate('/room');
+        }
+      }
+    } else {
+      setAuth(true);
+    }
+  }, [
+    auth,
+    _user?.internInfo?.companyInfo?.company_id,
+    _user?.employeeInfo?.listOfCompanies,
+    room_id,
+    navigate,
+  ]);
+
   return (
     <RoomLayout>
       <StyledContainer width='lg'>
@@ -74,7 +125,7 @@ const Attendance = () => {
           </Box>
 
           <TabPanel value={value} index={0}>
-            <Daily />
+            <Daily company_id={roomInfo?._id} />
           </TabPanel>
           <TabPanel value={value} index={1}>
             <Monthly />

@@ -6,6 +6,20 @@ export const DateFormatter = (date) => {
   return `${format(d, 'MMMM d, yyyy hh:mm a')}`;
 };
 
+export const TimeFormatter = (date) => {
+  const d = new Date(`${date}`);
+
+  // sample output: 12:30 PM
+  return `${format(d, 'hh:mm a')}`;
+};
+
+export const DailyAttendanceDateFormatter = (date) => {
+  const d = new Date(`${date}`);
+
+  // sample output: 10/16/2022
+  return `${format(d, 'M-d-yyyy')}`;
+};
+
 export const isDatePast = (date) => {
   const d = new Date(`${date}`);
 
