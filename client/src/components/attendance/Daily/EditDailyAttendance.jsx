@@ -30,13 +30,10 @@ const EditDailyAttendance = ({ intern, handleModalClose }) => {
       name: intern?.name,
       attendance_date: intern?.attendance_date,
       in_time: intern?.in_time,
-      out_time: moment(''),
+      out_time: moment(),
       status: intern?.status,
     },
   });
-
-  console.log(watch('in_time'));
-  console.log(watch('out_time'));
 
   const handleFormSubmit = (data) => {
     dispatch(updateDailyAttendance(data));
