@@ -61,15 +61,17 @@ function App() {
     if (_user?.internInfo?.companyInfo?.hasCompany) {
       const date = new Date();
 
-      dispatch(
-        createNewDailyAttendance({
-          id: _user?.internInfo?.companyInfo?.company_id,
-          attendance_date: DailyAttendanceDateFormatter(date),
-          status: 'Present',
-          user_id: _user?._id,
-          in_time: date,
-        })
-      );
+      if (date.getDay() !== 0) {
+        dispatch(
+          createNewDailyAttendance({
+            id: _user?.internInfo?.companyInfo?.company_id,
+            attendance_date: DailyAttendanceDateFormatter(date),
+            status: 'Present',
+            user_id: _user?._id,
+            in_time: date,
+          })
+        );
+      }
     }
   }, [
     _user?.internInfo?.companyInfo?.hasCompany,
