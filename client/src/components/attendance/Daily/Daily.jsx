@@ -71,7 +71,7 @@ const Daily = ({ company_id }) => {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - get_daily_attendances.length)
+      ? Math.max(0, (1 + page) * rowsPerPage - get_daily_attendances?.length)
       : 0;
 
   const handleChangePage = (event, newPage) => {
@@ -254,7 +254,6 @@ const Daily = ({ company_id }) => {
                       {...(get_daily_attendances?.length > 0 && {
                         count: get_daily_attendances.length,
                       })}
-                      // count={rows.length}
                       rowsPerPage={rowsPerPage}
                       page={page}
                       SelectProps={{

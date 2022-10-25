@@ -98,8 +98,37 @@ const fetchDailyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch Summary Attendance
+// get method | api/attendances/:id
+const fetchSummaryAttendance = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const attendances = await Attendances.find({
+      company_id: id,
+    });
+
+    if (!attendances)
+      return res.json({ err: 'cannot find attendance with id ', id });
+
+    const ids = attendances.map((e) => e.user_id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+    return res.json({ attendances, users });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
+  fetchSummaryAttendance,
   updateDailyAttendance,
 };

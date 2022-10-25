@@ -131,7 +131,7 @@ const Attendance = () => {
             <Monthly />
           </TabPanel>
           <TabPanel value={value} index={2}>
-            <Summary />
+            <Summary company_id={roomInfo?._id} />
           </TabPanel>
         </Box>
       </StyledContainer>
