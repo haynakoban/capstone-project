@@ -6,6 +6,7 @@ const initialState = {
   attendance: {},
   daily_attendances: [],
   daily_attendance: {},
+  summary_attendances: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -58,6 +59,23 @@ export const fetchDailyAttendance = createAsyncThunk(
   }
 );
 
+// fetch summary attendance
+export const fetchSummaryAttendance = createAsyncThunk(
+  'attendances/fetchSummaryAttendance',
+  async (initialState) => {
+    try {
+      const { id } = initialState;
+
+      const response = await axios.get(`api/attendances/${id}`);
+
+      return response.data;
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  }
+);
+
 const attendancesSlice = createSlice({
   name: 'attendances',
   initialState,
@@ -100,6 +118,43 @@ const attendancesSlice = createSlice({
 
           state.daily_attendances = [...attendances, action.payload.attendance];
         }
+      })
+      .addCase(fetchSummaryAttendance.fulfilled, (state, action) => {
+        if (action.payload.users && action.payload.attendances) {
+          const { attendances, users } = action.payload;
+
+          const ATTENDANCES_SIZE = attendances?.length;
+          const USERS_SIZE = users?.length;
+
+          state.summary_attendances = users;
+
+          // assign hours
+          for (let i = 0; i < USERS_SIZE; i++) {
+            let total = 0;
+
+            for (let j = 0; j < ATTENDANCES_SIZE; j++) {
+              if (users[i]._id === attendances[j].user_id) {
+                // completed hours
+                total += attendances?.[j]?.total_hours;
+              }
+            }
+
+            // completed hours
+            state.summary_attendances[i].completed_hours = `${total?.toFixed(
+              0
+            )} Hours`;
+
+            // remaining hours
+            state.summary_attendances[i].remaining_hours = `${(
+              486 - total
+            )?.toFixed(0)} Hours`;
+
+            // summary hours
+            state.summary_attendances[i].summary_hours = `${total?.toFixed(
+              0
+            )}/486 Hours`;
+          }
+        }
       });
   },
 });
@@ -107,5 +162,7 @@ const attendancesSlice = createSlice({
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
   state.attendances.daily_attendances;
+export const getSummaryAttendances = (state) =>
+  state.attendances.summary_attendances;
 
 export default attendancesSlice.reducer;

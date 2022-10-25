@@ -11,6 +11,9 @@ router
   .post(auth, attendancesController.createDailyAttendance)
   .put(auth, attendancesController.updateDailyAttendance);
 
+// get method - fetch summary attendance
+router.route('/:id').get(attendancesController.fetchSummaryAttendance);
+
 // get method - fetch daily attendance
 router
   .route('/:id/:attendance_date')
