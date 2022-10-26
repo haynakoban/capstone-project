@@ -156,7 +156,12 @@ const attendancesSlice = createSlice({
             for (let j = 0; j < ATTENDANCES_SIZE; j++) {
               if (users[i]._id === attendances[j].user_id) {
                 // completed hours
-                total += attendances?.[j]?.total_hours;
+                if (
+                  attendances?.[j]?.total_hours &&
+                  typeof attendances?.[j]?.total_hours === 'number'
+                ) {
+                  total += attendances?.[j]?.total_hours;
+                }
               }
             }
 
