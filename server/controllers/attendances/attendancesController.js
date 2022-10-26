@@ -1,6 +1,9 @@
-const { Attendances, Users } = require('../../models');
+const { Attendances, Users, Companies } = require('../../models');
 const ObjectId = require('mongodb').ObjectId;
-const { formatDistance } = require('../../lib/dateFormatter');
+const {
+  formatDistance,
+  isStartAndEndTime,
+} = require('../../lib/dateFormatter');
 
 // create new daily attendance
 // post method | api/attendances
@@ -16,6 +19,12 @@ const createDailyAttendance = async (req, res, next) => {
     if (!canSave)
       return res.status(400).json({ err: 'required field must be filled' });
 
+    const findCompany = await Companies.findById(id);
+
+    if (!findCompany) {
+      return res.json({ err: 'cannot find company with id ', id });
+    }
+
     const findAttendance = await Attendances.find({
       attendance_date,
       user_id,
@@ -24,15 +33,36 @@ const createDailyAttendance = async (req, res, next) => {
     if (findAttendance?.length > 0)
       return res.json({ attendance: findAttendance?.[0] });
 
-    const createAttendance = await Attendances.create({
-      attendance_date,
-      in_time,
-      status,
-      user_id: ObjectId(user_id),
-      company_id: ObjectId(id),
-    });
+    if (findCompany?.time?.isOn) {
+      // check if the in time is after the start time of the company settings
+      if (
+        isStartAndEndTime(
+          findCompany?.time?.start_time,
+          in_time,
+          findCompany?.time?.end_time
+        )
+      ) {
+        const createAttendance = await Attendances.create({
+          attendance_date,
+          in_time,
+          status,
+          user_id: ObjectId(user_id),
+          company_id: ObjectId(id),
+        });
 
-    return res.json({ createAttendance });
+        return res.json({ createAttendance });
+      }
+    } else {
+      const createAttendance = await Attendances.create({
+        attendance_date,
+        in_time,
+        status,
+        user_id: ObjectId(user_id),
+        company_id: ObjectId(id),
+      });
+
+      return res.json({ createAttendance });
+    }
   } catch (error) {
     next(error);
   }
@@ -131,28 +161,47 @@ const fetchSummaryAttendance = async (req, res, next) => {
 const outTimeDailyAttendance = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { attendance_date } = req.body;
+    const { attendance_date, out_time } = req.body;
 
     // if one is empty or missing the result return false, otherwise true.
-    const canSave = [id, attendance_date].every(Boolean);
+    const canSave = [id, attendance_date, out_time].every(Boolean);
 
     if (!canSave)
       return res.status(400).json({ err: 'required field must be filled' });
 
-    const findAttendance = await Attendances.find({
-      id,
-      attendance_date,
-    });
-    console.log(findAttendance);
+    const findAttendance = await Attendances.findById(id);
 
-    if (!findAttendance?.[0])
+    if (!findAttendance)
       return res.json({ err: 'cannot find attendance with id ', id });
 
-    // edit this later,
-    // kapag yung out time ni user ay lampas sa out time settings ng company
-    // di na counted ang out time ni user
+    const findCompany = await Companies.findById(findAttendance?.company_id);
 
-    // return res.json({ createAttendance });
+    if (!findCompany) {
+      return res.json({ err: 'cannot find company with id ', id });
+    }
+
+    if (findCompany.time.isOn) {
+      // check if the in time is after the start time of the company settings
+      if (
+        isStartAndEndTime(
+          findCompany?.time?.start_time,
+          out_time,
+          findCompany?.time?.end_time
+        )
+      ) {
+        findAttendance.out_time = out_time;
+
+        const updatedAttendance = await findAttendance?.save();
+
+        return res.json({ attendance: updatedAttendance });
+      }
+    } else {
+      findAttendance.out_time = out_time;
+
+      const updatedAttendance = await findAttendance?.save();
+
+      return res.json({ attendance: updatedAttendance });
+    }
   } catch (error) {
     next(error);
   }

@@ -126,6 +126,25 @@ export const declineInternRequest = createAsyncThunk(
   }
 );
 
+// start and end time : on and off
+export const toggleStartAndEndTime = createAsyncThunk(
+  'companies/toggleStartAndEndTime',
+  async (initialState) => {
+    try {
+      const { id } = initialState;
+
+      const response = await axios.put(
+        `api/companies/auth/${id}`,
+        initialState
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const companiesSlice = createSlice({
   name: 'companies',
   initialState,
@@ -330,6 +349,12 @@ const companiesSlice = createSlice({
 
           state.company = { ...state.company, request: company };
         }
+      })
+      .addCase(toggleStartAndEndTime.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          return;
+        }
+        return;
       });
   },
 });

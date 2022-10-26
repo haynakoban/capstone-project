@@ -352,6 +352,47 @@ const declineInternRequest = async (req, res, next) => {
   }
 };
 
+// toggle start and end time
+// put method | api/companies/auth/:id
+const toogleStartAndEndTime = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const room = await Companies.findById(id);
+    if (!room) return res.json({ err: `no room found` });
+
+    if (req.body?.start_time && req.body?.end_time) {
+      if (req.body?.isOn) {
+        room.time.isOn = req.body?.isOn;
+        room.time.start_time = req.body?.start_time;
+        room.time.end_time = req.body?.end_time;
+      } else {
+        room.time.isOn = req.body?.isOn;
+      }
+    } else if (req.body?.start_time) {
+      if (req.body?.isOn) {
+        room.time.start_time = req.body?.start_time;
+      }
+    } else if (req.body?.end_time) {
+      if (req.body?.isOn) {
+        room.time.end_time = req.body?.end_time;
+      }
+    }
+
+    const updatedRoom = await room?.save();
+
+    return res.json({ room: updatedRoom });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptIntern,
   addDescription,
@@ -361,5 +402,6 @@ module.exports = {
   getRoomInfo,
   getRooms,
   joinRoom,
+  toogleStartAndEndTime,
   // isRoomNameValid,
 };

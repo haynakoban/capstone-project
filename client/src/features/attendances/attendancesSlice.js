@@ -156,7 +156,12 @@ const attendancesSlice = createSlice({
             for (let j = 0; j < ATTENDANCES_SIZE; j++) {
               if (users[i]._id === attendances[j].user_id) {
                 // completed hours
-                total += attendances?.[j]?.total_hours;
+                if (
+                  attendances?.[j]?.total_hours &&
+                  typeof attendances?.[j]?.total_hours === 'number'
+                ) {
+                  total += attendances?.[j]?.total_hours;
+                }
               }
             }
 
@@ -178,7 +183,9 @@ const attendancesSlice = createSlice({
         }
       })
       .addCase(outTimeDailyAttendance.fulfilled, (state, action) => {
-        console.log(action.payload);
+        if (action.payload?.attendance) {
+          state.daily_attendance = action.payload?.attendance;
+        }
       });
   },
 });

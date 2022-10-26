@@ -19,7 +19,11 @@ router
   .post(companiesController.joinRoom);
 
 // get method -- get the room info
-router.route('/auth/:id').get(companiesController.getRoomInfo);
+// put method -- set the start and end time
+router
+  .route('/auth/:id')
+  .get(companiesController.getRoomInfo)
+  .put(companiesController.toogleStartAndEndTime);
 
 // get method -- retrieve all my room
 // put method -- add company description

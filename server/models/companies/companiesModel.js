@@ -1,5 +1,21 @@
 const mongoose = require('mongoose');
 
+const time = {
+  isOn: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  start_time: {
+    type: Date,
+    required: false,
+  },
+  end_time: {
+    type: Date,
+    required: false,
+  },
+};
+
 const companiesSchema = new mongoose.Schema({
   roomName: {
     type: String,
@@ -74,6 +90,7 @@ const companiesSchema = new mongoose.Schema({
     ref: 'Users',
     required: false,
   },
+  time,
   createdAt: {
     type: Date,
     default: () => Date.now(),
