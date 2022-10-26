@@ -6,6 +6,7 @@ const initialState = {
   attendance: {},
   daily_attendances: [],
   daily_attendance: {},
+  monthly_attendances: [],
   summary_attendances: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
@@ -84,6 +85,25 @@ export const outTimeDailyAttendance = createAsyncThunk(
       const { id } = initialState;
 
       const response = await axios.put(`api/attendances/${id}`, initialState);
+
+      return response.data;
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  }
+);
+
+// fetch monthly attendance
+export const fetchMonthlyAttendance = createAsyncThunk(
+  'attendances/fetchMonthlyAttendance',
+  async (initialState) => {
+    try {
+      const { company_id, attendance_date } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/monthly/${company_id}/${attendance_date}`
+      );
 
       return response.data;
     } catch (e) {
@@ -186,6 +206,52 @@ const attendancesSlice = createSlice({
         if (action.payload?.attendance) {
           state.daily_attendance = action.payload?.attendance;
         }
+      })
+      .addCase(fetchMonthlyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.attendances && action.payload?.users) {
+          const { attendances, users, month } = action.payload;
+
+          const ATTENDANCES_SIZE = attendances?.length;
+          const USERS_SIZE = users?.length;
+
+          state.monthly_attendances = users;
+
+          // assign hours
+          for (let i = 0; i < USERS_SIZE; i++) {
+            state.monthly_attendances[i].month = month;
+
+            let summary = 0;
+            let total = 0;
+            let monthly = [];
+
+            for (let j = 0; j < ATTENDANCES_SIZE; j++) {
+              if (users[i]._id === attendances[j].user_id) {
+                total += 1;
+
+                if (attendances[j]?.status === 'Present') {
+                  summary += 1;
+                }
+
+                // push the day and status
+                monthly?.unshift({
+                  day: attendances[j]?.attendance_date,
+                  status: attendances[j]?.status,
+                });
+              }
+            }
+
+            // summary
+            state.monthly_attendances[i].summary = `${summary}/${total} days`;
+
+            // sort monthly
+            const newMonth = monthly.sort((a, b) =>
+              a?.day > b?.day ? 1 : b?.day > a?.day ? -1 : 0
+            );
+
+            // monthly
+            state.monthly_attendances[i].monthly = newMonth;
+          }
+        }
       });
   },
 });
@@ -193,6 +259,8 @@ const attendancesSlice = createSlice({
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
   state.attendances.daily_attendances;
+export const getMonthlyAttendances = (state) =>
+  state.attendances.monthly_attendances;
 export const getSummaryAttendances = (state) =>
   state.attendances.summary_attendances;
 

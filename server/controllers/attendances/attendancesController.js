@@ -5,6 +5,38 @@ const {
   isStartAndEndTime,
 } = require('../../lib/dateFormatter');
 
+// validate attendance date
+const validateAttendanceDate = (date) => {
+  switch (date) {
+    case '01':
+      return 'January';
+    case '02':
+      return 'February';
+    case '03':
+      return 'March';
+    case '04':
+      return 'April';
+    case '05':
+      return 'May';
+    case '06':
+      return 'June';
+    case '07':
+      return 'July';
+    case '08':
+      return 'August';
+    case '09':
+      return 'September';
+    case '10':
+      return 'October';
+    case '11':
+      return 'November';
+    case '12':
+      return 'December';
+    default:
+      return '';
+  }
+};
+
 // create new daily attendance
 // post method | api/attendances
 const createDailyAttendance = async (req, res, next) => {
@@ -207,9 +239,45 @@ const outTimeDailyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch Monthly Attendance
+// get method | api/attendances/monthly/:company_id/:attendance_date
+const fetchMonthlyAttendance = async (req, res, next) => {
+  try {
+    const { company_id, attendance_date } = req.params;
+
+    if (!company_id && !attendance_date)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const month = validateAttendanceDate(attendance_date);
+
+    const attendances = await Attendances.find({
+      company_id,
+      attendance_date: { $regex: attendance_date, $options: 'i' },
+    });
+
+    if (!attendances?.length > 0) {
+      return res.json({
+        err: 'cannot find attendance with company_id ',
+        company_id,
+      });
+    }
+
+    const ids = attendances.map((e) => e.user_id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+    return res.json({ attendances, users, month });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
+  fetchMonthlyAttendance,
   fetchSummaryAttendance,
   outTimeDailyAttendance,
   updateDailyAttendance,

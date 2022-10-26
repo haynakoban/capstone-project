@@ -22,10 +22,10 @@ const MonthlyRow = (props) => {
     <Fragment>
       <TableRow>
         <TableCell component='th' scope='row'>
-          {row.name}
+          {row?.name}
         </TableCell>
         <TableCell component='th' scope='row'>
-          {row.summary}
+          {row?.summary}
         </TableCell>
         <TableCell align='right'>
           <IconButton
@@ -57,11 +57,11 @@ const MonthlyRow = (props) => {
                 </TableHead>
                 <TableBody>
                   {row.monthly.map((month) => (
-                    <TableRow key={month.day}>
+                    <TableRow key={month?.day}>
                       <TableCell component='th' scope='row'>
-                        {month.day}
+                        {month?.day}
                       </TableCell>
-                      {month.status === 'Absent' ? (
+                      {month?.status === 'Absent' ? (
                         <TableCell
                           component='th'
                           scope='row'
@@ -79,7 +79,7 @@ const MonthlyRow = (props) => {
                             fontWeight: 700,
                           }}
                         >
-                          {month.status}
+                          {month?.status}
                         </TableCell>
                       )}
                     </TableRow>
