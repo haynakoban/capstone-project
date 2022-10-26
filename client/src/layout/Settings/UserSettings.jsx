@@ -54,32 +54,33 @@ const UserSettings = () => {
 
   // handle logout button
   const onUserLogout = () => {
-    if (daily_attendance?._id) {
-      dispatch(userLogout());
+    dispatch(userLogout());
 
-      // if user is intern, create out time
-      // otherwise ignore this line of code
-      if (user?.internInfo?.companyInfo?.hasCompany) {
-        const date = new Date();
+    // if user is intern, create out time
+    // otherwise ignore this line of code
+    if (user?.internInfo?.companyInfo?.hasCompany) {
+      const date = new Date();
 
-        if (date.getDay() !== 0) {
+      if (date.getDay() !== 0) {
+        if (daily_attendance?._id) {
           dispatch(
             outTimeDailyAttendance({
               id: daily_attendance?._id,
               attendance_date: daily_attendance?.attendance_date,
+              out_time: date,
             })
           );
         }
       }
+    }
 
-      if (pathname === '/') {
-        resetState();
-        window.location.reload(true);
-      } else {
-        navigate('/');
-        resetState();
-        window.location.reload(true);
-      }
+    if (pathname === '/') {
+      resetState();
+      window.location.reload(true);
+    } else {
+      navigate('/');
+      resetState();
+      window.location.reload(true);
     }
   };
 

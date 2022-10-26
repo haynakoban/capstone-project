@@ -183,7 +183,9 @@ const attendancesSlice = createSlice({
         }
       })
       .addCase(outTimeDailyAttendance.fulfilled, (state, action) => {
-        console.log(action.payload);
+        if (action.payload?.attendance) {
+          state.daily_attendance = action.payload?.attendance;
+        }
       });
   },
 });
