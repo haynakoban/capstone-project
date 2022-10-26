@@ -128,7 +128,7 @@ const Attendance = () => {
             <Daily company_id={roomInfo?._id} />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <Monthly />
+            <Monthly company_id={roomInfo?._id} />
           </TabPanel>
           <TabPanel value={value} index={2}>
             <Summary company_id={roomInfo?._id} />

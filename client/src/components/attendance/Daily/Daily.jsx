@@ -52,7 +52,6 @@ const Daily = ({ company_id }) => {
       company_id,
       attendance_date: moment(),
     },
-    mode: 'onBlur',
   });
 
   useEffect(() => {
