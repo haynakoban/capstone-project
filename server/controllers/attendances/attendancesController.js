@@ -22,7 +22,7 @@ const createDailyAttendance = async (req, res, next) => {
     });
 
     if (findAttendance?.length > 0)
-      return res.json({ err: 'attendance is already created' });
+      return res.json({ attendance: findAttendance?.[0] });
 
     const createAttendance = await Attendances.create({
       attendance_date,
@@ -126,9 +126,42 @@ const fetchSummaryAttendance = async (req, res, next) => {
   }
 };
 
+// on logged out, create out time on daily attendance
+// put method | api/attendances/:id
+const outTimeDailyAttendance = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { attendance_date } = req.body;
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, attendance_date].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findAttendance = await Attendances.find({
+      id,
+      attendance_date,
+    });
+    console.log(findAttendance);
+
+    if (!findAttendance?.[0])
+      return res.json({ err: 'cannot find attendance with id ', id });
+
+    // edit this later,
+    // kapag yung out time ni user ay lampas sa out time settings ng company
+    // di na counted ang out time ni user
+
+    // return res.json({ createAttendance });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
   fetchSummaryAttendance,
+  outTimeDailyAttendance,
   updateDailyAttendance,
 };

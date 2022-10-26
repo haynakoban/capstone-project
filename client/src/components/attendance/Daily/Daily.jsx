@@ -217,7 +217,15 @@ const Daily = ({ company_id }) => {
                           {row?.status}
                         </TableCell>
                       ) : (
-                        <TableCell component='th' scope='row'>
+                        <TableCell
+                          component='th'
+                          scope='row'
+                          sx={{
+                            color: '#0d6efd',
+                            fontStyle: 'italic',
+                            fontWeight: 700,
+                          }}
+                        >
                           {row?.status}
                         </TableCell>
                       )}

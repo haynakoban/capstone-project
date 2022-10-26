@@ -76,6 +76,23 @@ export const fetchSummaryAttendance = createAsyncThunk(
   }
 );
 
+// update logged out attendance
+export const outTimeDailyAttendance = createAsyncThunk(
+  'attendances/outTimeDailyAttendance',
+  async (initialState) => {
+    try {
+      const { id } = initialState;
+
+      const response = await axios.put(`api/attendances/${id}`, initialState);
+
+      return response.data;
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  }
+);
+
 const attendancesSlice = createSlice({
   name: 'attendances',
   initialState,
@@ -85,6 +102,10 @@ const attendancesSlice = createSlice({
       .addCase(createNewDailyAttendance.fulfilled, (state, action) => {
         if (action.payload?.createAttendance) {
           state.daily_attendance = action.payload?.createAttendance;
+        }
+
+        if (action.payload.attendance) {
+          state.daily_attendance = action.payload.attendance;
         }
       })
       .addCase(fetchDailyAttendance.fulfilled, (state, action) => {
@@ -155,6 +176,9 @@ const attendancesSlice = createSlice({
             )}/486 Hours`;
           }
         }
+      })
+      .addCase(outTimeDailyAttendance.fulfilled, (state, action) => {
+        console.log(action.payload);
       });
   },
 });

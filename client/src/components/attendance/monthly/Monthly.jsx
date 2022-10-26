@@ -1,13 +1,13 @@
 import {
   Box,
   Button,
-  // Paper,
-  // Table,
-  // TableBody,
-  // TableCell,
-  // TableContainer,
-  // TableHead,
-  // TableRow,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Toolbar,
 } from '@mui/material';
@@ -20,8 +20,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-// import MonthlyRow from './MonthlyRow';
-// import { monthlyRows } from './data';
+import MonthlyRow from './MonthlyRow';
+import { monthlyRows } from '../data';
 
 const Monthly = () => {
   const {
@@ -76,16 +76,17 @@ const Monthly = () => {
 
       {/* attendance sheet */}
       <Box mt={2}>
-        {/* <TableContainer component={Paper}>
+        <TableContainer component={Paper}>
           <Table aria-label='collapsible table'>
             <TableHead>
               <TableRow>
-                <TableCell />
-                <TableCell>Dessert (100g serving)</TableCell>
-                <TableCell align='right'>Calories</TableCell>
-                <TableCell align='right'>Fat&nbsp;(g)</TableCell>
-                <TableCell align='right'>Carbs&nbsp;(g)</TableCell>
-                <TableCell align='right'>Protein&nbsp;(g)</TableCell>
+                <TableCell component='th' scope='row'>
+                  Name
+                </TableCell>
+                <TableCell component='th' scope='row'>
+                  Summary
+                </TableCell>
+                <TableCell align='right' />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -94,7 +95,7 @@ const Monthly = () => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer> */}
+        </TableContainer>
       </Box>
     </Box>
   );
