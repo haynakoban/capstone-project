@@ -26,6 +26,10 @@ import {
   userLogout,
 } from '../../features/users/usersSlice';
 import avatarTheme from '../../lib/avatar';
+import {
+  dailyAttendance,
+  outTimeDailyAttendance,
+} from '../../features/attendances/attendancesSlice';
 
 const UserSettings = () => {
   const dispatch = useDispatch();
@@ -36,6 +40,7 @@ const UserSettings = () => {
 
   const userId = useSelector(getUserId);
   const user = useSelector(getUserInfo);
+  const daily_attendance = useSelector(dailyAttendance);
 
   useEffect(() => {
     if (userId) {
@@ -49,15 +54,32 @@ const UserSettings = () => {
 
   // handle logout button
   const onUserLogout = () => {
-    dispatch(userLogout());
+    if (daily_attendance?._id) {
+      dispatch(userLogout());
 
-    if (pathname === '/') {
-      resetState();
-      window.location.reload(true);
-    } else {
-      navigate('/');
-      resetState();
-      window.location.reload(true);
+      // if user is intern, create out time
+      // otherwise ignore this line of code
+      if (user?.internInfo?.companyInfo?.hasCompany) {
+        const date = new Date();
+
+        if (date.getDay() !== 0) {
+          dispatch(
+            outTimeDailyAttendance({
+              id: daily_attendance?._id,
+              attendance_date: daily_attendance?.attendance_date,
+            })
+          );
+        }
+      }
+
+      if (pathname === '/') {
+        resetState();
+        window.location.reload(true);
+      } else {
+        navigate('/');
+        resetState();
+        window.location.reload(true);
+      }
     }
   };
 

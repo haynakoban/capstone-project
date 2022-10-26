@@ -95,44 +95,133 @@ export const summaryData = [
   ),
 ];
 
-// function createMonthlyData(day, status, name = 'Gerald') {
-//   return {
-//     name,
-//     dateToday: day,
-//     status,
-//   };
-// }
+function createMonthlyData(name, summary, month) {
+  return {
+    name,
+    summary,
+    month,
+    monthly: [
+      {
+        day: 1,
+        status: 'Present',
+      },
+      {
+        day: 2,
+        status: 'Present',
+      },
+      {
+        day: 3,
+        status: 'Present',
+      },
+      {
+        day: 4,
+        status: 'Absent',
+      },
+      {
+        day: 5,
+        status: 'Present',
+      },
+      {
+        day: 6,
+        status: 'Absent',
+      },
+      {
+        day: 8,
+        status: 'Present',
+      },
+      {
+        day: 9,
+        status: 'Absent',
+      },
+      {
+        day: 10,
+        status: 'Present',
+      },
+      {
+        day: 11,
+        status: 'Present',
+      },
+      {
+        day: 12,
+        status: 'Present',
+      },
+      {
+        day: 13,
+        status: 'Present',
+      },
+      {
+        day: 15,
+        status: 'Present',
+      },
+      {
+        day: 16,
+        status: 'Present',
+      },
+      {
+        day: 17,
+        status: 'Present',
+      },
+      {
+        day: 18,
+        status: 'Present',
+      },
+      {
+        day: 19,
+        status: 'Present',
+      },
+      {
+        day: 20,
+        status: 'Present',
+      },
+      {
+        day: 22,
+        status: 'Present',
+      },
+      {
+        day: 23,
+        status: 'Present',
+      },
+      {
+        day: 24,
+        status: 'Present',
+      },
+      {
+        day: 25,
+        status: 'Present',
+      },
+      {
+        day: 26,
+        status: 'Present',
+      },
+      {
+        day: 28,
+        status: 'Present',
+      },
+      {
+        day: 29,
+        status: 'Absent',
+      },
+      {
+        day: 30,
+        status: 'Present',
+      },
+      {
+        day: 31,
+        status: 'Present',
+      },
+    ],
+  };
+}
 
-// export const monthlyRows = [
-//   createMonthlyData(1, 'Present'),
-//   createMonthlyData(2, 'Present'),
-//   createMonthlyData(3, 'Absent'),
-//   createMonthlyData(4, 'Present'),
-//   createMonthlyData(5, 'Saturday'),
-//   createMonthlyData(6, 'Sunday'),
-//   createMonthlyData(7, 'Present'),
-//   createMonthlyData(8, 'Present'),
-//   createMonthlyData(9, 'Present'),
-//   createMonthlyData(10, 'Present'),
-//   createMonthlyData(11, 'Present'),
-//   createMonthlyData(12, 'Saturday'),
-//   createMonthlyData(13, 'Sunday'),
-//   createMonthlyData(14, 'Absent'),
-//   createMonthlyData(15, 'Present'),
-//   createMonthlyData(16, 'Present'),
-//   createMonthlyData(17, 'Present'),
-//   createMonthlyData(18, 'Present'),
-//   createMonthlyData(19, 'Saturday'),
-//   createMonthlyData(20, 'Sunday'),
-//   createMonthlyData(21, 'Present'),
-//   createMonthlyData(22, 'Present'),
-//   createMonthlyData(23, 'Present'),
-//   createMonthlyData(24, 'Present'),
-//   createMonthlyData(25, 'Present'),
-//   createMonthlyData(26, 'Saturday'),
-//   createMonthlyData(27, 'Sunday'),
-//   createMonthlyData(28, 'Present'),
-//   createMonthlyData(29, 'Present'),
-//   createMonthlyData(30, 'Present'),
-//   createMonthlyData(31, 'Present'),
-// ];
+export const monthlyRows = [
+  createMonthlyData('Gerald Tolentino', '24/28', 'October'),
+  createMonthlyData('Abner Macapagal', '24/28', 'October'),
+  createMonthlyData('Bogart Macapinlac', '24/28', 'October'),
+  createMonthlyData('Bryan Cortez', '24/28', 'October'),
+  createMonthlyData('Rizza Mia Servanda', '24/28', 'October'),
+  createMonthlyData('Thea Mae Rirao', '24/28', 'October'),
+  createMonthlyData('Xenon Vergara', '24/28', 'October'),
+  createMonthlyData('Allana Shane Baterina', '24/28', 'October'),
+  createMonthlyData('Jeremy Roie Laxamana', '24/28', 'October'),
+  createMonthlyData('Aaron Joshua Quesada', '24/28', 'October'),
+];

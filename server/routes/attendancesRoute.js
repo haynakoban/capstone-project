@@ -12,7 +12,11 @@ router
   .put(auth, attendancesController.updateDailyAttendance);
 
 // get method - fetch summary attendance
-router.route('/:id').get(attendancesController.fetchSummaryAttendance);
+// put method - on logged out, create out time on daily attendance
+router
+  .route('/:id')
+  .get(attendancesController.fetchSummaryAttendance)
+  .put(attendancesController.outTimeDailyAttendance);
 
 // get method - fetch daily attendance
 router
