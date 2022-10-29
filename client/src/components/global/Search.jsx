@@ -1,4 +1,4 @@
-import { alpha, InputBase, styled } from '@mui/material';
+import { alpha, IconButton, InputBase, styled } from '@mui/material';
 
 export const SearchContainer = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -15,14 +15,18 @@ export const SearchContainer = styled('div')(({ theme }) => ({
   },
 }));
 
-export const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
+export const SearchIconWrapper = styled(IconButton)(() => ({
+  marginLeft: 5,
   height: '100%',
   position: 'absolute',
-  pointerEvents: 'none',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  cursor: 'pointer !important',
+  zIndex: '1000 !important',
+  '&:hover, &.Mui-focusVisible': {
+    bgcolor: 'transparent !important',
+  },
 }));
 
 export const StyledInputBase = styled(InputBase)(({ theme }) => ({
