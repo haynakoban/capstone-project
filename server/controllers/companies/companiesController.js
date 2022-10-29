@@ -393,6 +393,31 @@ const toogleStartAndEndTime = async (req, res, next) => {
   }
 };
 
+// search room or company name
+// post method | api/companies/search
+const searchRoom = async (req, res, next) => {
+  try {
+    const { keyword } = req.body;
+
+    if (!keyword) return res.json({ msg: 'no keyword' });
+
+    const listOfRooms = await Companies.find({
+      $or: [
+        { companyName: { $regex: keyword, $options: 'i' } },
+        { roomName: { $regex: keyword, $options: 'i' } },
+      ],
+    });
+
+    if (listOfRooms?.length > 0) {
+      return res.json({ rooms: listOfRooms });
+    }
+
+    return res.json({ err: 'No results matched' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptIntern,
   addDescription,
@@ -402,6 +427,7 @@ module.exports = {
   getRoomInfo,
   getRooms,
   joinRoom,
+  searchRoom,
   toogleStartAndEndTime,
   // isRoomNameValid,
 };
