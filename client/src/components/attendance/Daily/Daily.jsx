@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import FileDownload from 'js-file-download';
+
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +39,7 @@ import {
 import {
   fetchDailyAttendance,
   getDailyAttendances,
+  getDailyCSV,
 } from '../../../features/attendances/attendancesSlice';
 
 const Daily = ({ company_id }) => {
@@ -46,6 +49,8 @@ const Daily = ({ company_id }) => {
 
   const dispatch = useDispatch();
   const get_daily_attendances = useSelector(getDailyAttendances);
+
+  const get_csv = useSelector(getDailyCSV);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -143,7 +148,7 @@ const Daily = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() => console.log('download result')}
+              onClick={() => FileDownload(get_csv?.csv, `${get_csv?.day}.csv`)}
             >
               Download
             </Button>

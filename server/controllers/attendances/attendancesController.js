@@ -223,12 +223,21 @@ const outTimeDailyAttendance = async (req, res, next) => {
       ) {
         findAttendance.out_time = out_time;
 
+        findAttendance.total_hours = formatDistance(
+          findAttendance.in_time,
+          out_time
+        );
+
         const updatedAttendance = await findAttendance?.save();
 
         return res.json({ attendance: updatedAttendance });
       }
     } else {
       findAttendance.out_time = out_time;
+      findAttendance.total_hours = formatDistance(
+        findAttendance.in_time,
+        out_time
+      );
 
       const updatedAttendance = await findAttendance?.save();
 
