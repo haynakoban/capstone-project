@@ -16,6 +16,8 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import FileDownload from 'js-file-download';
+
 import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -23,6 +25,7 @@ import TablePaginationActions from './TablePaginationActions';
 import {
   fetchSummaryAttendance,
   getSummaryAttendances,
+  getSummaryCSV,
 } from '../../features/attendances/attendancesSlice';
 
 const Summary = ({ company_id }) => {
@@ -31,6 +34,7 @@ const Summary = ({ company_id }) => {
 
   const dispatch = useDispatch();
   const get_summary_attendances = useSelector(getSummaryAttendances);
+  const get_csv = useSelector(getSummaryCSV);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -74,7 +78,7 @@ const Summary = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() => console.log('download result')}
+              onClick={() => FileDownload(get_csv, `attendance_summary.csv`)}
             >
               Download
             </Button>

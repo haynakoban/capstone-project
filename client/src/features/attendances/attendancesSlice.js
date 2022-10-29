@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '../../lib/axiosConfig';
+import { TimeFormatter } from '../../lib/DateFormatter';
 
 const initialState = {
   attendances: [],
@@ -208,6 +209,10 @@ const attendancesSlice = createSlice({
         }
       })
       .addCase(fetchMonthlyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.monthly_attendances = [];
+        }
+
         if (action.payload?.attendances && action.payload?.users) {
           const { attendances, users, month } = action.payload;
 
@@ -263,5 +268,139 @@ export const getMonthlyAttendances = (state) =>
   state.attendances.monthly_attendances;
 export const getSummaryAttendances = (state) =>
   state.attendances.summary_attendances;
+
+// get daily csv
+export const getDailyCSV = (state) => {
+  const items = state.attendances.daily_attendances;
+  const day = state.attendances.daily_attendances?.[0]?.attendance_date;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      attendance_date: item?.attendance_date,
+      in_time: item?.in_time ? TimeFormatter(item?.in_time) : '00:00',
+      out_time: item?.out_time ? TimeFormatter(item?.out_time) : '00:00',
+      status: item?.status,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Attendance Date', 'In Time', 'Out Time', 'Status'];
+  const fields = ['name', 'attendance_date', 'in_time', 'out_time', 'status'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return { csv, day };
+};
+
+// get monthly csv
+export const getMonthlyCSV = (state) => {
+  const items = state.attendances.monthly_attendances;
+  const month = state.attendances.monthly_attendances?.[0]?.month;
+  const monthlyHeader = [];
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      month: item?.month,
+      name: item?.name,
+      monthly: item?.monthly,
+      summary: item?.summary,
+    };
+
+    item?.monthly.forEach((day) => {
+      // return true if day is in the monthlyheader, otherwise false
+      const res = monthlyHeader?.some((e) => e === day?.day);
+
+      // if res variable is false, add the day in the monthly header
+      if (!res) monthlyHeader?.push(day?.day);
+    });
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Month']?.concat(monthlyHeader);
+  const fields = ['name', 'summary', 'month'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) => {
+      // get user info: name, summary and month field
+      const getUserRow = fields.map((fieldName) =>
+        JSON.stringify(row?.[fieldName], replacer)
+      );
+
+      // get the rest of the day in month
+      const getDaysRow = row?.monthly?.map((day) => {
+        // return true if the day is in monthlyHeader, otherwise false;
+        const res = monthlyHeader?.some((d) => d === day?.day);
+
+        // if the varialbe res is true, add the status in the array;
+        if (res) {
+          return JSON.stringify(day?.status, replacer);
+        }
+
+        return '';
+      });
+
+      const getRow = getUserRow?.concat(getDaysRow)?.join(',');
+
+      return getRow;
+    }),
+  ].join('\r\n');
+
+  return { csv, month };
+};
+
+// get summary csv
+export const getSummaryCSV = (state) => {
+  const items = state.attendances.summary_attendances;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      completed_hours: item?.completed_hours,
+      remaining_hours: item?.remaining_hours,
+      summary_hours: item?.summary_hours,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Completed Hours', 'Remaining Hours'];
+  const fields = [
+    'name',
+    'summary_hours',
+    'completed_hours',
+    'remaining_hours',
+  ];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return csv;
+};
 
 export default attendancesSlice.reducer;

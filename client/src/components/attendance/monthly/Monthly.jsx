@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import FileDownload from 'js-file-download';
+
 import moment from 'moment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -28,11 +30,13 @@ import { MonthlyAttendanceDateFormatter } from '../../../lib/DateFormatter';
 import {
   fetchMonthlyAttendance,
   getMonthlyAttendances,
+  getMonthlyCSV,
 } from '../../../features/attendances/attendancesSlice';
 
 const Monthly = ({ company_id }) => {
   const dispatch = useDispatch();
   const get_monthly_attendances = useSelector(getMonthlyAttendances);
+  const get_csv = useSelector(getMonthlyCSV);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -113,7 +117,9 @@ const Monthly = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() => console.log('download result')}
+              onClick={() =>
+                FileDownload(get_csv?.csv, `${get_csv?.month}.csv`)
+              }
             >
               Download
             </Button>
