@@ -30,6 +30,8 @@ import {
 
 const Summary = ({ company_id }) => {
   const [page, setPage] = useState(0);
+  const [order, setOrder] = useState('asc');
+  const [sortedNames, setSortedName] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const dispatch = useDispatch();
@@ -38,9 +40,7 @@ const Summary = ({ company_id }) => {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - get_summary_attendances?.length)
-      : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - sortedNames?.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -55,9 +55,37 @@ const Summary = ({ company_id }) => {
     dispatch(fetchSummaryAttendance({ id: company_id }));
   }, [company_id, dispatch]);
 
+  // handle members
+  useEffect(() => {
+    setSortedName(get_summary_attendances);
+  }, [get_summary_attendances]);
+
+  // handle sort by name
+  const handleSortByName = () => {
+    if (order === 'asc') {
+      const users = [...get_summary_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        b?.name.localeCompare(a?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('desc');
+    } else if (order === 'desc') {
+      const users = [...get_summary_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        a?.name.localeCompare(b?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('asc');
+    }
+  };
+
   return (
     <Box>
-      {get_summary_attendances?.length > 0 && (
+      {sortedNames?.length > 0 && (
         <Fragment>
           {/* result and download */}
           <Toolbar
@@ -69,7 +97,7 @@ const Summary = ({ company_id }) => {
             }}
           >
             <Typography variant='body1' fontWeight={600}>
-              Result: {get_summary_attendances?.length}
+              Result: {sortedNames?.length}
             </Typography>
             <Button
               color='success'
@@ -95,9 +123,9 @@ const Summary = ({ company_id }) => {
                   <TableRow sx={{ '& > th': { fontWeight: 600 } }}>
                     <TableCell component='th' scope='row'>
                       <TableSortLabel
-                      // active={orderBy === headCell.id}
-                      // direction={orderBy === headCell.id ? order : 'asc'}
-                      // onClick={createSortHandler(headCell.id)}
+                        active={false}
+                        direction={order}
+                        onClick={handleSortByName}
                       >
                         Name
                       </TableSortLabel>
@@ -115,11 +143,11 @@ const Summary = ({ company_id }) => {
                 </TableHead>
                 <TableBody>
                   {(rowsPerPage > 0
-                    ? get_summary_attendances?.slice(
+                    ? sortedNames?.slice(
                         page * rowsPerPage,
                         page * rowsPerPage + rowsPerPage
                       )
-                    : get_summary_attendances
+                    : sortedNames
                   )?.map((row) => (
                     <TableRow key={row._id}>
                       <TableCell component='th' scope='row'>
@@ -158,8 +186,8 @@ const Summary = ({ company_id }) => {
                         { label: 'All', value: -1 },
                       ]}
                       colSpan={6}
-                      {...(get_summary_attendances?.length > 0 && {
-                        count: get_summary_attendances.length,
+                      {...(sortedNames?.length > 0 && {
+                        count: sortedNames.length,
                       })}
                       rowsPerPage={rowsPerPage}
                       page={page}
