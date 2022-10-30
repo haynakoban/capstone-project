@@ -3,11 +3,9 @@ import {
   Container,
   Divider,
   Grid,
-  IconButton,
   Toolbar,
   Typography,
 } from '@mui/material';
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
@@ -128,10 +126,6 @@ const InternshipList = () => {
               onKeyDown={handleKeyDown}
             />
           </SearchContainer>
-
-          <IconButton sx={{ ml: 2 }}>
-            <FilterListRoundedIcon />
-          </IconButton>
         </Toolbar>
 
         <Divider sx={{ bgcolor: '#00000050' }} />

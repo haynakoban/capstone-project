@@ -74,31 +74,14 @@ const getMyRoom = async (req, res, next) => {
 
     const findCompany = await Companies.find({ 'members.id': id });
 
-    if (!findCompany) return res.json({ err: 'room name is taken' });
+    if (!findCompany)
+      return res.json({ err: 'cannot find room with id: ', id });
 
     return res.json({ rooms: findCompany });
   } catch (e) {
     next(e);
   }
 };
-
-// check if room name is valid
-// post method | /api/companies/validate
-// const isRoomNameValid = async (req, res, next) => {
-//   try {
-//     const { name } = req.body;
-
-//     if (!name) return res.json({ err: 'this field is required' });
-
-//     const findCompany = await Companies.findOne({ name }, 'name');
-
-//     if (findCompany) return res.json({ err: 'room name is taken' });
-
-//     return res.json({ msg: 'success' });
-//   } catch (e) {
-//     next(e);
-//   }
-// };
 
 // join a room (for employee)
 // post method | /api/companies/validate
@@ -429,5 +412,4 @@ module.exports = {
   joinRoom,
   searchRoom,
   toogleStartAndEndTime,
-  // isRoomNameValid,
 };
