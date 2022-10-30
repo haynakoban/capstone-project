@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   TextField,
   Toolbar,
   Typography,
@@ -21,7 +22,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
@@ -34,6 +35,9 @@ import {
 } from '../../../features/attendances/attendancesSlice';
 
 const Monthly = ({ company_id }) => {
+  const [order, setOrder] = useState('asc');
+  const [sortedNames, setSortedName] = useState([]);
+
   const dispatch = useDispatch();
   const get_monthly_attendances = useSelector(getMonthlyAttendances);
   const get_csv = useSelector(getMonthlyCSV);
@@ -58,6 +62,11 @@ const Monthly = ({ company_id }) => {
     }
   }, [dispatch, company_id, getValues]);
 
+  // handle members
+  useEffect(() => {
+    setSortedName(get_monthly_attendances);
+  }, [get_monthly_attendances]);
+
   // handle change month
   const handleOnChangeMonth = (date) => {
     if (company_id) {
@@ -67,6 +76,29 @@ const Monthly = ({ company_id }) => {
           attendance_date: MonthlyAttendanceDateFormatter(date),
         })
       );
+    }
+  };
+
+  // handle sort by name
+  const handleSortByName = () => {
+    if (order === 'asc') {
+      const users = [...get_monthly_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        b?.name.localeCompare(a?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('desc');
+    } else if (order === 'desc') {
+      const users = [...get_monthly_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        a?.name.localeCompare(b?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('asc');
     }
   };
 
@@ -96,7 +128,7 @@ const Monthly = ({ company_id }) => {
         </LocalizationProvider>
       </Toolbar>
 
-      {get_monthly_attendances?.length > 0 && (
+      {sortedNames?.length > 0 && (
         <Fragment>
           {/* result and download */}
           <Toolbar
@@ -108,7 +140,7 @@ const Monthly = ({ company_id }) => {
             }}
           >
             <Typography variant='body1' fontWeight={600}>
-              Result: {get_monthly_attendances?.length}
+              Result: {sortedNames?.length}
             </Typography>
             <Button
               color='success'
@@ -132,7 +164,13 @@ const Monthly = ({ company_id }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell component='th' scope='row'>
-                      Name
+                      <TableSortLabel
+                        active={false}
+                        direction={order}
+                        onClick={handleSortByName}
+                      >
+                        Name
+                      </TableSortLabel>
                     </TableCell>
                     <TableCell component='th' scope='row'>
                       Summary
@@ -141,7 +179,7 @@ const Monthly = ({ company_id }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {get_monthly_attendances?.map((row) => (
+                  {sortedNames?.map((row) => (
                     <MonthlyRow key={row?._id} row={row} />
                   ))}
                 </TableBody>

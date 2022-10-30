@@ -45,6 +45,8 @@ import {
 const Daily = ({ company_id }) => {
   const { _user } = useContext(AuthContext);
   const [page, setPage] = useState(0);
+  const [order, setOrder] = useState('asc');
+  const [sortedNames, setSortedName] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const dispatch = useDispatch();
@@ -72,11 +74,14 @@ const Daily = ({ company_id }) => {
     }
   }, [dispatch, company_id, getValues]);
 
+  // handle members
+  useEffect(() => {
+    setSortedName(get_daily_attendances);
+  }, [get_daily_attendances]);
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - get_daily_attendances?.length)
-      : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - sortedNames?.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -94,6 +99,29 @@ const Daily = ({ company_id }) => {
         attendance_date: DailyAttendanceDateFormatter(date),
       })
     );
+  };
+
+  // handle sort by name
+  const handleSortByName = () => {
+    if (order === 'asc') {
+      const users = [...get_daily_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        b?.name.localeCompare(a?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('desc');
+    } else if (order === 'desc') {
+      const users = [...get_daily_attendances];
+
+      const orderedNames = users?.sort((a, b) =>
+        a?.name.localeCompare(b?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('asc');
+    }
   };
 
   return (
@@ -127,7 +155,7 @@ const Daily = ({ company_id }) => {
         variant='middle'
       />
 
-      {get_daily_attendances?.length > 0 && (
+      {sortedNames?.length > 0 && (
         <Fragment>
           {/* result and download */}
           <Toolbar
@@ -139,7 +167,7 @@ const Daily = ({ company_id }) => {
             }}
           >
             <Typography variant='body1' fontWeight={600}>
-              Result: {get_daily_attendances?.length}
+              Result: {sortedNames?.length}
             </Typography>
             <Button
               color='success'
@@ -165,9 +193,9 @@ const Daily = ({ company_id }) => {
                   <TableRow sx={{ '& > th': { fontWeight: 600 } }}>
                     <TableCell component='th' scope='row'>
                       <TableSortLabel
-                      // active={orderBy === headCell.id}
-                      // direction={orderBy === headCell.id ? order : 'asc'}
-                      // onClick={createSortHandler(headCell.id)}
+                        active={false}
+                        direction={order}
+                        onClick={handleSortByName}
                       >
                         Name
                       </TableSortLabel>
@@ -193,11 +221,11 @@ const Daily = ({ company_id }) => {
                 </TableHead>
                 <TableBody>
                   {(rowsPerPage > 0
-                    ? get_daily_attendances?.slice(
+                    ? sortedNames?.slice(
                         page * rowsPerPage,
                         page * rowsPerPage + rowsPerPage
                       )
-                    : get_daily_attendances
+                    : sortedNames
                   )?.map((row) => (
                     <TableRow key={row?._id}>
                       <TableCell component='th' scope='row'>
@@ -263,8 +291,8 @@ const Daily = ({ company_id }) => {
                         { label: 'All', value: -1 },
                       ]}
                       colSpan={6}
-                      {...(get_daily_attendances?.length > 0 && {
-                        count: get_daily_attendances.length,
+                      {...(sortedNames?.length > 0 && {
+                        count: sortedNames.length,
                       })}
                       rowsPerPage={rowsPerPage}
                       page={page}
