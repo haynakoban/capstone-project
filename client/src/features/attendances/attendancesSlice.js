@@ -36,7 +36,6 @@ export const updateDailyAttendance = createAsyncThunk(
 
       return response.data;
     } catch (e) {
-      console.log(e);
       return e.message;
     }
   }
@@ -55,7 +54,6 @@ export const fetchDailyAttendance = createAsyncThunk(
 
       return response.data;
     } catch (e) {
-      console.log(e);
       return e.message;
     }
   }
@@ -72,7 +70,6 @@ export const fetchSummaryAttendance = createAsyncThunk(
 
       return response.data;
     } catch (e) {
-      console.log(e);
       return e.message;
     }
   }
@@ -89,7 +86,6 @@ export const outTimeDailyAttendance = createAsyncThunk(
 
       return response.data;
     } catch (e) {
-      console.log(e);
       return e.message;
     }
   }
@@ -108,7 +104,6 @@ export const fetchMonthlyAttendance = createAsyncThunk(
 
       return response.data;
     } catch (e) {
-      console.log(e);
       return e.message;
     }
   }
@@ -344,16 +339,14 @@ export const getMonthlyCSV = (state) => {
       );
 
       // get the rest of the day in month
-      const getDaysRow = row?.monthly?.map((day) => {
-        // return true if the day is in monthlyHeader, otherwise false;
-        const res = monthlyHeader?.some((d) => d === day?.day);
+      const getDaysRow = monthlyHeader?.map((day) => {
+        const getDay = row?.monthly?.filter((d) => d?.day === day);
 
-        // if the varialbe res is true, add the status in the array;
-        if (res) {
-          return JSON.stringify(day?.status, replacer);
+        if (getDay?.length > 0) {
+          return JSON.stringify(getDay?.[0]?.status, replacer);
+        } else {
+          return null;
         }
-
-        return '';
       });
 
       const getRow = getUserRow?.concat(getDaysRow)?.join(',');
