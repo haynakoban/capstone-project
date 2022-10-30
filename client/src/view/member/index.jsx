@@ -41,6 +41,8 @@ import avatarTheme from '../../lib/avatar';
 const Member = () => {
   const [type, setType] = useState('All');
   const [searchKey, setSearchKey] = useState('');
+  const [order, setOrder] = useState('asc');
+  const [sortedNames, setSortedName] = useState([]);
   const [auth, setAuth] = useState(false);
   const { _user, _isUserAuth } = useContext(AuthContext);
 
@@ -85,6 +87,11 @@ const Member = () => {
     navigate,
   ]);
 
+  // handle members
+  useEffect(() => {
+    setSortedName(members);
+  }, [members]);
+
   const handleChange = async ({ target }) => {
     setType(target.value);
 
@@ -104,6 +111,29 @@ const Member = () => {
   const handleOnClick = () => {
     // fetch here
     dispatch(searchUser({ keyword: searchKey, type, room_id }));
+  };
+
+  // handle sort by name
+  const handleSortByName = () => {
+    if (order === 'asc') {
+      const users = [...members];
+
+      const orderedNames = users?.sort((a, b) =>
+        b?.name.localeCompare(a?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('desc');
+    } else if (order === 'desc') {
+      const users = [...members];
+
+      const orderedNames = users?.sort((a, b) =>
+        a?.name.localeCompare(b?.name)
+      );
+
+      setSortedName(orderedNames);
+      setOrder('asc');
+    }
   };
 
   return (
@@ -169,7 +199,7 @@ const Member = () => {
         </Toolbar>
 
         {/* list of members */}
-        {members?.length > 0 ? (
+        {sortedNames?.length > 0 ? (
           <TableContainer component={Paper} sx={{ mt: 2 }}>
             <Table aria-label='simple table'>
               <TableHead>
@@ -179,9 +209,9 @@ const Member = () => {
                   </TableCell>
                   <TableCell align='left' padding='none'>
                     <TableSortLabel
-                    // active={orderBy === headCell.id}
-                    // direction={orderBy === headCell.id ? order : 'asc'}
-                    // onClick={createSortHandler(headCell.id)}
+                      active={false}
+                      direction={order}
+                      onClick={handleSortByName}
                     >
                       Name
                     </TableSortLabel>
@@ -192,7 +222,7 @@ const Member = () => {
 
               {/* body */}
               <TableBody>
-                {members?.map((row) => (
+                {sortedNames?.map((row) => (
                   <TableRow hover key={row?._id}>
                     <TableCell align='left'>
                       <Avatar
