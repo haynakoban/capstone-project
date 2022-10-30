@@ -14,6 +14,7 @@ import {
   TableRow,
   TableSortLabel,
   Toolbar,
+  Typography,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -23,8 +24,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
 import {
-  getCompanyInfo,
+  getMembers,
   getRoomInfo,
+  searchUser,
 } from '../../features/companies/companiesSlice';
 
 import RoomLayout from '../../layout/RoomLayout';
@@ -37,7 +39,8 @@ import {
 import avatarTheme from '../../lib/avatar';
 
 const Member = () => {
-  const [type, setType] = useState('');
+  const [type, setType] = useState('All');
+  const [searchKey, setSearchKey] = useState('');
   const [auth, setAuth] = useState(false);
   const { _user, _isUserAuth } = useContext(AuthContext);
 
@@ -46,7 +49,7 @@ const Member = () => {
   const room_id = pathname.slice(6).slice(0, 24);
 
   const dispatch = useDispatch();
-  const roomInfo = useSelector(getCompanyInfo);
+  const members = useSelector(getMembers);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
@@ -82,8 +85,25 @@ const Member = () => {
     navigate,
   ]);
 
-  const handleChange = ({ target }) => {
+  const handleChange = async ({ target }) => {
     setType(target.value);
+
+    // fetch here
+    dispatch(searchUser({ keyword: searchKey, type: target.value, room_id }));
+  };
+
+  // handle event key
+  const handleKeyDown = (event) => {
+    if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
+      // fetch here
+      dispatch(searchUser({ keyword: searchKey, type, room_id }));
+    }
+  };
+
+  // handle click button
+  const handleOnClick = () => {
+    // fetch here
+    dispatch(searchUser({ keyword: searchKey, type, room_id }));
   };
 
   return (
@@ -102,12 +122,19 @@ const Member = () => {
         >
           {/* search  */}
           <SearchContainer>
-            <SearchIconWrapper>
+            <SearchIconWrapper
+              disableRipple
+              size='small'
+              onClick={handleOnClick}
+            >
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder='Search…'
               inputProps={{ 'aria-label': 'search' }}
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </SearchContainer>
 
@@ -136,60 +163,75 @@ const Member = () => {
             >
               <MenuItem value='All'>All</MenuItem>
               <MenuItem value='Intern'>Intern</MenuItem>
-              <MenuItem value='Employee'>Employee</MenuItem>
+              <MenuItem value='Owner'>Owner</MenuItem>
             </Select>
           </FormControl>
         </Toolbar>
 
         {/* list of members */}
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
-              <TableRow>
-                <TableCell align='left' padding='checkbox'>
-                  <IconButton disabled></IconButton>
-                </TableCell>
-                <TableCell align='left' padding='none'>
-                  <TableSortLabel
-                  // active={orderBy === headCell.id}
-                  // direction={orderBy === headCell.id ? order : 'asc'}
-                  // onClick={createSortHandler(headCell.id)}
-                  >
-                    Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align='right'>Roles</TableCell>
-              </TableRow>
-            </TableHead>
-
-            {/* body */}
-            <TableBody>
-              {roomInfo?.members?.map((row) => (
-                <TableRow hover key={row?.id}>
-                  <TableCell align='left'>
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: avatarTheme({
-                          name: row?.name?.[0]?.toLowerCase(),
-                        }),
-                      }}
-                    >
-                      {row?.name?.[0]}
-                    </Avatar>
+        {members?.length > 0 ? (
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <Table aria-label='simple table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell align='left' padding='checkbox'>
+                    <IconButton disabled></IconButton>
                   </TableCell>
                   <TableCell align='left' padding='none'>
-                    {row?.name}
+                    <TableSortLabel
+                    // active={orderBy === headCell.id}
+                    // direction={orderBy === headCell.id ? order : 'asc'}
+                    // onClick={createSortHandler(headCell.id)}
+                    >
+                      Name
+                    </TableSortLabel>
                   </TableCell>
-                  <TableCell align='right' sx={{ textTransform: 'capitalize' }}>
-                    {row?.roles}
-                  </TableCell>
+                  <TableCell align='right'>Roles</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+
+              {/* body */}
+              <TableBody>
+                {members?.map((row) => (
+                  <TableRow hover key={row?._id}>
+                    <TableCell align='left'>
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor: avatarTheme({
+                            name: row?.name?.[0]?.toLowerCase(),
+                          }),
+                        }}
+                      >
+                        {row?.name?.[0]}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell align='left' padding='none'>
+                      {row?.name}
+                    </TableCell>
+                    <TableCell
+                      align='right'
+                      sx={{ textTransform: 'capitalize' }}
+                    >
+                      {row?.roles}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography
+            variant='h6'
+            component='p'
+            width='100%'
+            mt={{ xs: 3, sm: 5 }}
+            textAlign='center'
+          >
+            No results matched your search.
+          </Typography>
+        )}
       </StyledContainer>
     </RoomLayout>
   );

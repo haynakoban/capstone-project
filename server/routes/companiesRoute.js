@@ -14,6 +14,9 @@ router
 // post method -- search room or company name
 router.route('/search').post(auth, companiesController.searchRoom);
 
+// post method -- search room or company name
+router.route('/users/search').post(auth, companiesController.searchUser);
+
 // get method -- retrieve the company/room information
 // post method -- join to a room
 router

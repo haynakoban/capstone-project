@@ -427,6 +427,170 @@ const searchRoom = async (req, res, next) => {
   }
 };
 
+// search user
+// post method | api/companies/users/search
+const searchUser = async (req, res, next) => {
+  try {
+    const { keyword, type, room_id } = req.body;
+
+    if (!room_id)
+      return res.json({ err: 'room id must have value: ', room_id });
+
+    if (!keyword) {
+      if (type === 'Intern') {
+        const findCompany = await Companies.findById({ _id: room_id });
+
+        if (!findCompany)
+          res.json({ err: 'cannot find room with an id: ', room_id });
+
+        const members = findCompany?.members?.filter(
+          (e) => e.roles === 'member'
+        );
+
+        if (members?.length > 0) {
+          const ids = members?.map((e) => e.id);
+
+          const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+          return res.json({ room: findCompany, users });
+        }
+
+        return res.json({ err: 'No results matched' });
+      } else if (type === 'Owner') {
+        const findCompany = await Companies.findById({ _id: room_id });
+
+        if (!findCompany)
+          res.json({ err: 'cannot find room with an id: ', room_id });
+
+        const members = findCompany?.members?.filter(
+          (e) => e.roles === 'owner'
+        );
+
+        if (members?.length > 0) {
+          const ids = members?.map((e) => e.id);
+
+          const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+          return res.json({ room: findCompany, users });
+        }
+
+        return res.json({ err: 'No results matched' });
+      } else if (type === 'All') {
+        const findCompany = await Companies.findById({ _id: room_id });
+
+        if (!findCompany)
+          res.json({ err: 'cannot find room with an id: ', room_id });
+
+        const members = findCompany?.members?.map((e) => e.id);
+
+        if (members?.length > 0) {
+          const users = await Users.find(
+            { _id: { $in: members } },
+            'name'
+          ).exec();
+
+          return res.json({ room: findCompany, users });
+        }
+
+        return res.json({ err: 'No results matched' });
+      }
+    } else {
+      if (type === 'Intern') {
+        const listOfUsers = await Users.find(
+          {
+            $and: [
+              { name: { $regex: keyword, $options: 'i' } },
+              { isIntern: true },
+            ],
+          },
+          '_id name'
+        );
+
+        if (listOfUsers?.length > 0) {
+          // find company
+          const findCompany = await Companies.findById({ _id: room_id });
+
+          if (!findCompany)
+            res.json({ err: 'cannot find room with an id: ', room_id });
+
+          const ids = findCompany?.members?.map((e) => e.id);
+
+          const users = listOfUsers?.filter((e) => {
+            return ids?.some((id) => id == e?._id);
+          });
+
+          return res.json({ room: findCompany, users });
+        }
+
+        return res.json({ err: 'No results matched' });
+      } else if (type === 'Owner') {
+        const listOfUsers = await Users.find(
+          {
+            $and: [
+              { name: { $regex: keyword, $options: 'i' } },
+              { isIntern: false },
+            ],
+          },
+          '_id name'
+        );
+
+        if (listOfUsers?.length > 0) {
+          // find company
+          const findCompany = await Companies.findById({ _id: room_id });
+
+          if (!findCompany)
+            res.json({ err: 'cannot find room with an id: ', room_id });
+
+          const ids = findCompany?.members?.map((e) => e.id);
+
+          const users = listOfUsers?.filter((e) => {
+            return ids?.some((id) => id == e?._id);
+          });
+
+          if (users?.length > 0) {
+            return res.json({ room: findCompany, users });
+          }
+
+          return res.json({ err: 'No results matched' });
+        }
+
+        return res.json({ err: 'No results matched' });
+      } else if (type === 'All') {
+        const listOfUsers = await Users.find(
+          {
+            $and: [{ name: { $regex: keyword, $options: 'i' } }],
+          },
+          '_id name'
+        );
+
+        if (listOfUsers?.length > 0) {
+          // find company
+          const findCompany = await Companies.findById({ _id: room_id });
+
+          if (!findCompany)
+            res.json({ err: 'cannot find room with an id: ', room_id });
+
+          const ids = findCompany?.members?.map((e) => e.id);
+
+          const users = listOfUsers?.filter((e) => {
+            return ids?.some((id) => id == e?._id);
+          });
+
+          if (users?.length > 0) {
+            return res.json({ room: findCompany, users });
+          }
+
+          return res.json({ err: 'No results matched' });
+        }
+
+        return res.json({ err: 'No results matched' });
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptIntern,
   addDescription,
@@ -437,5 +601,6 @@ module.exports = {
   getRooms,
   joinRoom,
   searchRoom,
+  searchUser,
   toogleStartAndEndTime,
 };

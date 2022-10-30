@@ -6,6 +6,7 @@ const initialState = {
   company_id: '',
   company: {},
   rooms: [],
+  members: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -145,6 +146,23 @@ export const toggleStartAndEndTime = createAsyncThunk(
   }
 );
 
+// search user
+export const searchUser = createAsyncThunk(
+  'companies/searchUser',
+  async (initialState) => {
+    try {
+      const response = await axios.post(
+        `api/companies/users/search`,
+        initialState
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const companiesSlice = createSlice({
   name: 'companies',
   initialState,
@@ -199,6 +217,7 @@ const companiesSlice = createSlice({
 
         if (action.payload.room && action.payload.users) {
           state.company = action.payload.room;
+          state.members = action.payload.users;
 
           const MEMBERS_SIZE = action.payload.room.members.length;
           const REQUEST_SIZE = action.payload?.room?.request?.length;
@@ -217,6 +236,15 @@ const companiesSlice = createSlice({
           const req_users = action.payload.req_users;
           const pen_users = action.payload.pen_users;
           const req_files = action.payload.files;
+
+          // assign user
+          for (let i = 0; i < USERS_SIZE; i++) {
+            for (let j = 0; j < MEMBERS_SIZE; j++) {
+              if (users[i]._id === action.payload.room?.members[j].id) {
+                state.members[i].roles = action.payload.room?.members[j].roles;
+              }
+            }
+          }
 
           for (let i = 0; i < MEMBERS_SIZE; i++) {
             for (let j = 0; j < USERS_SIZE; j++) {
@@ -355,6 +383,29 @@ const companiesSlice = createSlice({
           return;
         }
         return;
+      })
+      .addCase(searchUser.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.members = [];
+        }
+
+        if (action.payload?.room && action.payload?.users) {
+          const { room, users } = action.payload;
+
+          state.members = users;
+
+          const USERS_SIZE = users?.length;
+          const MEMBERS_SIZE = room.members?.length;
+
+          // assign user
+          for (let i = 0; i < USERS_SIZE; i++) {
+            for (let j = 0; j < MEMBERS_SIZE; j++) {
+              if (users[i]._id === room?.members[j].id) {
+                state.members[i].roles = room?.members[j].roles;
+              }
+            }
+          }
+        }
       });
   },
 });
@@ -364,6 +415,8 @@ export const roomId = (state) => state.companies.company_id;
 export const myRooms = (state) => state.companies.rooms;
 export const getError = (state) => state.companies.error;
 export const getCompanyInfo = (state) => state.companies.company;
+
+export const getMembers = (state) => state.companies.members;
 
 // export const roomStatus = (state) => state.companies.status;
 
