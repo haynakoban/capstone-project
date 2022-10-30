@@ -23,7 +23,7 @@ const ResumeAction = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserInfo);
 
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit, watch, reset } = useForm({
     defaultValues: { resume: [], cv: [], letter: [] },
   });
 
@@ -60,7 +60,17 @@ const ResumeAction = () => {
       .then((res) => {
         dispatch(updateUserDocs(res.data.user));
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() =>
+        setTimeout(() => {
+          handleClose();
+          reset({
+            resume: [],
+            cv: [],
+            letter: [],
+          });
+        }, 500)
+      );
   };
 
   return (
@@ -221,6 +231,7 @@ const ResumeAction = () => {
             onClick={handleSubmit(handleFormSubmit)}
             type='submit'
             sx={{ marginX: 'auto', mt: 2 }}
+            {...(progress > 0 && { disabled: true })}
           >
             Save
           </Button>

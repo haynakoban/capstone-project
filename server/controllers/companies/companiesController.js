@@ -56,7 +56,10 @@ const createRoom = async (req, res, next) => {
 // get method | /api/companies
 const getRooms = async (req, res, next) => {
   try {
-    const company = await Companies.find({ showRoom: true }).limit(16);
+    const company = await Companies.find({ showRoom: true }).limit(16).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
 
     if (!company) return res.json({ err: 'no rooms available' });
 
@@ -72,7 +75,10 @@ const getMyRoom = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const findCompany = await Companies.find({ 'members.id': id });
+    const findCompany = await Companies.find({ 'members.id': id }).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
 
     if (!findCompany)
       return res.json({ err: 'cannot find room with id: ', id });
