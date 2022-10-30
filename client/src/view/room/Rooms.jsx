@@ -73,6 +73,7 @@ const Rooms = () => {
       // fetch here
       const res = await axios.post('api/companies/search', {
         keyword: searchKey,
+        id: _user?._id,
       });
 
       if (res.data?.rooms) {
@@ -93,6 +94,7 @@ const Rooms = () => {
     // fetch here
     const res = await axios.post('api/companies/search', {
       keyword: searchKey,
+      id: _user?._id,
     });
 
     if (res.data?.rooms) {
