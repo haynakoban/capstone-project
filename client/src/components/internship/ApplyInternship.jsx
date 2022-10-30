@@ -78,7 +78,7 @@ const ApplyInternship = ({ id }) => {
         .finally(() =>
           setTimeout(() => {
             handleClose();
-          }, 2000)
+          }, 500)
         );
     }
   };
@@ -186,6 +186,7 @@ const ApplyInternship = ({ id }) => {
             onClick={handleSubmit}
             type='submit'
             sx={{ marginX: 'auto', mt: 2 }}
+            {...(progress > 0 && { disabled: true })}
           >
             Upload
           </Button>

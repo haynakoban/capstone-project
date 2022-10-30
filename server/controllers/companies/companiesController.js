@@ -56,7 +56,10 @@ const createRoom = async (req, res, next) => {
 // get method | /api/companies
 const getRooms = async (req, res, next) => {
   try {
-    const company = await Companies.find({ showRoom: true }).limit(16);
+    const company = await Companies.find({ showRoom: true }).limit(16).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
 
     if (!company) return res.json({ err: 'no rooms available' });
 
@@ -72,33 +75,19 @@ const getMyRoom = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const findCompany = await Companies.find({ 'members.id': id });
+    const findCompany = await Companies.find({ 'members.id': id }).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
 
-    if (!findCompany) return res.json({ err: 'room name is taken' });
+    if (!findCompany)
+      return res.json({ err: 'cannot find room with id: ', id });
 
     return res.json({ rooms: findCompany });
   } catch (e) {
     next(e);
   }
 };
-
-// check if room name is valid
-// post method | /api/companies/validate
-// const isRoomNameValid = async (req, res, next) => {
-//   try {
-//     const { name } = req.body;
-
-//     if (!name) return res.json({ err: 'this field is required' });
-
-//     const findCompany = await Companies.findOne({ name }, 'name');
-
-//     if (findCompany) return res.json({ err: 'room name is taken' });
-
-//     return res.json({ msg: 'success' });
-//   } catch (e) {
-//     next(e);
-//   }
-// };
 
 // join a room (for employee)
 // post method | /api/companies/validate
@@ -397,22 +386,42 @@ const toogleStartAndEndTime = async (req, res, next) => {
 // post method | api/companies/search
 const searchRoom = async (req, res, next) => {
   try {
-    const { keyword } = req.body;
+    const { keyword, id } = req.body;
 
     if (!keyword) return res.json({ msg: 'no keyword' });
 
-    const listOfRooms = await Companies.find({
-      $or: [
-        { companyName: { $regex: keyword, $options: 'i' } },
-        { roomName: { $regex: keyword, $options: 'i' } },
-      ],
-    });
+    if (id) {
+      const listOfRooms = await Companies.find({
+        $and: [
+          { 'members.id': id },
+          {
+            $or: [
+              { companyName: { $regex: keyword, $options: 'i' } },
+              { roomName: { $regex: keyword, $options: 'i' } },
+            ],
+          },
+        ],
+      });
 
-    if (listOfRooms?.length > 0) {
-      return res.json({ rooms: listOfRooms });
+      if (listOfRooms?.length > 0) {
+        return res.json({ rooms: listOfRooms });
+      }
+
+      return res.json({ err: 'No results matched' });
+    } else {
+      const listOfRooms = await Companies.find({
+        $or: [
+          { companyName: { $regex: keyword, $options: 'i' } },
+          { roomName: { $regex: keyword, $options: 'i' } },
+        ],
+      });
+
+      if (listOfRooms?.length > 0) {
+        return res.json({ rooms: listOfRooms });
+      }
+
+      return res.json({ err: 'No results matched' });
     }
-
-    return res.json({ err: 'No results matched' });
   } catch (error) {
     next(error);
   }
@@ -429,5 +438,4 @@ module.exports = {
   joinRoom,
   searchRoom,
   toogleStartAndEndTime,
-  // isRoomNameValid,
 };

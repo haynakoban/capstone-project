@@ -19,3 +19,8 @@ textarea::-webkit-scrollbar-track {
 .comment::-webkit-scrollbar-track {
   background-color: #20212850 !important;
 }
+
+.css-1lj81rs-MuiInputBase-root-MuiInput-root:before,
+.css-1lj81rs-MuiInputBase-root-MuiInput-root:after {
+  border-bottom: none !important;
+}

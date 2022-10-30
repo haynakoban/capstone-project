@@ -22,6 +22,12 @@ const mainTheme = createTheme({
   typography: {
     fontFamily: `Mulish, Poppins, sans-serif`,
   },
+  transitions: {
+    easing: {
+      easeOut: 'ease-out',
+      sharp: 'ease-out',
+    },
+  },
   //   components: {
   //     MuiOutlinedInput: {
   //       variants: [

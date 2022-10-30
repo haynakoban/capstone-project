@@ -2,7 +2,7 @@ import { Box, Button, Modal, Stack, Typography } from '@mui/material';
 import { Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { acceptIntern } from '../../features/companies/companiesSlice';
-import { StackContainer, StyledPostBox } from '../global';
+import { DownloadableFile, StackContainer } from '../global';
 import DeleteInternRequest from './DeleteInternRequest';
 
 const Request = ({ req, room }) => {
@@ -55,7 +55,7 @@ const Request = ({ req, room }) => {
             },
           }}
         >
-          <StyledPostBox>{req?.filename}</StyledPostBox>
+          <DownloadableFile file={req?.filename} id={req?.file_id} />
         </Box>
 
         <Box sx={{ mt: { xs: 1, sm: 2 } }}>

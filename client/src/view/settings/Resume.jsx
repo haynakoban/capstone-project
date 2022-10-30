@@ -5,6 +5,9 @@ import {
   StyledStack,
 } from '../../components/global';
 
+import axios from '../../lib/axiosConfig';
+import FileDownload from 'js-file-download';
+
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
@@ -24,6 +27,15 @@ const Resume = () => {
       navigate('/settings/account');
     }
   }, [_isUserAuth, _user?.isIntern, navigate]);
+
+  const handleFileDownload = (filename, id) => {
+    axios
+      .get(`api/downloads/${id}`, { responseType: 'blob' })
+      .then((res) => {
+        FileDownload(res.data, filename);
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <ProfileLayout>
@@ -49,7 +61,16 @@ const Resume = () => {
             {_user?.docs?.resume?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>Resume</Typography>
-                <Typography variant='body1'>
+                <Typography
+                  variant='body1'
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    handleFileDownload(
+                      _user?.docs?.resume?.file_name,
+                      _user?.docs?.resume?.file_id
+                    )
+                  }
+                >
                   {_user?.docs?.resume?.file_name}
                 </Typography>
               </StyledStack>
@@ -57,7 +78,16 @@ const Resume = () => {
             {_user?.docs?.cv?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>CV</Typography>
-                <Typography variant='body1'>
+                <Typography
+                  variant='body1'
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    handleFileDownload(
+                      _user?.docs?.cv?.file_name,
+                      _user?.docs?.cv?.file_id
+                    )
+                  }
+                >
                   {_user?.docs?.cv?.file_name}
                 </Typography>
               </StyledStack>
@@ -65,7 +95,16 @@ const Resume = () => {
             {_user?.docs?.letter?.file_name && (
               <StyledStack>
                 <Typography variant='caption'>Application Letter</Typography>
-                <Typography variant='body1'>
+                <Typography
+                  variant='body1'
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    handleFileDownload(
+                      _user?.docs?.letter?.file_name,
+                      _user?.docs?.letter?.file_id
+                    )
+                  }
+                >
                   {_user?.docs?.letter?.file_name}
                 </Typography>
               </StyledStack>

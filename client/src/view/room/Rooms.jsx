@@ -4,12 +4,10 @@ import {
   Container,
   Divider,
   Grid,
-  IconButton,
   Snackbar,
   Toolbar,
   Typography,
 } from '@mui/material';
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SearchIcon from '@mui/icons-material/Search';
 
 import axios from '../../lib/axiosConfig';
@@ -75,6 +73,7 @@ const Rooms = () => {
       // fetch here
       const res = await axios.post('api/companies/search', {
         keyword: searchKey,
+        id: _user?._id,
       });
 
       if (res.data?.rooms) {
@@ -95,6 +94,7 @@ const Rooms = () => {
     // fetch here
     const res = await axios.post('api/companies/search', {
       keyword: searchKey,
+      id: _user?._id,
     });
 
     if (res.data?.rooms) {
@@ -175,10 +175,6 @@ const Rooms = () => {
               onKeyDown={handleKeyDown}
             />
           </SearchContainer>
-
-          <IconButton sx={{ ml: 2 }}>
-            <FilterListRoundedIcon />
-          </IconButton>
         </Toolbar>
 
         <Divider sx={{ bgcolor: '#00000050' }} />
