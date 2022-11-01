@@ -16,6 +16,11 @@ router
   .route('/monthly/:company_id/:attendance_date')
   .get(auth, attendancesController.fetchMonthlyAttendance);
 
+// get method - fetch my summary attendance
+router
+  .route('/summary/:id/:user_id')
+  .get(attendancesController.fetchMySummaryAttendance);
+
 // get method - fetch summary attendance
 // put method - on logged out, create out time on daily attendance
 router

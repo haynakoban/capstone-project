@@ -9,6 +9,7 @@ const initialState = {
   daily_attendance: {},
   monthly_attendances: [],
   summary_attendances: [],
+  my_summary_attendances: {},
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -100,6 +101,24 @@ export const fetchMonthlyAttendance = createAsyncThunk(
 
       const response = await axios.get(
         `api/attendances/monthly/${company_id}/${attendance_date}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch my sumary attendance
+export const fetchMySummaryAttendance = createAsyncThunk(
+  'attendances/fetchMySummaryAttendance',
+  async (initialState) => {
+    try {
+      const { company_id, user_id } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/summary/${company_id}/${user_id}`
       );
 
       return response.data;
@@ -252,6 +271,38 @@ const attendancesSlice = createSlice({
             state.monthly_attendances[i].monthly = newMonth;
           }
         }
+      })
+      .addCase(fetchMySummaryAttendance.fulfilled, (state, action) => {
+        if (action.payload.msg) {
+          state.my_summary_attendances = {};
+        }
+
+        if (action.payload.attendances) {
+          const { attendances } = action.payload;
+
+          const ATTENDANCES_SIZE = attendances?.length;
+
+          let total = 0;
+
+          // assign hours
+          for (let i = 0; i < ATTENDANCES_SIZE; i++) {
+            // check if there is total hours
+            if (
+              attendances?.[i]?.total_hours &&
+              typeof attendances?.[i]?.total_hours === 'number'
+            ) {
+              total += attendances?.[i]?.total_hours;
+            }
+          }
+
+          // completed hours
+          state.my_summary_attendances.completed_hours = total?.toFixed(0);
+
+          // remaining hours
+          state.my_summary_attendances.remaining_hours = (486 - total)?.toFixed(
+            0
+          );
+        }
       });
   },
 });
@@ -263,6 +314,8 @@ export const getMonthlyAttendances = (state) =>
   state.attendances.monthly_attendances;
 export const getSummaryAttendances = (state) =>
   state.attendances.summary_attendances;
+export const getMySummaryAttendances = (state) =>
+  state.attendances.my_summary_attendances;
 
 // get daily csv
 export const getDailyCSV = (state) => {

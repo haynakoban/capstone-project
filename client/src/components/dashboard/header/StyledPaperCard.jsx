@@ -29,7 +29,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const StyledPaperCard = ({ text, hours }) => {
+const StyledPaperCard = ({ text, hours = 0 }) => {
   return (
     <StyledPaper>
       <Typography

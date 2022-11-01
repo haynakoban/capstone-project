@@ -7,9 +7,9 @@ import {
   CardHeader,
 } from '@mui/material';
 
-import { DownloadableFile, StyledTypography, TimeAgo } from '../../global';
+import { DownloadableFile, StyledTypography, TimeAgo } from '../global';
 import { useNavigate } from 'react-router-dom';
-import avatarTheme from '../../../lib/avatar';
+import avatarTheme from '../../lib/avatar';
 
 const PostCard = ({ post }) => {
   const navigate = useNavigate();

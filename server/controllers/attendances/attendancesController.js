@@ -283,10 +283,36 @@ const fetchMonthlyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch My Summary Attendance
+// get method | api/attendances/summary/:company_id/:user_id
+const fetchMySummaryAttendance = async (req, res, next) => {
+  try {
+    const { id, user_id } = req.params;
+
+    if (!id && !user_id)
+      return res
+        .status(400)
+        .json({ err: 'company id and user id should be provided' });
+
+    const attendances = await Attendances.find({
+      $and: [{ company_id: id }, { user_id }],
+    });
+
+    if (attendances?.length > 0) {
+      return res.json({ attendances });
+    }
+
+    return res.json({ msg: "you don't attendance yet!" });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
+  fetchMySummaryAttendance,
   fetchSummaryAttendance,
   outTimeDailyAttendance,
   updateDailyAttendance,
