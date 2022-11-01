@@ -298,8 +298,12 @@ const fetchMySummaryAttendance = async (req, res, next) => {
       $and: [{ company_id: id }, { user_id }],
     });
 
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
     if (attendances?.length > 0) {
-      return res.json({ attendances });
+      return res.json({ attendances, user });
     }
 
     return res.json({ msg: "you don't attendance yet!" });

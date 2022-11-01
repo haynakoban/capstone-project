@@ -278,9 +278,12 @@ const attendancesSlice = createSlice({
         }
 
         if (action.payload.attendances) {
-          const { attendances } = action.payload;
+          const { attendances, user } = action.payload;
 
           const ATTENDANCES_SIZE = attendances?.length;
+
+          // assign name
+          state.my_summary_attendances = user;
 
           let total = 0;
 
@@ -295,13 +298,28 @@ const attendancesSlice = createSlice({
             }
           }
 
+          // completed hours (INT)
+          state.my_summary_attendances.int_completed_hours = total?.toFixed(0);
+
+          // remaining hours (INT)
+          state.my_summary_attendances.int_remaining_hours = (
+            486 - total
+          )?.toFixed(0);
+
           // completed hours
-          state.my_summary_attendances.completed_hours = total?.toFixed(0);
+          state.my_summary_attendances.completed_hours = `${total?.toFixed(
+            0
+          )} Hours`;
 
           // remaining hours
-          state.my_summary_attendances.remaining_hours = (486 - total)?.toFixed(
+          state.my_summary_attendances.remaining_hours = `${(
+            486 - total
+          )?.toFixed(0)} Hours`;
+
+          // summary hours
+          state.my_summary_attendances.summary_hours = `${total?.toFixed(
             0
-          );
+          )}/486 Hours`;
         }
       });
   },
@@ -425,6 +443,42 @@ export const getSummaryCSV = (state) => {
 
     return newObj;
   });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Completed Hours', 'Remaining Hours'];
+  const fields = [
+    'name',
+    'summary_hours',
+    'completed_hours',
+    'remaining_hours',
+  ];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return csv;
+};
+
+// get summary csv
+export const getMySummaryCSV = (state) => {
+  const items = state.attendances.my_summary_attendances;
+
+  const newObj = {
+    name: items?.name,
+    completed_hours: items?.completed_hours,
+    remaining_hours: items?.remaining_hours,
+    summary_hours: items?.summary_hours,
+  };
+
+  const new_items = [newObj];
 
   // specify how you want to handle null values here
   const replacer = (key, value) => (value === null ? '' : value);

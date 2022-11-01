@@ -61,6 +61,8 @@ const Daily = ({ company_id }) => {
     },
   });
 
+  // fetch daily attendance
+  // check if intern or company
   useEffect(() => {
     if (company_id) {
       dispatch(

@@ -18,17 +18,22 @@ import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import TablePaginationActions from './TablePaginationActions';
 import {
+  fetchMySummaryAttendance,
   fetchSummaryAttendance,
+  getMySummaryAttendances,
+  getMySummaryCSV,
   getSummaryAttendances,
   getSummaryCSV,
 } from '../../features/attendances/attendancesSlice';
+import { AuthContext } from '../../lib/authContext';
 
 const Summary = ({ company_id }) => {
+  const { _user } = useContext(AuthContext);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
@@ -36,7 +41,9 @@ const Summary = ({ company_id }) => {
 
   const dispatch = useDispatch();
   const get_summary_attendances = useSelector(getSummaryAttendances);
+  const get_summary = useSelector(getMySummaryAttendances);
   const get_csv = useSelector(getSummaryCSV);
+  const get_my_csv = useSelector(getMySummaryCSV);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -51,35 +58,56 @@ const Summary = ({ company_id }) => {
     setPage(0);
   };
 
+  // get summary attendance
+  // check if user is intern or company
   useEffect(() => {
-    dispatch(fetchSummaryAttendance({ id: company_id }));
-  }, [company_id, dispatch]);
+    if (_user?.internInfo?.companyInfo?.hasCompany) {
+      dispatch(fetchMySummaryAttendance({ company_id, user_id: _user?._id }));
+    } else {
+      dispatch(fetchSummaryAttendance({ id: company_id }));
+    }
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    _user?._id,
+    company_id,
+    dispatch,
+  ]);
 
   // handle members
   useEffect(() => {
-    setSortedName(get_summary_attendances);
-  }, [get_summary_attendances]);
+    if (_user?.internInfo?.companyInfo?.hasCompany && get_summary?._id) {
+      setSortedName([get_summary]);
+    } else {
+      setSortedName(get_summary_attendances);
+    }
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    get_summary,
+    get_summary_attendances,
+  ]);
 
   // handle sort by name
   const handleSortByName = () => {
-    if (order === 'asc') {
-      const users = [...get_summary_attendances];
+    if (_user?.employeeInfo) {
+      if (order === 'asc') {
+        const users = [...get_summary_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        b?.name.localeCompare(a?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          b?.name.localeCompare(a?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('desc');
-    } else if (order === 'desc') {
-      const users = [...get_summary_attendances];
+        setSortedName(orderedNames);
+        setOrder('desc');
+      } else if (order === 'desc') {
+        const users = [...get_summary_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        a?.name.localeCompare(b?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          a?.name.localeCompare(b?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('asc');
+        setSortedName(orderedNames);
+        setOrder('asc');
+      }
     }
   };
 
@@ -106,7 +134,13 @@ const Summary = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() => FileDownload(get_csv, `attendance_summary.csv`)}
+              onClick={() => {
+                if (_user?.internInfo?.companyInfo?.hasCompany) {
+                  FileDownload(get_my_csv, `attendance_summary.csv`);
+                } else {
+                  FileDownload(get_csv, `attendance_summary.csv`);
+                }
+              }}
             >
               Download
             </Button>
@@ -149,18 +183,18 @@ const Summary = ({ company_id }) => {
                       )
                     : sortedNames
                   )?.map((row) => (
-                    <TableRow key={row._id}>
+                    <TableRow key={row?._id}>
                       <TableCell component='th' scope='row'>
-                        {row.name}
+                        {row?.name}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row.summary_hours}
+                        {row?.summary_hours}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row.completed_hours}
+                        {row?.completed_hours}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row.remaining_hours}
+                        {row?.remaining_hours}
                       </TableCell>
                     </TableRow>
                   ))}
