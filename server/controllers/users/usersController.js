@@ -25,6 +25,84 @@ const isUsernameValid = async (req, res, next) => {
   }
 };
 
+// change username
+// post method | /api/users/validation/username
+const changeUsername = async (req, res, next) => {
+  try {
+    const { username, oldUsername } = req.body;
+
+    if (username === oldUsername) return res.json({ succ: true });
+
+    if (!username) return res.json({ err: 'this field is required' });
+
+    const findUser = await Users.findOne({ username }, 'username');
+
+    if (findUser) return res.json({ err: 'username is taken' });
+
+    return res.json({ msg: 'success' });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// validate password
+// post method | /api/users/validation/password
+const validatePassword = async (req, res, next) => {
+  try {
+    const { id, password } = req.body;
+
+    if (!id) return res.json({ err: 'this field is required' });
+
+    const findUser = await Users.findById({ _id: id }, 'username password');
+
+    if (!findUser) return res.json({ err: 'no user found' });
+
+    // validating the password
+    bcryptjs.compare(password, findUser?.password).then((match) => {
+      if (!match) return res.json({ err: 'incorrect password' });
+
+      return res.json({ msg: 'success' });
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// change account info
+// put method | /api/users/validation/username
+const changeAccountInfo = async (req, res, next) => {
+  try {
+    const { id, username, password } = req.body;
+    const date = new Date();
+
+    // if one is empty or missing the result return false, otherwise true.
+    const canSave = [id, username, password].every(Boolean);
+
+    if (!canSave)
+      return res.status(400).json({ err: 'required field must be filled' });
+
+    const findUser = await Users.findById(
+      { _id: id },
+      'username password updatedAt'
+    );
+
+    if (!findUser) return res.json({ err: 'no user found' });
+
+    // hash the password for basic security
+    const hashPassword = await bcryptjs.hash(password, 10);
+
+    findUser.username = username;
+    findUser.password = hashPassword;
+    findUser.updatedAt = date;
+
+    const updatedUser = await findUser?.save();
+
+    return res.json({ msg: 'success', user: updatedUser });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // create new user
 // post method | /api/users
 const createNewUser = async (req, res, next) => {
@@ -475,6 +553,8 @@ const declineCompanyOffer = async (req, res, next) => {
 
 module.exports = {
   acceptCompanyOffer,
+  changeAccountInfo,
+  changeUsername,
   createNewUser,
   declineCompanyOffer,
   getUserInfo,
@@ -485,4 +565,5 @@ module.exports = {
   userLogin,
   userLogout,
   uploadFile,
+  validatePassword,
 };

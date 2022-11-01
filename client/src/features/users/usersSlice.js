@@ -49,6 +49,23 @@ export const fetchUserInfo = createAsyncThunk(
   }
 );
 
+// fetch the current user information
+export const changeAccountInfo = createAsyncThunk(
+  'users/changeAccountInfo',
+  async (initialState) => {
+    try {
+      const response = await axios.put(
+        `api/users/validation/username`,
+        initialState
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 // update the current user profile information
 export const updateUserProfileInfo = createAsyncThunk(
   'users/updateUserProfileInfo',
@@ -238,6 +255,11 @@ const usersSlice = createSlice({
       .addCase(declineCompanyOffer.fulfilled, (state, action) => {
         if (action.payload.user && action.payload.room) {
           state.user = action.payload.user;
+        }
+      })
+      .addCase(changeAccountInfo.fulfilled, (state, action) => {
+        if (action.payload?.msg) {
+          state.user.username = action.payload?.user?.username;
         }
       });
   },

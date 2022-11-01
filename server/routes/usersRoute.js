@@ -15,6 +15,16 @@ router
   .get(auth, usersController.userLogout)
   .post(usersController.isUsernameValid);
 
+// post method - change username
+// put method - change account info
+router
+  .route('/validation/username')
+  .post(usersController.changeUsername)
+  .put(usersController.changeAccountInfo);
+
+// post method - validate password
+router.route('/validation/password').post(usersController.validatePassword);
+
 // post method -- apply for internship
 // put method -- update the user documents under the resume settings
 router
