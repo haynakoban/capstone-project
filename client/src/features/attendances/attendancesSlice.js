@@ -9,6 +9,7 @@ const initialState = {
   daily_attendance: {},
   monthly_attendances: [],
   summary_attendances: [],
+  my_daily_attendances: [],
   my_summary_attendances: {},
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
@@ -119,6 +120,24 @@ export const fetchMySummaryAttendance = createAsyncThunk(
 
       const response = await axios.get(
         `api/attendances/summary/${company_id}/${user_id}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch my daily attendance
+export const fetchMyDailyAttendance = createAsyncThunk(
+  'attendances/fetchMyDailyAttendance',
+  async (initialState) => {
+    try {
+      const { company_id, attendance_date, user_id } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/daily/${company_id}/${attendance_date}/${user_id}`
       );
 
       return response.data;
@@ -321,6 +340,14 @@ const attendancesSlice = createSlice({
             0
           )}/486 Hours`;
         }
+      })
+      .addCase(fetchMyDailyAttendance.fulfilled, (state, action) => {
+        if (action.payload.user && action.payload.attendances) {
+          const { attendances, user } = action.payload;
+
+          state.my_daily_attendances = attendances;
+          state.my_daily_attendances[0].name = user?.name;
+        }
       });
   },
 });
@@ -334,6 +361,8 @@ export const getSummaryAttendances = (state) =>
   state.attendances.summary_attendances;
 export const getMySummaryAttendances = (state) =>
   state.attendances.my_summary_attendances;
+export const getMyDailyAttendances = (state) =>
+  state.attendances.my_daily_attendances;
 
 // get daily csv
 export const getDailyCSV = (state) => {
@@ -467,7 +496,42 @@ export const getSummaryCSV = (state) => {
   return csv;
 };
 
-// get summary csv
+// get my daily csv
+export const getMyDailyCSV = (state) => {
+  const items = state.attendances.my_daily_attendances;
+  const day = state.attendances.my_daily_attendances?.[0]?.attendance_date;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      attendance_date: item?.attendance_date,
+      in_time: item?.in_time ? TimeFormatter(item?.in_time) : '00:00',
+      out_time: item?.out_time ? TimeFormatter(item?.out_time) : '00:00',
+      status: item?.status,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Attendance Date', 'In Time', 'Out Time', 'Status'];
+  const fields = ['name', 'attendance_date', 'in_time', 'out_time', 'status'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return { csv, day };
+};
+
+// get my summary csv
 export const getMySummaryCSV = (state) => {
   const items = state.attendances.my_summary_attendances;
 

@@ -284,7 +284,7 @@ const fetchMonthlyAttendance = async (req, res, next) => {
 };
 
 // fetch My Summary Attendance
-// get method | api/attendances/summary/:company_id/:user_id
+// get method | api/attendances/summary/:id/:user_id
 const fetchMySummaryAttendance = async (req, res, next) => {
   try {
     const { id, user_id } = req.params;
@@ -312,10 +312,40 @@ const fetchMySummaryAttendance = async (req, res, next) => {
   }
 };
 
+// fetch Daily Attendance
+// get method | api/attendances/daily/:company_id/:attendance_date/:user_id
+const fetchMyDailyAttendance = async (req, res, next) => {
+  try {
+    const { company_id, attendance_date, user_id } = req.params;
+
+    if (!company_id && !attendance_date && !user_id)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const attendances = await Attendances.find({
+      $and: [{ company_id }, { attendance_date }, { user_id }],
+    });
+
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
+    if (attendances?.length > 0) {
+      return res.json({ attendances, user });
+    }
+
+    return res.json({ err: 'cannot find daily attendance' });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
+  fetchMyDailyAttendance,
   fetchMySummaryAttendance,
   fetchSummaryAttendance,
   outTimeDailyAttendance,

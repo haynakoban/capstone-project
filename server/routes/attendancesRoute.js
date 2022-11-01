@@ -11,6 +11,11 @@ router
   .post(auth, attendancesController.createDailyAttendance)
   .put(auth, attendancesController.updateDailyAttendance);
 
+// get method - fetch my daily attendance
+router
+  .route('/daily/:company_id/:attendance_date/:user_id')
+  .get(attendancesController.fetchMyDailyAttendance);
+
 // get method - fetch monthly attendance
 router
   .route('/monthly/:company_id/:attendance_date')
