@@ -1,5 +1,4 @@
-import { IconButton, Paper, Stack, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Paper, Stack, Typography } from '@mui/material';
 import {
   StackContainer,
   StyledContainer,
@@ -18,6 +17,7 @@ import {
   ProfileAction,
   SchoolAction,
 } from '../../components/settings';
+import AccountAction from '../../components/settings/AccountAction';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -190,11 +190,9 @@ const Profile = () => {
             justifyContent='space-between'
           >
             <Typography variant='h6' fontWeight={700}>
-              Security
+              Account
             </Typography>
-            <IconButton size='small'>
-              <EditIcon />
-            </IconButton>
+            <AccountAction />
           </Stack>
 
           <StackContainer>

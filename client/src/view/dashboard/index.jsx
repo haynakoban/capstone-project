@@ -1,11 +1,9 @@
-import { Box, Typography } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import { Box, Container, Typography } from '@mui/material';
 
-import DashboardHeader from '../../components/dashboard/header';
-import PostCard from '../../components/dashboard/body/PostCard';
-import DashboardFooter from '../../components/dashboard/footer';
 import RoomLayout from '../../layout/RoomLayout';
+import DashboardHeader from '../../components/dashboard/header';
+import PostCard from '../../components/dashboard/PostCard';
+import CardMemberIcon from '../../components/cards/CardMemberIcon';
 
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -20,21 +18,10 @@ import {
   fetchLatestPost,
   selectLatestPost,
 } from '../../features/posts/postsSlice';
-
-const Tasks = [
-  {
-    text: 'Back-end Development ',
-    icon: <RadioButtonUncheckedIcon />,
-  },
-  {
-    text: 'Front-end Development',
-    icon: <CheckCircleIcon color='primary' />,
-  },
-  {
-    text: 'UI/UX DESIGNING',
-    icon: <CheckCircleIcon color='primary' />,
-  },
-];
+import {
+  fetchMySummaryAttendance,
+  getMySummaryAttendances,
+} from '../../features/attendances/attendancesSlice';
 
 const Dashboard = () => {
   const [auth, setAuth] = useState(false);
@@ -46,6 +33,7 @@ const Dashboard = () => {
 
   const latest_post = useSelector(selectLatestPost);
   const room_info = useSelector(getCompanyInfo);
+  const working_hours = useSelector(getMySummaryAttendances);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -56,7 +44,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
-  }, [room_id, dispatch]);
+
+    if (_user?._id) {
+      dispatch(
+        fetchMySummaryAttendance({ company_id: room_id, user_id: _user?._id })
+      );
+    }
+  }, [room_id, _user?._id, dispatch]);
 
   useEffect(() => {
     if (!_isUserAuth) {
@@ -95,33 +89,48 @@ const Dashboard = () => {
 
   return (
     <RoomLayout>
-      <Box display='flex' flexDirection='column'>
-        {/* header */}
-        {/* interns remaining and completed hours or;*/}
-        {/* meet up start button;*/}
-        <DashboardHeader _user={_user} />
+      <Box display='flex' justifyContent='space-between'>
+        <Container
+          maxWidth='md'
+          disableGutters
+          sx={{
+            marginLeft: 0,
+            width: {
+              xs: '100%',
+              sm: '100%',
+              md: 'calc(100% - 380px)',
+            },
+          }}
+        >
+          {/* header */}
+          {/* interns remaining and completed hours or;*/}
+          {/* meet up start button;*/}
+          <DashboardHeader _user={_user} working_hours={working_hours} />
 
-        {/* body */}
-        {/* announcements */}
-        <Box mt={3}>
-          <Typography
-            variant='body1'
-            component='div'
-            letterSpacing={1}
-            fontWeight={600}
-            textTransform='uppercase'
-            pl={3}
-          >
-            Latest Post :
-          </Typography>
+          {/* body */}
+          {/* announcements */}
+          <Box mt={3}>
+            <Typography
+              variant='body1'
+              component='div'
+              letterSpacing={1}
+              fontWeight={600}
+              textTransform='uppercase'
+              pl={3}
+              mb={1}
+            >
+              Latest Post :
+            </Typography>
 
-          {/* the post details */}
-          {content}
-        </Box>
+            {/* the post details */}
+            {content}
+          </Box>
 
-        {/* footer */}
-        {/* member and tasks */}
-        <DashboardFooter Tasks={Tasks} room_info={room_info} />
+          {/* can insert another design here */}
+        </Container>
+
+        {/* members */}
+        <CardMemberIcon members={room_info.members?.slice(0, 5)} />
       </Box>
     </RoomLayout>
   );

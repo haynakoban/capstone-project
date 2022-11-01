@@ -3,7 +3,7 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import { Fragment } from 'react';
 import StyledPaperCard from './StyledPaperCard';
 
-const DashboardHeader = ({ _user }) => {
+const DashboardHeader = ({ _user, working_hours }) => {
   return (
     <Fragment>
       {_user.isIntern ? (
@@ -17,11 +17,11 @@ const DashboardHeader = ({ _user }) => {
         >
           <StyledPaperCard
             text='Remaining Hours'
-            hours={_user?.internInfo?.workingHours?.remaining}
+            hours={working_hours?.remaining_hours}
           />
           <StyledPaperCard
             text='Completed Hours'
-            hours={_user?.internInfo?.workingHours?.completed}
+            hours={working_hours?.completed_hours}
           />
         </Box>
       ) : (

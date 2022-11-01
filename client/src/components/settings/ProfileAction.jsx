@@ -1,4 +1,6 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Button,
   FormControl,
@@ -13,12 +15,10 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 
 import { StyledModalBox } from '../global';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   getUserInfo,
   updateUserProfileInfo,
 } from '../../features/users/usersSlice';
-import { useEffect } from 'react';
 
 const ProfileAction = () => {
   const user = useSelector(getUserInfo);
@@ -34,9 +34,9 @@ const ProfileAction = () => {
 
   useEffect(() => {
     setValues({
-      name: user?.name ? user?.name : '',
-      address: user?.address ? user?.address : '',
-      gender: user?.gender ? user?.gender : '',
+      name: user?.name ?? '',
+      address: user?.address ?? '',
+      gender: user?.gender ?? '',
     });
   }, [user?.name, user?.address, user?.gender]);
 
