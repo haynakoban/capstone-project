@@ -125,7 +125,7 @@ const Daily = ({ company_id }) => {
     setPage(0);
   };
 
-  // for company
+  // handle when date change
   const handleFormSubmit = (company_id, date, user_id) => {
     if (_user?.internInfo?.companyInfo?.hasCompany) {
       dispatch(

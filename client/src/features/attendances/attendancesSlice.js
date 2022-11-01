@@ -10,6 +10,7 @@ const initialState = {
   monthly_attendances: [],
   summary_attendances: [],
   my_daily_attendances: [],
+  my_monthly_attendances: [],
   my_summary_attendances: {},
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
@@ -138,6 +139,24 @@ export const fetchMyDailyAttendance = createAsyncThunk(
 
       const response = await axios.get(
         `api/attendances/daily/${company_id}/${attendance_date}/${user_id}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch my monthly attendance
+export const fetchMyMonthlyAttendance = createAsyncThunk(
+  'attendances/fetchMyMonthlyAttendance',
+  async (initialState) => {
+    try {
+      const { company_id, attendance_date, user_id } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/monthly/${company_id}/${attendance_date}/${user_id}`
       );
 
       return response.data;
@@ -348,6 +367,53 @@ const attendancesSlice = createSlice({
           state.my_daily_attendances = attendances;
           state.my_daily_attendances[0].name = user?.name;
         }
+      })
+      .addCase(fetchMyMonthlyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.my_monthly_attendances = [];
+        }
+
+        if (action.payload?.attendances && action.payload?.user) {
+          const { attendances, user, month } = action.payload;
+
+          const ATTENDANCES_SIZE = attendances?.length;
+
+          state.my_monthly_attendances = [user];
+
+          // assign hours
+          state.my_monthly_attendances[0].month = month;
+
+          let summary = 0;
+          let total = 0;
+          let monthly = [];
+
+          for (let j = 0; j < ATTENDANCES_SIZE; j++) {
+            if (user?._id === attendances[j]?.user_id) {
+              total += 1;
+
+              if (attendances[j]?.status === 'Present') {
+                summary += 1;
+              }
+
+              // push the day and status
+              monthly?.unshift({
+                day: attendances[j]?.attendance_date,
+                status: attendances[j]?.status,
+              });
+            }
+          }
+
+          // summary
+          state.my_monthly_attendances[0].summary = `${summary}/${total} days`;
+
+          // sort monthly
+          const newMonth = monthly.sort((a, b) =>
+            a?.day > b?.day ? 1 : b?.day > a?.day ? -1 : 0
+          );
+
+          // monthly
+          state.my_monthly_attendances[0].monthly = newMonth;
+        }
       });
   },
 });
@@ -363,6 +429,8 @@ export const getMySummaryAttendances = (state) =>
   state.attendances.my_summary_attendances;
 export const getMyDailyAttendances = (state) =>
   state.attendances.my_daily_attendances;
+export const getMyMonthlyAttendances = (state) =>
+  state.attendances.my_monthly_attendances;
 
 // get daily csv
 export const getDailyCSV = (state) => {
@@ -529,6 +597,65 @@ export const getMyDailyCSV = (state) => {
   ].join('\r\n');
 
   return { csv, day };
+};
+
+// get my monthly csv
+export const getMyMonthlyCSV = (state) => {
+  const items = state.attendances.my_monthly_attendances;
+  const month = state.attendances.my_monthly_attendances?.[0]?.month;
+  const monthlyHeader = [];
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      month: item?.month,
+      name: item?.name,
+      monthly: item?.monthly,
+      summary: item?.summary,
+    };
+
+    item?.monthly.forEach((day) => {
+      // return true if day is in the monthlyheader, otherwise false
+      const res = monthlyHeader?.some((e) => e === day?.day);
+
+      // if res variable is false, add the day in the monthly header
+      if (!res) monthlyHeader?.push(day?.day);
+    });
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Month']?.concat(monthlyHeader);
+  const fields = ['name', 'summary', 'month'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) => {
+      // get user info: name, summary and month field
+      const getUserRow = fields.map((fieldName) =>
+        JSON.stringify(row?.[fieldName], replacer)
+      );
+
+      // get the rest of the day in month
+      const getDaysRow = monthlyHeader?.map((day) => {
+        const getDay = row?.monthly?.filter((d) => d?.day === day);
+
+        if (getDay?.length > 0) {
+          return JSON.stringify(getDay?.[0]?.status, replacer);
+        } else {
+          return null;
+        }
+      });
+
+      const getRow = getUserRow?.concat(getDaysRow)?.join(',');
+
+      return getRow;
+    }),
+  ].join('\r\n');
+
+  return { csv, month };
 };
 
 // get my summary csv

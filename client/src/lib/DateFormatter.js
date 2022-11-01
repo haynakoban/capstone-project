@@ -23,8 +23,8 @@ export const DailyAttendanceDateFormatter = (date) => {
 export const MonthlyAttendanceDateFormatter = (date) => {
   const d = new Date(`${date}`);
 
-  // sample output: 10 or 09
-  return `${format(d, 'MM')}`;
+  // sample output: 10 - 2022 or 01 - 1999
+  return `${format(d, 'MM - yyyy')}`;
 };
 
 export const isDatePast = (date) => {

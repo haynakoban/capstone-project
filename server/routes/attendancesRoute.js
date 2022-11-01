@@ -21,6 +21,11 @@ router
   .route('/monthly/:company_id/:attendance_date')
   .get(auth, attendancesController.fetchMonthlyAttendance);
 
+// get method - fetch my monthly attendance
+router
+  .route('/monthly/:company_id/:attendance_date/:user_id')
+  .get(attendancesController.fetchMyMonthlyAttendance);
+
 // get method - fetch my summary attendance
 router
   .route('/summary/:id/:user_id')

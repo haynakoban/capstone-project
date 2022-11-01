@@ -7,7 +7,7 @@ const {
 
 // validate attendance date
 const validateAttendanceDate = (date) => {
-  switch (date) {
+  switch (date?.slice(0, 2)) {
     case '01':
       return 'January';
     case '02':
@@ -254,6 +254,9 @@ const fetchMonthlyAttendance = async (req, res, next) => {
   try {
     const { company_id, attendance_date } = req.params;
 
+    const startsWith = attendance_date?.slice(0, 2);
+    const endsWith = attendance_date?.slice(-4);
+
     if (!company_id && !attendance_date)
       return res
         .status(400)
@@ -262,8 +265,19 @@ const fetchMonthlyAttendance = async (req, res, next) => {
     const month = validateAttendanceDate(attendance_date);
 
     const attendances = await Attendances.find({
-      company_id,
-      attendance_date: { $regex: attendance_date, $options: 'i' },
+      $and: [
+        { company_id },
+        {
+          $and: [
+            {
+              attendance_date: { $regex: `^${startsWith}`, $options: 'm' },
+            },
+            {
+              attendance_date: { $regex: `${endsWith}$`, $options: 'm' },
+            },
+          ],
+        },
+      ],
     });
 
     if (!attendances?.length > 0) {
@@ -312,7 +326,7 @@ const fetchMySummaryAttendance = async (req, res, next) => {
   }
 };
 
-// fetch Daily Attendance
+// fetch My Daily Attendance
 // get method | api/attendances/daily/:company_id/:attendance_date/:user_id
 const fetchMyDailyAttendance = async (req, res, next) => {
   try {
@@ -341,11 +355,62 @@ const fetchMyDailyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch My Monthly Attendance
+// get method | api/attendances/monthly/:company_id/:attendance_date/:user_id
+const fetchMyMonthlyAttendance = async (req, res, next) => {
+  try {
+    const { company_id, attendance_date, user_id } = req.params;
+
+    const startsWith = attendance_date?.slice(0, 2);
+    const endsWith = attendance_date?.slice(-4);
+
+    if (!company_id && !attendance_date && !user_id)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const month = validateAttendanceDate(attendance_date);
+
+    const attendances = await Attendances.find({
+      $and: [
+        { company_id },
+        { user_id },
+        {
+          $and: [
+            {
+              attendance_date: { $regex: `^${startsWith}`, $options: 'm' },
+            },
+            {
+              attendance_date: { $regex: `${endsWith}$`, $options: 'm' },
+            },
+          ],
+        },
+      ],
+    });
+
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
+    if (!attendances?.length > 0) {
+      return res.json({
+        err: 'cannot find attendance with company_id ',
+        company_id,
+      });
+    }
+
+    return res.json({ attendances, user, month });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
   fetchMyDailyAttendance,
+  fetchMyMonthlyAttendance,
   fetchMySummaryAttendance,
   fetchSummaryAttendance,
   outTimeDailyAttendance,
