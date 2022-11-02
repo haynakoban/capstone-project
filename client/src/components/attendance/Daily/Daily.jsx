@@ -39,11 +39,16 @@ import {
 import {
   fetchDailyAttendance,
   fetchMyDailyAttendance,
+  generateAttendances,
   getDailyAttendances,
   getDailyCSV,
   getMyDailyAttendances,
   getMyDailyCSV,
 } from '../../../features/attendances/attendancesSlice';
+import {
+  getMembers,
+  getRoomInfo,
+} from '../../../features/companies/companiesSlice';
 
 const Daily = ({ company_id }) => {
   const { _user } = useContext(AuthContext);
@@ -55,9 +60,9 @@ const Daily = ({ company_id }) => {
   const dispatch = useDispatch();
   const get_daily_attendances = useSelector(getDailyAttendances);
   const get_daily = useSelector(getMyDailyAttendances);
-
   const get_csv = useSelector(getDailyCSV);
   const get_my_csv = useSelector(getMyDailyCSV);
+  const members = useSelector(getMembers);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -65,6 +70,11 @@ const Daily = ({ company_id }) => {
       attendance_date: moment(),
     },
   });
+
+  // fetch room info
+  useEffect(() => {
+    if (company_id) dispatch(getRoomInfo(company_id)).unwrap();
+  }, [company_id, dispatch]);
 
   // fetch daily attendance
   // check if user intern or company
@@ -170,6 +180,26 @@ const Daily = ({ company_id }) => {
     }
   };
 
+  const handleGenerateAttendance = () => {
+    // filter the member
+    const listOfMembers = members?.filter((e) => e?.roles === 'member');
+
+    // filter the member who don't have attendance
+    const filterMembers = listOfMembers?.filter((e) => {
+      return !get_daily_attendances?.some((u) => u?.name === e?.name) && e;
+    });
+
+    dispatch(
+      generateAttendances({
+        users: filterMembers,
+        company_id,
+        attendance_date: DailyAttendanceDateFormatter(
+          getValues('attendance_date')
+        ),
+      })
+    );
+  };
+
   return (
     <Box>
       {/* calendar */}
@@ -193,6 +223,17 @@ const Daily = ({ company_id }) => {
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
+
+        {/* generate attendance  */}
+        {_user?.employeeInfo && (
+          <Button
+            variant='contained'
+            color='success'
+            onClick={handleGenerateAttendance}
+          >
+            Generate Attendance
+          </Button>
+        )}
       </Toolbar>
 
       <Divider

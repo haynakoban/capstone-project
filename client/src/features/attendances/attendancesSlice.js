@@ -30,6 +30,20 @@ export const createNewDailyAttendance = createAsyncThunk(
   }
 );
 
+// generate attendance
+export const generateAttendances = createAsyncThunk(
+  'attendances/generateAttendances',
+  async (initialState) => {
+    try {
+      const response = await axios.post('api/attendances/gen', initialState);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 // update daily attendance
 export const updateDailyAttendance = createAsyncThunk(
   'attendances/updateDailyAttendance',
@@ -413,6 +427,36 @@ const attendancesSlice = createSlice({
 
           // monthly
           state.my_monthly_attendances[0].monthly = newMonth;
+        }
+      })
+      .addCase(generateAttendances.fulfilled, (state, action) => {
+        if (action.payload?.attendances) {
+          const { attendances, users } = action.payload;
+
+          const genAttendances = attendances;
+
+          const ATTENDANCES_SIZE = attendances?.length;
+          const USERS_SIZE = users?.length;
+
+          // assign name with attendance
+          for (let i = 0; i < ATTENDANCES_SIZE; i++) {
+            for (let j = 0; j < USERS_SIZE; j++) {
+              if (attendances[i].user_id === users[j]._id) {
+                genAttendances[i].name = users[j].name;
+              }
+            }
+          }
+
+          const listOfAttendances =
+            state.daily_attendances?.concat(genAttendances);
+
+          state.daily_attendances = listOfAttendances;
+        } else if (action.payload?.attendance) {
+          const { attendance, user } = action.payload;
+
+          attendance.name = user?.name;
+
+          state.daily_attendances = [...state.daily_attendances, attendance];
         }
       });
   },

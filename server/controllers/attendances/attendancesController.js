@@ -37,6 +37,63 @@ const validateAttendanceDate = (date) => {
   }
 };
 
+// generate attendance
+// post method | api/attendances/gen
+const generateAttendances = async (req, res, next) => {
+  try {
+    const { users, company_id, attendance_date } = req.body;
+
+    if (!company_id && !attendance_date)
+      return res.json({ err: 'required field must be filled' });
+
+    if (users?.length === 0) {
+      return res.json({ err: 'no users' });
+    } else if (users?.length === 1) {
+      // insert 1
+      const createAttendance = await Attendances.create({
+        attendance_date,
+        status: 'Absent',
+        user_id: ObjectId(users?.[0]?._id),
+        company_id: ObjectId(company_id),
+      });
+
+      const findUser = await Users?.findById({ _id: users?.[0]?._id }, 'name');
+
+      if (!findUser) {
+        return res.json({ err: 'no users found' });
+      }
+
+      return res.json({ attendance: createAttendance, user: findUser });
+    } else {
+      const getIds = users?.map((e) => e?._id);
+
+      const newUsers = getIds?.map((e) => {
+        const user = {
+          attendance_date,
+          status: 'Absent',
+          user_id: ObjectId(e),
+          company_id: ObjectId(company_id),
+        };
+
+        return user;
+      });
+
+      // intern many
+      const createAttendance = await Attendances?.insertMany(newUsers);
+
+      const findUsers = await Users?.find({ _id: { $in: getIds } }, 'name');
+
+      if (findUsers?.length === 0) {
+        return res.json({ err: 'no users found' });
+      }
+
+      return res.json({ attendances: createAttendance, users: findUsers });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 // create new daily attendance
 // post method | api/attendances
 const createDailyAttendance = async (req, res, next) => {
@@ -413,6 +470,7 @@ module.exports = {
   fetchMyMonthlyAttendance,
   fetchMySummaryAttendance,
   fetchSummaryAttendance,
+  generateAttendances,
   outTimeDailyAttendance,
   updateDailyAttendance,
 };
