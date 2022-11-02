@@ -22,7 +22,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
@@ -30,17 +30,24 @@ import MonthlyRow from './MonthlyRow';
 import { MonthlyAttendanceDateFormatter } from '../../../lib/DateFormatter';
 import {
   fetchMonthlyAttendance,
+  fetchMyMonthlyAttendance,
   getMonthlyAttendances,
   getMonthlyCSV,
+  getMyMonthlyAttendances,
+  getMyMonthlyCSV,
 } from '../../../features/attendances/attendancesSlice';
+import { AuthContext } from '../../../lib/authContext';
 
 const Monthly = ({ company_id }) => {
+  const { _user } = useContext(AuthContext);
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
 
   const dispatch = useDispatch();
   const get_monthly_attendances = useSelector(getMonthlyAttendances);
+  const get_monthly = useSelector(getMyMonthlyAttendances);
   const get_csv = useSelector(getMonthlyCSV);
+  const get_my_csv = useSelector(getMyMonthlyCSV);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -49,56 +56,96 @@ const Monthly = ({ company_id }) => {
     },
   });
 
+  // fetch daily attendance
+  // check if user intern or company
   useEffect(() => {
     if (company_id) {
-      dispatch(
-        fetchMonthlyAttendance({
-          company_id,
-          attendance_date: MonthlyAttendanceDateFormatter(
-            getValues('attendance_date')
-          ),
-        })
-      );
+      if (_user?.internInfo?.companyInfo?.hasCompany) {
+        dispatch(
+          fetchMyMonthlyAttendance({
+            company_id,
+            attendance_date: MonthlyAttendanceDateFormatter(
+              getValues('attendance_date')
+            ),
+            user_id: _user?._id,
+          })
+        );
+      } else {
+        dispatch(
+          fetchMonthlyAttendance({
+            company_id,
+            attendance_date: MonthlyAttendanceDateFormatter(
+              getValues('attendance_date')
+            ),
+          })
+        );
+      }
     }
-  }, [dispatch, company_id, getValues]);
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    _user?._id,
+    dispatch,
+    company_id,
+    getValues,
+  ]);
 
   // handle members
   useEffect(() => {
-    setSortedName(get_monthly_attendances);
-  }, [get_monthly_attendances]);
+    if (_user?.internInfo?.companyInfo?.hasCompany && get_monthly?.[0]?._id) {
+      setSortedName(get_monthly);
+    } else {
+      setSortedName(get_monthly_attendances);
+    }
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    get_monthly_attendances,
+    get_monthly,
+  ]);
 
   // handle change month
   const handleOnChangeMonth = (date) => {
     if (company_id) {
-      dispatch(
-        fetchMonthlyAttendance({
-          company_id,
-          attendance_date: MonthlyAttendanceDateFormatter(date),
-        })
-      );
+      if (_user?.internInfo?.companyInfo?.hasCompany) {
+        dispatch(
+          fetchMyMonthlyAttendance({
+            company_id,
+            attendance_date: MonthlyAttendanceDateFormatter(date),
+            user_id: _user?._id,
+          })
+        );
+      } else {
+        dispatch(
+          fetchMonthlyAttendance({
+            company_id,
+            attendance_date: MonthlyAttendanceDateFormatter(date),
+          })
+        );
+      }
     }
   };
 
   // handle sort by name
   const handleSortByName = () => {
-    if (order === 'asc') {
-      const users = [...get_monthly_attendances];
+    if (_user?.employeeInfo) {
+      if (order === 'asc') {
+        const users = [...get_monthly_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        b?.name.localeCompare(a?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          b?.name.localeCompare(a?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('desc');
-    } else if (order === 'desc') {
-      const users = [...get_monthly_attendances];
+        setSortedName(orderedNames);
+        setOrder('desc');
+      } else if (order === 'desc') {
+        const users = [...get_monthly_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        a?.name.localeCompare(b?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          a?.name.localeCompare(b?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('asc');
+        setSortedName(orderedNames);
+        setOrder('asc');
+      }
     }
   };
 
@@ -149,9 +196,13 @@ const Monthly = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() =>
-                FileDownload(get_csv?.csv, `${get_csv?.month}.csv`)
-              }
+              onClick={() => {
+                if (_user?.internInfo?.companyInfo?.hasCompany) {
+                  FileDownload(get_my_csv?.csv, `${get_my_csv?.month}.csv`);
+                } else {
+                  FileDownload(get_csv?.csv, `${get_csv?.month}.csv`);
+                }
+              }}
             >
               Download
             </Button>

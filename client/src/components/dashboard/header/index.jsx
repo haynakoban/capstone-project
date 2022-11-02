@@ -17,11 +17,11 @@ const DashboardHeader = ({ _user, working_hours }) => {
         >
           <StyledPaperCard
             text='Remaining Hours'
-            hours={working_hours?.remaining_hours}
+            hours={working_hours?.int_remaining_hours}
           />
           <StyledPaperCard
             text='Completed Hours'
-            hours={working_hours?.completed_hours}
+            hours={working_hours?.int_completed_hours}
           />
         </Box>
       ) : (

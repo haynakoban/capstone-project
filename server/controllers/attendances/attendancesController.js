@@ -7,7 +7,7 @@ const {
 
 // validate attendance date
 const validateAttendanceDate = (date) => {
-  switch (date) {
+  switch (date?.slice(0, 2)) {
     case '01':
       return 'January';
     case '02':
@@ -34,6 +34,63 @@ const validateAttendanceDate = (date) => {
       return 'December';
     default:
       return '';
+  }
+};
+
+// generate attendance
+// post method | api/attendances/gen
+const generateAttendances = async (req, res, next) => {
+  try {
+    const { users, company_id, attendance_date } = req.body;
+
+    if (!company_id && !attendance_date)
+      return res.json({ err: 'required field must be filled' });
+
+    if (users?.length === 0) {
+      return res.json({ err: 'no users' });
+    } else if (users?.length === 1) {
+      // insert 1
+      const createAttendance = await Attendances.create({
+        attendance_date,
+        status: 'Absent',
+        user_id: ObjectId(users?.[0]?._id),
+        company_id: ObjectId(company_id),
+      });
+
+      const findUser = await Users?.findById({ _id: users?.[0]?._id }, 'name');
+
+      if (!findUser) {
+        return res.json({ err: 'no users found' });
+      }
+
+      return res.json({ attendance: createAttendance, user: findUser });
+    } else {
+      const getIds = users?.map((e) => e?._id);
+
+      const newUsers = getIds?.map((e) => {
+        const user = {
+          attendance_date,
+          status: 'Absent',
+          user_id: ObjectId(e),
+          company_id: ObjectId(company_id),
+        };
+
+        return user;
+      });
+
+      // intern many
+      const createAttendance = await Attendances?.insertMany(newUsers);
+
+      const findUsers = await Users?.find({ _id: { $in: getIds } }, 'name');
+
+      if (findUsers?.length === 0) {
+        return res.json({ err: 'no users found' });
+      }
+
+      return res.json({ attendances: createAttendance, users: findUsers });
+    }
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -254,6 +311,9 @@ const fetchMonthlyAttendance = async (req, res, next) => {
   try {
     const { company_id, attendance_date } = req.params;
 
+    const startsWith = attendance_date?.slice(0, 2);
+    const endsWith = attendance_date?.slice(-4);
+
     if (!company_id && !attendance_date)
       return res
         .status(400)
@@ -262,8 +322,19 @@ const fetchMonthlyAttendance = async (req, res, next) => {
     const month = validateAttendanceDate(attendance_date);
 
     const attendances = await Attendances.find({
-      company_id,
-      attendance_date: { $regex: attendance_date, $options: 'i' },
+      $and: [
+        { company_id },
+        {
+          $and: [
+            {
+              attendance_date: { $regex: `^${startsWith}`, $options: 'm' },
+            },
+            {
+              attendance_date: { $regex: `${endsWith}$`, $options: 'm' },
+            },
+          ],
+        },
+      ],
     });
 
     if (!attendances?.length > 0) {
@@ -284,7 +355,7 @@ const fetchMonthlyAttendance = async (req, res, next) => {
 };
 
 // fetch My Summary Attendance
-// get method | api/attendances/summary/:company_id/:user_id
+// get method | api/attendances/summary/:id/:user_id
 const fetchMySummaryAttendance = async (req, res, next) => {
   try {
     const { id, user_id } = req.params;
@@ -298,11 +369,94 @@ const fetchMySummaryAttendance = async (req, res, next) => {
       $and: [{ company_id: id }, { user_id }],
     });
 
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
     if (attendances?.length > 0) {
-      return res.json({ attendances });
+      return res.json({ attendances, user });
     }
 
     return res.json({ msg: "you don't attendance yet!" });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// fetch My Daily Attendance
+// get method | api/attendances/daily/:company_id/:attendance_date/:user_id
+const fetchMyDailyAttendance = async (req, res, next) => {
+  try {
+    const { company_id, attendance_date, user_id } = req.params;
+
+    if (!company_id && !attendance_date && !user_id)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const attendances = await Attendances.find({
+      $and: [{ company_id }, { attendance_date }, { user_id }],
+    });
+
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
+    if (attendances?.length > 0) {
+      return res.json({ attendances, user });
+    }
+
+    return res.json({ err: 'cannot find daily attendance' });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// fetch My Monthly Attendance
+// get method | api/attendances/monthly/:company_id/:attendance_date/:user_id
+const fetchMyMonthlyAttendance = async (req, res, next) => {
+  try {
+    const { company_id, attendance_date, user_id } = req.params;
+
+    const startsWith = attendance_date?.slice(0, 2);
+    const endsWith = attendance_date?.slice(-4);
+
+    if (!company_id && !attendance_date && !user_id)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const month = validateAttendanceDate(attendance_date);
+
+    const attendances = await Attendances.find({
+      $and: [
+        { company_id },
+        { user_id },
+        {
+          $and: [
+            {
+              attendance_date: { $regex: `^${startsWith}`, $options: 'm' },
+            },
+            {
+              attendance_date: { $regex: `${endsWith}$`, $options: 'm' },
+            },
+          ],
+        },
+      ],
+    });
+
+    const user = await Users.findById({ _id: user_id }, 'name').exec();
+
+    if (!user) return res.json({ err: 'cannot find user: ', user_id });
+
+    if (!attendances?.length > 0) {
+      return res.json({
+        err: 'cannot find attendance with company_id ',
+        company_id,
+      });
+    }
+
+    return res.json({ attendances, user, month });
   } catch (e) {
     next(e);
   }
@@ -312,8 +466,11 @@ module.exports = {
   createDailyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
+  fetchMyDailyAttendance,
+  fetchMyMonthlyAttendance,
   fetchMySummaryAttendance,
   fetchSummaryAttendance,
+  generateAttendances,
   outTimeDailyAttendance,
   updateDailyAttendance,
 };

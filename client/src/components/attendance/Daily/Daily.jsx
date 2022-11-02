@@ -38,9 +38,17 @@ import {
 } from '../../../lib/DateFormatter';
 import {
   fetchDailyAttendance,
+  fetchMyDailyAttendance,
+  generateAttendances,
   getDailyAttendances,
   getDailyCSV,
+  getMyDailyAttendances,
+  getMyDailyCSV,
 } from '../../../features/attendances/attendancesSlice';
+import {
+  getMembers,
+  getRoomInfo,
+} from '../../../features/companies/companiesSlice';
 
 const Daily = ({ company_id }) => {
   const { _user } = useContext(AuthContext);
@@ -51,8 +59,10 @@ const Daily = ({ company_id }) => {
 
   const dispatch = useDispatch();
   const get_daily_attendances = useSelector(getDailyAttendances);
-
+  const get_daily = useSelector(getMyDailyAttendances);
   const get_csv = useSelector(getDailyCSV);
+  const get_my_csv = useSelector(getMyDailyCSV);
+  const members = useSelector(getMembers);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -61,23 +71,56 @@ const Daily = ({ company_id }) => {
     },
   });
 
+  // fetch room info
+  useEffect(() => {
+    if (company_id) dispatch(getRoomInfo(company_id)).unwrap();
+  }, [company_id, dispatch]);
+
+  // fetch daily attendance
+  // check if user intern or company
   useEffect(() => {
     if (company_id) {
-      dispatch(
-        fetchDailyAttendance({
-          id: company_id,
-          attendance_date: DailyAttendanceDateFormatter(
-            getValues('attendance_date')
-          ),
-        })
-      );
+      if (_user?.internInfo?.companyInfo?.hasCompany) {
+        dispatch(
+          fetchMyDailyAttendance({
+            company_id,
+            attendance_date: DailyAttendanceDateFormatter(
+              getValues('attendance_date')
+            ),
+            user_id: _user?._id,
+          })
+        );
+      } else {
+        dispatch(
+          fetchDailyAttendance({
+            id: company_id,
+            attendance_date: DailyAttendanceDateFormatter(
+              getValues('attendance_date')
+            ),
+          })
+        );
+      }
     }
-  }, [dispatch, company_id, getValues]);
+  }, [
+    _user?._id,
+    _user?.internInfo?.companyInfo?.hasCompany,
+    dispatch,
+    company_id,
+    getValues,
+  ]);
 
   // handle members
   useEffect(() => {
-    setSortedName(get_daily_attendances);
-  }, [get_daily_attendances]);
+    if (_user?.internInfo?.companyInfo?.hasCompany && get_daily?.[0]?._id) {
+      setSortedName(get_daily);
+    } else {
+      setSortedName(get_daily_attendances);
+    }
+  }, [
+    _user?.internInfo?.companyInfo?.hasCompany,
+    get_daily,
+    get_daily_attendances,
+  ]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -92,36 +135,69 @@ const Daily = ({ company_id }) => {
     setPage(0);
   };
 
-  const handleFormSubmit = (company_id, date) => {
-    dispatch(
-      fetchDailyAttendance({
-        id: company_id,
-        attendance_date: DailyAttendanceDateFormatter(date),
-      })
-    );
+  // handle when date change
+  const handleFormSubmit = (company_id, date, user_id) => {
+    if (_user?.internInfo?.companyInfo?.hasCompany) {
+      dispatch(
+        fetchMyDailyAttendance({
+          company_id,
+          attendance_date: DailyAttendanceDateFormatter(date),
+          user_id,
+        })
+      );
+    } else {
+      dispatch(
+        fetchDailyAttendance({
+          id: company_id,
+          attendance_date: DailyAttendanceDateFormatter(date),
+        })
+      );
+    }
   };
 
   // handle sort by name
   const handleSortByName = () => {
-    if (order === 'asc') {
-      const users = [...get_daily_attendances];
+    if (_user?.employeeInfo) {
+      if (order === 'asc') {
+        const users = [...get_daily_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        b?.name.localeCompare(a?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          b?.name.localeCompare(a?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('desc');
-    } else if (order === 'desc') {
-      const users = [...get_daily_attendances];
+        setSortedName(orderedNames);
+        setOrder('desc');
+      } else if (order === 'desc') {
+        const users = [...get_daily_attendances];
 
-      const orderedNames = users?.sort((a, b) =>
-        a?.name.localeCompare(b?.name)
-      );
+        const orderedNames = users?.sort((a, b) =>
+          a?.name.localeCompare(b?.name)
+        );
 
-      setSortedName(orderedNames);
-      setOrder('asc');
+        setSortedName(orderedNames);
+        setOrder('asc');
+      }
     }
+  };
+
+  const handleGenerateAttendance = () => {
+    // filter the member
+    const listOfMembers = members?.filter((e) => e?.roles === 'member');
+
+    // filter the member who don't have attendance
+    const filterMembers = listOfMembers?.filter((e) => {
+      return !get_daily_attendances?.some((u) => u?.name === e?.name) && e;
+    });
+
+    dispatch(
+      generateAttendances({
+        users: filterMembers,
+        company_id,
+        attendance_date: DailyAttendanceDateFormatter(
+          getValues('attendance_date')
+        ),
+      })
+    );
   };
 
   return (
@@ -142,11 +218,22 @@ const Daily = ({ company_id }) => {
             value={watch('attendance_date')}
             onChange={(date) => {
               setValue('attendance_date', date);
-              handleFormSubmit(company_id, date);
+              handleFormSubmit(company_id, date, _user?._id);
             }}
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
+
+        {/* generate attendance  */}
+        {_user?.employeeInfo && (
+          <Button
+            variant='contained'
+            color='success'
+            onClick={handleGenerateAttendance}
+          >
+            Generate Attendance
+          </Button>
+        )}
       </Toolbar>
 
       <Divider
@@ -176,7 +263,13 @@ const Daily = ({ company_id }) => {
               sx={{
                 textTransform: 'capitalize',
               }}
-              onClick={() => FileDownload(get_csv?.csv, `${get_csv?.day}.csv`)}
+              onClick={() => {
+                if (_user?.internInfo?.companyInfo?.hasCompany) {
+                  FileDownload(get_my_csv?.csv, `${get_my_csv?.day}.csv`);
+                } else {
+                  FileDownload(get_csv?.csv, `${get_csv?.day}.csv`);
+                }
+              }}
             >
               Download
             </Button>

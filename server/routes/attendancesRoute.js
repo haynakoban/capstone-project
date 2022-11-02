@@ -11,10 +11,23 @@ router
   .post(auth, attendancesController.createDailyAttendance)
   .put(auth, attendancesController.updateDailyAttendance);
 
+// post method - generate attendances
+router.route('/gen').post(auth, attendancesController.generateAttendances);
+
+// get method - fetch my daily attendance
+router
+  .route('/daily/:company_id/:attendance_date/:user_id')
+  .get(attendancesController.fetchMyDailyAttendance);
+
 // get method - fetch monthly attendance
 router
   .route('/monthly/:company_id/:attendance_date')
   .get(auth, attendancesController.fetchMonthlyAttendance);
+
+// get method - fetch my monthly attendance
+router
+  .route('/monthly/:company_id/:attendance_date/:user_id')
+  .get(attendancesController.fetchMyMonthlyAttendance);
 
 // get method - fetch my summary attendance
 router
