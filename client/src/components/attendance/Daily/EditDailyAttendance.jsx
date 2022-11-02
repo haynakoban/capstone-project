@@ -20,6 +20,7 @@ import { useDispatch } from 'react-redux';
 
 import { StyledModalBoxAttendance } from '../../global';
 import { updateDailyAttendance } from '../../../features/attendances/attendancesSlice';
+import { FormatInOutTime } from '../../../lib/DateFormatter';
 
 const EditDailyAttendance = ({ intern, handleModalClose }) => {
   const dispatch = useDispatch();
@@ -30,13 +31,32 @@ const EditDailyAttendance = ({ intern, handleModalClose }) => {
       name: intern?.name,
       attendance_date: intern?.attendance_date,
       in_time: intern?.in_time,
-      out_time: moment(),
+      out_time: intern?.out_time ?? moment(),
       status: intern?.status,
     },
   });
 
   const handleFormSubmit = (data) => {
-    dispatch(updateDailyAttendance(data));
+    const { _id, name, attendance_date, status } = data;
+
+    const in_time = new Date(
+      `${watch('attendance_date')} ${FormatInOutTime(watch('in_time'))}`
+    );
+
+    const out_time = new Date(
+      `${watch('attendance_date')} ${FormatInOutTime(watch('out_time'))}`
+    );
+
+    dispatch(
+      updateDailyAttendance({
+        _id,
+        name,
+        attendance_date,
+        status,
+        in_time,
+        out_time,
+      })
+    );
 
     handleModalClose();
   };

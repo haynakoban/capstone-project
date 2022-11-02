@@ -38,3 +38,10 @@ export const DateToday = () => {
 
   return `${format(d, 'MMMM d, yyyy')}`;
 };
+
+export const FormatInOutTime = (date) => {
+  const d = new Date(`${date}`);
+
+  // sample out 01:24:02
+  return `${format(d, 'kk:mm:ss')}`;
+};
