@@ -242,7 +242,7 @@ const attendancesSlice = createSlice({
 
             for (let j = 0; j < ATTENDANCES_SIZE; j++) {
               if (users[i]._id === attendances[j].user_id) {
-                // completed hours
+                // check if present and if there is total hours
                 if (
                   attendances?.[j]?.status === 'Present' &&
                   attendances?.[j]?.total_hours &&
@@ -342,7 +342,7 @@ const attendancesSlice = createSlice({
 
           // assign hours
           for (let i = 0; i < ATTENDANCES_SIZE; i++) {
-            // check if there is total hours
+            // check if present and if there is total hours
             if (
               attendances?.[i]?.status === 'Present' &&
               attendances?.[i]?.total_hours &&
