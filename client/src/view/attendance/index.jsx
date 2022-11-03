@@ -16,6 +16,7 @@ import {
   getRoomInfo,
 } from '../../features/companies/companiesSlice';
 import { StyledContainer } from '../../components/global';
+import MediaModal from '../video/MediaModal';
 
 const Attendance = () => {
   const [value, setValue] = useState(0);
@@ -82,14 +83,7 @@ const Attendance = () => {
 
           {/* if intern show join meet, otherwise meet */}
           {_user?.employeeInfo ? (
-            <Button
-              variant='contained'
-              startIcon={<VideocamIcon />}
-              sx={{ textTransform: 'capitalize' }}
-              onClick={() => navigate(`/room/${room_id}/video`)}
-            >
-              Meet
-            </Button>
+            <MediaModal user={_user} />
           ) : (
             <Button
               variant='contained'

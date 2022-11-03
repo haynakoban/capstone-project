@@ -1,7 +1,8 @@
-import { Box, Button } from '@mui/material';
-import VideocamIcon from '@mui/icons-material/Videocam';
+import { Box } from '@mui/material';
 import { Fragment } from 'react';
+
 import StyledPaperCard from './StyledPaperCard';
+import MediaModal from '../../../view/video/MediaModal';
 
 const DashboardHeader = ({ _user, working_hours }) => {
   return (
@@ -26,14 +27,7 @@ const DashboardHeader = ({ _user, working_hours }) => {
         </Box>
       ) : (
         <Box display='flex' justifyContent='flex-end'>
-          <Button
-            variant='contained'
-            startIcon={<VideocamIcon />}
-            sx={{ textTransform: 'capitalize' }}
-            onClick={() => console.log('start a call')}
-          >
-            Meet
-          </Button>
+          <MediaModal user={_user} />
         </Box>
       )}
     </Fragment>
