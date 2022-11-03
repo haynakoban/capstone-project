@@ -23,6 +23,7 @@ import SingleTask from '../view/tasks/SingleTask';
 
 import Member from '../view/member';
 import Attendance from '../view/attendance';
+import Video from '../view/video';
 
 import Description from '../view/description';
 import CompanySettings from '../view/company_settings';
@@ -62,6 +63,8 @@ const AppRoutes = () => {
           <Route path='description' element={<Description />} />
 
           <Route path='settings' element={<CompanySettings />} />
+
+          <Route path='video' element={<Video />} />
         </Route>
       </Route>
       <Route path='login' element={<LogInPage />} />

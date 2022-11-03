@@ -80,19 +80,30 @@ const Attendance = () => {
             Today, {DateToday()}
           </Typography>
 
-          {/* if intern show join meet, otherwise create call */}
-          <Button
-            variant='contained'
-            startIcon={<VideocamIcon />}
-            sx={{
-              textTransform: 'capitalize',
-              alignSelf: 'flex-end',
-              mt: { xs: 1, sm: 0 },
-            }}
-            onClick={() => console.log('join a call')}
-          >
-            Join Meet
-          </Button>
+          {/* if intern show join meet, otherwise meet */}
+          {_user?.employeeInfo ? (
+            <Button
+              variant='contained'
+              startIcon={<VideocamIcon />}
+              sx={{ textTransform: 'capitalize' }}
+              onClick={() => navigate(`/room/${room_id}/video`)}
+            >
+              Meet
+            </Button>
+          ) : (
+            <Button
+              variant='contained'
+              startIcon={<VideocamIcon />}
+              sx={{
+                textTransform: 'capitalize',
+                alignSelf: 'flex-end',
+                mt: { xs: 1, sm: 0 },
+              }}
+              onClick={() => console.log('join a call')}
+            >
+              Join Meet
+            </Button>
+          )}
         </Box>
       </StyledContainer>
 

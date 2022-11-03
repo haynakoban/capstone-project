@@ -9,7 +9,8 @@ textarea::-webkit-scrollbar-track {
   background-color: #20212850 !important;
 }
 
-.comment::-webkit-scrollbar {
+.comment::-webkit-scrollbar,
+.video::-webkit-scrollbar {
   width: 0.4rem !important;
 }
 
@@ -18,6 +19,13 @@ textarea::-webkit-scrollbar-track {
 }
 .comment::-webkit-scrollbar-track {
   background-color: #20212850 !important;
+}
+
+.video::-webkit-scrollbar-thumb {
+  background-color: #f2f2f280 !important;
+}
+.video::-webkit-scrollbar-track {
+  background-color: #f2f2f250 !important;
 }
 
 .css-1lj81rs-MuiInputBase-root-MuiInput-root:before,
