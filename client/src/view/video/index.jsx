@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Card,
+  CardMedia,
   Container,
   Divider,
   FormControl,
@@ -18,11 +20,16 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 
-import VideoPlayer from './VideoPlayer';
-import { Fragment, useContext, useState } from 'react';
-import { AuthContext } from '../../lib/authContext';
+import Peer from 'simple-peer';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
 import { StyledModalBoxAttendance } from '../../components/global';
+
+import VideoPlayer from './VideoPlayer';
+import { useCallback } from 'react';
+import UserVideo from './UserVideo';
 
 const users = [
   { name: 'Bryan Cortez', type: 'offcam' },
@@ -50,12 +57,17 @@ const users = [
 ];
 
 const Video = () => {
-  const { _user } = useContext(AuthContext);
+  const { _user, socket } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(true);
   const [state, setState] = useState({
     video: true,
     audio: true,
   });
+
+  // video conf state and refs
+  const [peers, setPeers] = useState([]);
+  const userVideo = useRef();
+  const peersRef = useRef([]);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -76,10 +88,72 @@ const Video = () => {
   };
 
   const handleSubmit = () => {
-    console.log(state, _user, room_id);
+    navigator.mediaDevices.getUserMedia(state).then((stream) => {
+      console.log(stream);
+      userVideo.current.srcObject = stream;
+      socket.current?.emit('join room', room_id);
+    });
 
     handleModalClose();
   };
+
+  const createPeer = useCallback(
+    (userToSignal, callerID, stream) => {
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        stream,
+      });
+
+      peer.on('signal', (signal) => {
+        socket.current?.emit('sending signal', {
+          userToSignal,
+          callerID,
+          signal,
+        });
+      });
+
+      return peer;
+    },
+    [socket]
+  );
+
+  const addPeer = useCallback(
+    (incomingSignal, callerID, stream) => {
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream,
+      });
+
+      peer.on('signal', (signal) => {
+        socket.current?.emit('returning signal', { signal, callerID });
+      });
+
+      peer.signal(incomingSignal);
+
+      return peer;
+    },
+    [socket]
+  );
+
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia(state).then((stream) => {
+      socket.current.on('user joined', (payload) => {
+        const peer = addPeer(payload.signal, payload.callerID, stream);
+        peersRef.current?.push({
+          peerID: payload.callerID,
+          peer,
+        });
+        setPeers((users) => [...users, peer]);
+      });
+
+      socket.current?.on('receiving returned signal', (payload) => {
+        const item = peersRef.current.find((p) => p.peerID === payload.id);
+        item.peer.signal(payload.signal);
+      });
+    });
+  }, [room_id, socket, createPeer, addPeer, state]);
 
   return (
     <Box height='100vh' bgcolor='#363740' overflow='hidden'>
@@ -106,9 +180,39 @@ const Video = () => {
             className='video'
             p={1}
           >
-            {users.map((user, index) => (
-              <VideoPlayer key={index} user={user} />
-            ))}
+            {/* my video */}
+            {/* user video */}
+            <Card
+              sx={{
+                position: 'relative',
+                height: { xs: 140, sm: 200 },
+              }}
+            >
+              <Fragment>
+                <video
+                  ref={userVideo}
+                  playsInline
+                  style={{ width: '100%', height: '100%' }}
+                />
+                <Typography
+                  variant='subtitle1'
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    p: 2,
+                  }}
+                >
+                  Teya
+                </Typography>
+              </Fragment>
+              )}
+            </Card>
+            {/* <UserVideo ref={userVideo} />;
+            {peers.map((peer, index) => {
+              return <VideoPlayer key={index} peer={peer} />;
+            })} */}
           </Box>
 
           {/* control */}

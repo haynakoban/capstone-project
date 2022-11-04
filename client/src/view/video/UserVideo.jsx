@@ -1,16 +1,9 @@
 import { Avatar, Box, Card, CardMedia, Typography } from '@mui/material';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment } from 'react';
 import avatarTheme from '../../lib/avatar';
 
-const VideoPlayer = (props) => {
-  const { user = 'i' } = props;
-  const ref = useRef();
-
-  useEffect(() => {
-    props.peer.on('stream', (stream) => {
-      ref.current.srcObject = stream;
-    });
-  }, [props.peer]);
+const UserVideo = (props) => {
+  const { user = 'i', ref } = props;
 
   return (
     <Card
@@ -65,4 +58,4 @@ const VideoPlayer = (props) => {
     </Card>
   );
 };
-export default VideoPlayer;
+export default UserVideo;
