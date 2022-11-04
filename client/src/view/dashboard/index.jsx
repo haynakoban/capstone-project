@@ -105,7 +105,11 @@ const Dashboard = () => {
           {/* header */}
           {/* interns remaining and completed hours or;*/}
           {/* meet up start button;*/}
-          <DashboardHeader _user={_user} working_hours={working_hours} />
+          <DashboardHeader
+            _user={_user}
+            working_hours={working_hours}
+            room_id={room_id}
+          />
 
           {/* body */}
           {/* announcements */}

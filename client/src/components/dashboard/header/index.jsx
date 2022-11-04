@@ -1,10 +1,14 @@
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
+import VideocamIcon from '@mui/icons-material/Videocam';
+
+import { useNavigate } from 'react-router-dom';
 import { Fragment } from 'react';
 
 import StyledPaperCard from './StyledPaperCard';
-import MediaModal from '../../../view/video/MediaModal';
 
-const DashboardHeader = ({ _user, working_hours }) => {
+const DashboardHeader = ({ _user, working_hours, room_id }) => {
+  const navigate = useNavigate();
+
   return (
     <Fragment>
       {_user.isIntern ? (
@@ -27,7 +31,14 @@ const DashboardHeader = ({ _user, working_hours }) => {
         </Box>
       ) : (
         <Box display='flex' justifyContent='flex-end'>
-          <MediaModal user={_user} />
+          <Button
+            variant='contained'
+            startIcon={<VideocamIcon />}
+            sx={{ textTransform: 'capitalize' }}
+            onClick={() => navigate(`/room/${room_id}/video`)}
+          >
+            Meet
+          </Button>
         </Box>
       )}
     </Fragment>
