@@ -55,12 +55,19 @@ const socketToRoom = {};
 
 // socket.io : connection
 io.on('connection', (socket) => {
-  socket.on('join room', (roomID) => {
+  socket.on('join_room', (data) => {
+    socket.join(data);
+  });
+
+  socket.on('join call', (roomID) => {
+    socket.join(roomID);
+
     if (users[roomID]) {
       users[roomID].push(socket.id);
     } else {
       users[roomID] = [socket.id];
     }
+
     socketToRoom[socket.id] = roomID;
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
@@ -68,10 +75,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sending signal', (payload) => {
-    io.to(payload.userToSignal).emit('user joined', {
-      signal: payload.signal,
-      callerID: payload.callerID,
-    });
+    io.to(payload.userToSignal).emit('user joined', payload);
   });
 
   socket.on('returning signal', (payload) => {
@@ -79,10 +83,6 @@ io.on('connection', (socket) => {
       signal: payload.signal,
       id: socket.id,
     });
-  });
-
-  socket.on('join_room', (data) => {
-    socket.join(data);
   });
 
   socket.on('send_notif', (data) => {

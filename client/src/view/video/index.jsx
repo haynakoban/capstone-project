@@ -27,9 +27,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../lib/authContext';
 import { StyledModalBoxAttendance } from '../../components/global';
 
-import VideoPlayer from './VideoPlayer';
+// import VideoPlayer from './VideoPlayer';
 import { useCallback } from 'react';
-import UserVideo from './UserVideo';
+// import UserVideo from './UserVideo';
+import Users from './Users';
 
 const users = [
   { name: 'Bryan Cortez', type: 'offcam' },
@@ -87,15 +88,24 @@ const Video = () => {
     setState({ ...state, [prop]: !state[prop] });
   };
 
-  const handleSubmit = () => {
-    navigator.mediaDevices.getUserMedia(state).then((stream) => {
-      console.log(stream);
-      userVideo.current.srcObject = stream;
-      socket.current?.emit('join room', room_id);
-    });
+  const addPeer = useCallback(
+    (incomingSignal, callerID, stream) => {
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream,
+      });
 
-    handleModalClose();
-  };
+      peer.on('signal', (signal) => {
+        socket.current?.emit('returning signal', { signal, callerID });
+      });
+
+      peer.signal(incomingSignal);
+
+      return peer;
+    },
+    [socket]
+  );
 
   const createPeer = useCallback(
     (userToSignal, callerID, stream) => {
@@ -118,43 +128,148 @@ const Video = () => {
     [socket]
   );
 
-  const addPeer = useCallback(
-    (incomingSignal, callerID, stream) => {
-      const peer = new Peer({
-        initiator: false,
-        trickle: false,
-        stream,
-      });
+  const handleCreateMeet = () => {
+    // socket.current?.emit('join call', room_id);
+    // navigator.mediaDevices.getUserMedia(state).then((stream) => {
+    //   userVideo.current.srcObject = stream;
 
-      peer.on('signal', (signal) => {
-        socket.current?.emit('returning signal', { signal, callerID });
-      });
+    //   const peer = new Peer({
+    //     initiator: true,
+    //     trickle: false,
+    //     stream,
+    //   });
 
-      peer.signal(incomingSignal);
+    //   peer.on('signal', (signal) => {
+    //     socket.current?.emit('sending signal', {
+    //       userToSignal: room_id,
+    //       callerID: socket.current?.id,
+    //       signal,
+    //     });
+    //   });
+    // });
 
-      return peer;
-    },
-    [socket]
-  );
-
-  useEffect(() => {
     navigator.mediaDevices.getUserMedia(state).then((stream) => {
-      socket.current.on('user joined', (payload) => {
+      userVideo.current.srcObject = stream;
+      socket.current?.emit('join call', room_id);
+      socket.current?.on('all users', (users) => {
+        const peers = [];
+        users.forEach((userID) => {
+          const peer = createPeer(userID, socket.current.id, stream);
+          peersRef.current?.push({
+            peerID: userID,
+            peer,
+          });
+          peers.push(peer);
+        });
+        setPeers(peers);
+      });
+
+      socket.current?.on('user joined', (payload) => {
         const peer = addPeer(payload.signal, payload.callerID, stream);
         peersRef.current?.push({
           peerID: payload.callerID,
           peer,
         });
+
         setPeers((users) => [...users, peer]);
       });
 
       socket.current?.on('receiving returned signal', (payload) => {
-        const item = peersRef.current.find((p) => p.peerID === payload.id);
+        const item = peersRef.current?.find((p) => p.peerID === payload.id);
         item.peer.signal(payload.signal);
       });
     });
-  }, [room_id, socket, createPeer, addPeer, state]);
 
+    handleModalClose();
+  };
+
+  // const handleJoinMeet = () => {
+  //   navigator.mediaDevices.getUserMedia(state).then((stream) => {
+  //     const peer = new Peer({
+  //       initiator: false,
+  //       trickle: false,
+  //       stream,
+  //     });
+
+  //     socket.current?.on('user joined', (payload) => {
+  //       peer.on('signal', (signal) => {
+  //         socket.current.emit('returning signal', {
+  //           signal,
+  //           callerID: payload?.callerID,
+  //         });
+  //       });
+
+  //       peer.signal(payload?.signal);
+  //     });
+  //   });
+
+  //   handleModalClose();
+  // };
+
+  // useEffect(() => {
+  //   socket.current?.emit('join call', room_id);
+  // }, [room_id, socket]);
+
+  // useEffect(() => {
+  //   socket.current?.on('user joined', (payload) => {
+  //     console.log(payload);
+
+  //     navigator.mediaDevices.getUserMedia(state).then((stream) => {
+  //       userVideo.current.srcObject = stream;
+  //       socket.current.emit('join room', room_id);
+
+  //       socket.current.on('all users', (users) => {
+  //         console.log(users);
+  //         const peers = [];
+
+  //         users.forEach((userID) => {
+  //           const peer = createPeer(userID, socket.current.id, stream);
+  //           peersRef.current.push({
+  //             peerID: userID,
+  //             peer,
+  //           });
+  //           peers.push(peer);
+  //         });
+  //         setPeers(peers);
+  //       });
+
+  //       socket.current.on('user joined', (payload) => {
+  //         const peer = addPeer(payload.signal, payload.callerID, stream);
+  //         peersRef.current.push({
+  //           peerID: payload.callerID,
+  //           peer,
+  //         });
+
+  //         setPeers((users) => [...users, peer]);
+  //       });
+
+  //       socket.current.on('receiving returned signal', (payload) => {
+  //         const item = peersRef.current.find((p) => p.peerID === payload.id);
+  //         item.peer.signal(payload.signal);
+  //       });
+  //     });
+  //   });
+  // }, [room_id, state, socket, addPeer, createPeer]);
+
+  // useEffect(() => {
+  //   navigator.mediaDevices.getUserMedia(state).then((stream) => {
+  // socket.current.on('user joined', (payload) => {
+  //   const peer = addPeer(payload.signal, payload.callerID, stream);
+  //   peersRef.current?.push({
+  //     peerID: payload.callerID,
+  //     peer,
+  //   });
+  //   setPeers((users) => [...users, peer]);
+  // });
+
+  //     socket.current?.on('receiving returned signal', (payload) => {
+  //       const item = peersRef.current.find((p) => p.peerID === payload.id);
+  //       item.peer.signal(payload.signal);
+  //     });
+  //   });
+  // }, [room_id, socket, createPeer, addPeer, state]);
+
+  console.log(peers);
   return (
     <Box height='100vh' bgcolor='#363740' overflow='hidden'>
       {!modalOpen && (
@@ -185,14 +300,16 @@ const Video = () => {
             <Card
               sx={{
                 position: 'relative',
-                height: { xs: 140, sm: 200 },
               }}
             >
               <Fragment>
-                <video
-                  ref={userVideo}
+                <CardMedia
+                  component='video'
+                  sx={{ width: '100%', maxHeight: '100%' }}
+                  alt='sample 1'
                   playsInline
-                  style={{ width: '100%', height: '100%' }}
+                  autoPlay
+                  ref={userVideo}
                 />
                 <Typography
                   variant='subtitle1'
@@ -202,17 +319,17 @@ const Video = () => {
                     left: 0,
                     width: '100%',
                     p: 2,
+                    color: '#fff',
                   }}
                 >
-                  Teya
+                  {_user?.name}
                 </Typography>
               </Fragment>
-              )}
             </Card>
-            {/* <UserVideo ref={userVideo} />;
-            {peers.map((peer, index) => {
-              return <VideoPlayer key={index} peer={peer} />;
-            })} */}
+
+            {peers.map((peer, index) => (
+              <Users peer={peer} key={index} />
+            ))}
           </Box>
 
           {/* control */}
@@ -353,7 +470,14 @@ const Video = () => {
               </Button>
               <Button
                 variant='contained'
-                onClick={handleSubmit}
+                onClick={() => {
+                  // if (_user?.internInfo) {
+                  //   handleJoinMeet();
+                  // } else {
+                  //   handleCreateMeet();
+                  // }
+                  handleCreateMeet();
+                }}
                 type='submit'
                 sx={{ mx: 1 }}
               >

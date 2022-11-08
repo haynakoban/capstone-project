@@ -99,7 +99,7 @@ const Attendance = () => {
                 alignSelf: 'flex-end',
                 mt: { xs: 1, sm: 0 },
               }}
-              onClick={() => console.log('join a call')}
+              onClick={() => navigate(`/room/${room_id}/video`)}
             >
               Join Meet
             </Button>
