@@ -19,6 +19,8 @@ import SinglePost from '../view/newsfeed/SinglePost';
 // tasks
 import Tasks from '../view/tasks';
 import TasksList from '../view/tasks/TasksList';
+import PendingTask from '../view/tasks/PendingTask';
+import CompletedTask from '../view/tasks/CompletedTask';
 import SingleTask from '../view/tasks/SingleTask';
 
 import Member from '../view/member';
@@ -52,6 +54,8 @@ const AppRoutes = () => {
 
           <Route path='tasks' element={<Tasks />}>
             <Route index element={<TasksList />} />
+            <Route path='pending' element={<PendingTask />} />
+            <Route path='completed' element={<CompletedTask />} />
             <Route path=':id' element={<SingleTask />} />
           </Route>
 

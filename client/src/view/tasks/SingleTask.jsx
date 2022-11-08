@@ -143,12 +143,14 @@ const SingleTask = () => {
                   tasks={pending_tasks?.slice(0, 5)}
                   name='Pending Tasks'
                   type='pending'
+                  room_id={room_id}
                 />
               ) : (
                 <CardStatusTask
                   no='No Pending Tasks'
                   name='Pending Tasks'
                   type='pending'
+                  room_id={room_id}
                 />
               )}
               {/* completed - call the card status task */}
@@ -157,12 +159,14 @@ const SingleTask = () => {
                   tasks={completed_tasks?.slice(0, 5)}
                   name='Completed Tasks'
                   type='completed'
+                  room_id={room_id}
                 />
               ) : (
                 <CardStatusTask
                   no='No Tasks Completed'
                   name='Completed Tasks'
                   type='completed'
+                  room_id={room_id}
                 />
               )}
             </Box>
