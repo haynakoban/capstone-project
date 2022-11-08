@@ -190,10 +190,6 @@ const attendancesSlice = createSlice({
         if (action.payload?.createAttendance) {
           state.daily_attendance = action.payload?.createAttendance;
         }
-
-        if (action.payload.attendance) {
-          state.daily_attendance = action.payload.attendance;
-        }
       })
       .addCase(fetchDailyAttendance.fulfilled, (state, action) => {
         if (action.payload.users && action.payload.attendances) {
