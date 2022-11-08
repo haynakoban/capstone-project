@@ -551,6 +551,41 @@ const declineCompanyOffer = async (req, res, next) => {
   }
 };
 
+// leave room
+// put method | /api/users/leave/:id
+const leaveRoom = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) return res.status(400).json({ err: 'id must have value' });
+
+    const findUser = await Users.findById({ _id: id }, '-employeeInfo');
+
+    if (!findUser) return res.json({ err: 'cannot find user with id ', id });
+
+    const findCompany = await Companies.findById({
+      _id: findUser.internInfo.companyInfo.company_id,
+    });
+
+    if (!findCompany) return res.json({ err: 'cannot find room' });
+
+    const members = findCompany?.members?.filter((m) => m?.id !== id);
+
+    findCompany.members = members;
+
+    await findCompany.save();
+
+    findUser.internInfo.companyInfo.hasCompany = false;
+    findUser.internInfo.companyInfo.company_id = null;
+
+    const updatedUser = await findUser.save();
+
+    return res.json({ msg: 'success', user: updatedUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptCompanyOffer,
   changeAccountInfo,
@@ -560,6 +595,7 @@ module.exports = {
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
+  leaveRoom,
   updateUserDocs,
   updateUserProfileInfo,
   userLogin,

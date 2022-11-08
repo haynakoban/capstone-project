@@ -181,6 +181,22 @@ export const declineCompanyOffer = createAsyncThunk(
   }
 );
 
+// leave room
+export const leaveRoom = createAsyncThunk(
+  'users/leaveRoom',
+  async (initialState) => {
+    try {
+      const { id } = initialState;
+
+      const response = await axios.put(`api/users/leave/${id}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -260,6 +276,11 @@ const usersSlice = createSlice({
       .addCase(changeAccountInfo.fulfilled, (state, action) => {
         if (action.payload?.msg) {
           state.user.username = action.payload?.user?.username;
+        }
+      })
+      .addCase(leaveRoom.fulfilled, (state, action) => {
+        if (action.payload?.msg) {
+          state.user = action.payload?.user;
         }
       });
   },

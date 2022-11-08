@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Button,
   FormControl,
   IconButton,
   InputLabel,
@@ -28,6 +29,7 @@ import {
   getRoomInfo,
   searchUser,
 } from '../../features/companies/companiesSlice';
+import { leaveRoom } from '../../features/users/usersSlice';
 
 import RoomLayout from '../../layout/RoomLayout';
 import {
@@ -136,8 +138,28 @@ const Member = () => {
     }
   };
 
+  const handleLeaveRoom = () => {
+    dispatch(leaveRoom({ id: _user?._id }));
+
+    navigate('/');
+  };
+
   return (
     <RoomLayout>
+      {_user?.internInfo && (
+        <Toolbar
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            mb: 2,
+          }}
+        >
+          <Button color='error' variant='contained' onClick={handleLeaveRoom}>
+            Leave Room
+          </Button>
+        </Toolbar>
+      )}
+
       <StyledContainer width='lg'>
         <Toolbar
           sx={{

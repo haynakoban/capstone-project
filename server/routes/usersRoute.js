@@ -53,6 +53,9 @@ router
   .get(auth, usersController.getUserInfo)
   .put(auth, usersController.updateUserProfileInfo);
 
+// put method -- leave room
+router.route('/leave/:id').put(usersController.leaveRoom);
+
 // delete method - delete file
 router.route('/files/:id').delete(delete_file);
 
