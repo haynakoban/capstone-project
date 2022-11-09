@@ -131,7 +131,13 @@ const PendingTask = () => {
             <ArrowBackIosNewIcon />
           </IconButton>
 
-          {isPending ? <h4>Loading...</h4> : ListOfTasks}
+          {isPending ? (
+            <h4>Loading...</h4>
+          ) : ListOfTasks?.length > 0 ? (
+            ListOfTasks
+          ) : (
+            <h4>No pending task</h4>
+          )}
         </Container>
       </Box>
     </RoomLayout>

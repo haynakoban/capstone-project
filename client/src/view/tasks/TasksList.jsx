@@ -133,7 +133,13 @@ const TasksList = () => {
         >
           {!_user?.isIntern && <CreateTaskAction members={roomInfo?.members} />}
 
-          {isPending ? <h4>Loading...</h4> : ListOfTasks}
+          {isPending ? (
+            <h4>Loading...</h4>
+          ) : ListOfTasks?.length > 0 ? (
+            ListOfTasks
+          ) : (
+            <h4>No completed task</h4>
+          )}
         </Container>
 
         {/* list of tasks */}
