@@ -91,7 +91,7 @@ const Attendance = () => {
             }}
             onClick={() => console.log('join a call')}
           >
-            Join Meet
+            Meet
           </Button>
         </Box>
       </StyledContainer>
