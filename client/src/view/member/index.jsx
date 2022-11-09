@@ -5,6 +5,7 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
+  Modal,
   Paper,
   Select,
   Table,
@@ -19,7 +20,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,7 +30,6 @@ import {
   getRoomInfo,
   searchUser,
 } from '../../features/companies/companiesSlice';
-import { leaveRoom } from '../../features/users/usersSlice';
 
 import RoomLayout from '../../layout/RoomLayout';
 import {
@@ -39,6 +39,7 @@ import {
   StyledInputBase,
 } from '../../components/global';
 import avatarTheme from '../../lib/avatar';
+import LeaveRoomAction from '../../components/member/LeaveRoomAction';
 
 const Member = () => {
   const [type, setType] = useState('All');
@@ -47,6 +48,11 @@ const Member = () => {
   const [sortedNames, setSortedName] = useState([]);
   const [auth, setAuth] = useState(false);
   const { _user, _isUserAuth } = useContext(AuthContext);
+  const [open, setOpen] = useState(false);
+
+  // modal handler
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -138,12 +144,6 @@ const Member = () => {
     }
   };
 
-  const handleLeaveRoom = () => {
-    dispatch(leaveRoom({ id: _user?._id }));
-
-    navigate('/');
-  };
-
   return (
     <RoomLayout>
       {_user?.internInfo && (
@@ -154,9 +154,23 @@ const Member = () => {
             mb: 2,
           }}
         >
-          <Button color='error' variant='contained' onClick={handleLeaveRoom}>
+          <Button color='error' variant='contained' onClick={handleModalOpen}>
             Leave Room
           </Button>
+
+          <Modal
+            open={open}
+            onClose={handleModalClose}
+            aria-labelledby='modal-modal-title'
+            aria-describedby='modal-modal-description'
+          >
+            <Fragment>
+              <LeaveRoomAction
+                id={_user?._id}
+                handleModalClose={handleModalClose}
+              />
+            </Fragment>
+          </Modal>
         </Toolbar>
       )}
 
