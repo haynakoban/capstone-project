@@ -16,6 +16,9 @@ import Newsfeed from '../view/newsfeed';
 import PostsList from '../view/newsfeed/PostsList';
 import SinglePost from '../view/newsfeed/SinglePost';
 
+// video conferencing
+import Video from '../view/video';
+
 // tasks
 import Tasks from '../view/tasks';
 import TasksList from '../view/tasks/TasksList';
@@ -66,6 +69,8 @@ const AppRoutes = () => {
           <Route path='description' element={<Description />} />
 
           <Route path='settings' element={<CompanySettings />} />
+
+          <Route path='video' element={<Video />} />
         </Route>
       </Route>
       <Route path='login' element={<LogInPage />} />

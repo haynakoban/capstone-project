@@ -2732,6 +2732,18 @@
   dependencies:
     "debug" "4"
 
+"agora-rtc-sdk-ng@^4.14.2":
+  "integrity" "sha512-i3xy4wks8webXh0IAYcurIYD/6mqnonw0n+vBS3JcxcqPi38ksrADCBO0BKw+mhB9PNPP3yGG45SaUBqTxGYBw=="
+  "resolved" "https://registry.npmjs.org/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.14.2.tgz"
+  "version" "4.14.2"
+  dependencies:
+    "agora-rte-extension" "^1.0.22"
+
+"agora-rte-extension@^1.0.22":
+  "integrity" "sha512-k3yNrYVyzJRoQJjaJUktKUI1XRtf8J1XsW8OzYKFqGlS8WQRMsES1+Phj2rfuEriiLObfuyuCimG6KHQCt5tiw=="
+  "resolved" "https://registry.npmjs.org/agora-rte-extension/-/agora-rte-extension-1.2.3.tgz"
+  "version" "1.2.3"
+
 "ajv-formats@^2.1.1":
   "integrity" "sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA=="
   "resolved" "https://registry.npmjs.org/ajv-formats/-/ajv-formats-2.1.1.tgz"

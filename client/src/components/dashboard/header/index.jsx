@@ -2,8 +2,11 @@ import { Box, Button } from '@mui/material';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import { Fragment } from 'react';
 import StyledPaperCard from './StyledPaperCard';
+import { useNavigate } from 'react-router-dom';
 
-const DashboardHeader = ({ _user, working_hours }) => {
+const DashboardHeader = ({ _user, working_hours, room_id }) => {
+  const navigate = useNavigate();
+
   return (
     <Fragment>
       {_user.isIntern ? (
@@ -30,7 +33,7 @@ const DashboardHeader = ({ _user, working_hours }) => {
             variant='contained'
             startIcon={<VideocamIcon />}
             sx={{ textTransform: 'capitalize' }}
-            onClick={() => console.log('start a call')}
+            onClick={() => navigate(`/room/${room_id}/video`)}
           >
             Meet
           </Button>
