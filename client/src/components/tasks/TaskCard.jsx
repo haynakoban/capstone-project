@@ -15,6 +15,7 @@ import avatarTheme from '../../lib/avatar';
 const TaskCard = ({ task }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const room_id = pathname.slice(6).slice(0, 24);
 
   const DateFormatter = (date) => {
     const d = new Date(`${date}`);
@@ -89,7 +90,7 @@ const TaskCard = ({ task }) => {
         <Button
           variant='outlined'
           sx={{ px: '23px' }}
-          onClick={() => navigate(`${pathname}/${task?._id}`)}
+          onClick={() => navigate(`/room/${room_id}/tasks/${task?._id}`)}
         >
           View Task
         </Button>

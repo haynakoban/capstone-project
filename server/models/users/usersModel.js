@@ -52,16 +52,6 @@ const internInfo = {
       required: false,
     },
   },
-  workingHours: {
-    completed: {
-      type: Number,
-      required: false,
-    },
-    remaining: {
-      type: Number,
-      required: false,
-    },
-  },
   pending: {
     type: Array,
     default: [],

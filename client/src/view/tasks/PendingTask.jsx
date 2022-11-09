@@ -1,7 +1,6 @@
-import { Box, Container } from '@mui/material';
+import { Box, Container, IconButton } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
-import CreateTaskAction from '../../components/tasks/CreateTaskAction';
-import CardStatusTask from '../../components/cards/CardStatusTask';
 import TaskCard from '../../components/tasks/TaskCard';
 import RoomLayout from '../../layout/RoomLayout';
 
@@ -10,21 +9,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from '../../lib/authContext';
-import {
-  getCompanyInfo,
-  getRoomInfo,
-} from '../../features/companies/companiesSlice';
+import { getRoomInfo } from '../../features/companies/companiesSlice';
 
 import {
-  completedTasks,
   fetchTasks,
-  getCompletedTasks,
   getPendingTasks,
   pendingTasks,
-  selectAllTasks,
 } from '../../features/tasks/tasksSlice';
 
-const TasksList = () => {
+const PendingTask = () => {
   const [auth, setAuth] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [isPending, startTransition] = useTransition();
@@ -35,10 +28,7 @@ const TasksList = () => {
   const room_id = pathname.slice(6).slice(0, 24);
 
   const dispatch = useDispatch();
-  const roomInfo = useSelector(getCompanyInfo);
-  const tasksList = useSelector(selectAllTasks);
   const pending_tasks = useSelector(getPendingTasks);
-  const completed_tasks = useSelector(getCompletedTasks);
 
   useEffect(() => {
     dispatch(getRoomInfo(room_id)).unwrap();
@@ -49,9 +39,8 @@ const TasksList = () => {
   useEffect(() => {
     if (_user?._id) {
       dispatch(pendingTasks(_user?._id));
-      dispatch(completedTasks(_user?._id));
     }
-  }, [_user?._id, room_id, dispatch]);
+  }, [_user?._id, dispatch]);
 
   useEffect(() => {
     if (!_isUserAuth) {
@@ -84,22 +73,24 @@ const TasksList = () => {
   ]);
 
   useEffect(() => {
-    if (tasksList) {
+    if (pending_tasks) {
       if (_user?.isIntern) {
         startTransition(() => {
-          const tasks = tasksList?.filter((p) => {
+          const tasks = pending_tasks?.filter((p) => {
             return p.assignedTo.some((id) => id === _user?._id);
           });
 
           const orderedTasks = tasks
             ?.slice()
-            ?.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+            ?.sort((a, b) => b.updatedAt?.localeCompare(a.updatedAt));
 
           setTasks(orderedTasks);
         });
       } else {
         startTransition(() => {
-          const tasks = tasksList?.filter((p) => p.createdBy === _user?._id);
+          const tasks = pending_tasks?.filter(
+            (p) => p.createdBy === _user?._id
+          );
 
           const orderedTasks = tasks
             ?.slice()
@@ -109,7 +100,7 @@ const TasksList = () => {
         });
       }
     }
-  }, [_user?._id, _user?.isIntern, tasksList, dispatch]);
+  }, [_user?._id, _user?.isIntern, pending_tasks, dispatch]);
 
   const ListOfTasks = tasks.map((task) => {
     return <TaskCard task={task} key={task._id} />;
@@ -131,64 +122,19 @@ const TasksList = () => {
             },
           }}
         >
-          {!_user?.isIntern && <CreateTaskAction members={roomInfo?.members} />}
+          <IconButton
+            sx={{ mb: 2 }}
+            size='large'
+            // get the company id
+            onClick={() => navigate(`/room/${room_id}/tasks`)}
+          >
+            <ArrowBackIosNewIcon />
+          </IconButton>
 
           {isPending ? <h4>Loading...</h4> : ListOfTasks}
         </Container>
-
-        {/* list of tasks */}
-        {_user?.internInfo && (
-          <Box
-            maxWidth='xs'
-            width={356}
-            sx={{
-              display: {
-                xs: 'none',
-                sm: 'none',
-                md: 'block',
-                lg: 'block',
-              },
-              position: 'relative',
-            }}
-          >
-            <Box position='fixed' width='inherit'>
-              {/* pending - call the card status task */}
-              {pending_tasks?.length > 0 ? (
-                <CardStatusTask
-                  tasks={pending_tasks?.slice(0, 5)}
-                  name='Pending Tasks'
-                  type='pending'
-                  room_id={room_id}
-                />
-              ) : (
-                <CardStatusTask
-                  no='No Pending Tasks'
-                  name='Pending Tasks'
-                  type='pending'
-                  room_id={room_id}
-                />
-              )}
-              {/* completed - call the card status task */}
-              {completed_tasks?.length > 0 ? (
-                <CardStatusTask
-                  tasks={completed_tasks?.slice(0, 5)}
-                  name='Completed Tasks'
-                  type='completed'
-                  room_id={room_id}
-                />
-              ) : (
-                <CardStatusTask
-                  no='No Tasks Completed'
-                  name='Completed Tasks'
-                  type='completed'
-                  room_id={room_id}
-                />
-              )}
-            </Box>
-          </Box>
-        )}
       </Box>
     </RoomLayout>
   );
 };
-export default TasksList;
+export default PendingTask;

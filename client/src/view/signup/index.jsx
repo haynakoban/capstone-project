@@ -52,6 +52,7 @@ const SignUpPage = () => {
       password: '',
       confirmPassword: '',
     },
+    mode: 'onChange',
   });
 
   const [values, setValues] = useState({

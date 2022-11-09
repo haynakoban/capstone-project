@@ -114,23 +114,71 @@ const createDailyAttendance = async (req, res, next) => {
       return res.json({ err: 'cannot find company with id ', id });
     }
 
-    const findAttendance = await Attendances.find({
+    const findAttendance = await Attendances.findOne({
       attendance_date,
       user_id,
     });
 
-    if (findAttendance?.length > 0)
-      return res.json({ attendance: findAttendance?.[0] });
+    if (findAttendance) {
+      if (findCompany?.time?.isOn) {
+        // check if the in time is after the start time of the company settings
+        if (
+          isStartAndEndTime(
+            findCompany?.time?.start_time,
+            in_time,
+            findCompany?.time?.end_time
+          )
+        ) {
+          if (findAttendance?.in_time === undefined) {
+            findAttendance.in_time = in_time;
+            findAttendance.status = status;
 
-    if (findCompany?.time?.isOn) {
-      // check if the in time is after the start time of the company settings
-      if (
-        isStartAndEndTime(
-          findCompany?.time?.start_time,
-          in_time,
-          findCompany?.time?.end_time
-        )
-      ) {
+            const updatedAttendance = await findAttendance.save();
+
+            return res.json({
+              createAttendance: updatedAttendance,
+            });
+          } else {
+            return res.json({
+              createAttendance: findAttendance,
+            });
+          }
+        }
+      } else {
+        if (findAttendance?.in_time === undefined) {
+          findAttendance.in_time = in_time;
+          findAttendance.status = status;
+
+          const updatedAttendance = await findAttendance.save();
+
+          return res.json({ createAttendance: updatedAttendance });
+        } else {
+          return res.json({
+            createAttendance: findAttendance,
+          });
+        }
+      }
+    } else {
+      if (findCompany?.time?.isOn) {
+        // check if the in time is after the start time of the company settings
+        if (
+          isStartAndEndTime(
+            findCompany?.time?.start_time,
+            in_time,
+            findCompany?.time?.end_time
+          )
+        ) {
+          const createAttendance = await Attendances.create({
+            attendance_date,
+            in_time,
+            status,
+            user_id: ObjectId(user_id),
+            company_id: ObjectId(id),
+          });
+
+          return res.json({ createAttendance });
+        }
+      } else {
         const createAttendance = await Attendances.create({
           attendance_date,
           in_time,
@@ -141,16 +189,6 @@ const createDailyAttendance = async (req, res, next) => {
 
         return res.json({ createAttendance });
       }
-    } else {
-      const createAttendance = await Attendances.create({
-        attendance_date,
-        in_time,
-        status,
-        user_id: ObjectId(user_id),
-        company_id: ObjectId(id),
-      });
-
-      return res.json({ createAttendance });
     }
   } catch (error) {
     next(error);

@@ -12,7 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useNavigate } from 'react-router-dom';
 
-const CardStatusTask = ({ name, tasks = [], no = '', type }) => {
+const CardStatusTask = ({ name, tasks = [], no = '', type, room_id = '' }) => {
   const navigate = useNavigate();
 
   let ListOfTasks;
@@ -71,7 +71,7 @@ const CardStatusTask = ({ name, tasks = [], no = '', type }) => {
           fontWeight={500}
           sx={{ cursor: 'pointer' }}
           // fix the click event
-          onClick={() => console.log(`link to ${name}`)}
+          onClick={() => navigate(`/room/${room_id}/tasks/${type}`)}
         >
           View all
         </Typography>
