@@ -65,7 +65,7 @@ const Video = () => {
     client.on('user-left', handleUserLeft);
 
     client
-      .join(APP_ID, CHANNEL, TOKEN, _user._id)
+      .join(APP_ID, CHANNEL, TOKEN, _user?._id)
       .then((uid) =>
         Promise.all([
           AgoraRTC.createMicrophoneAndCameraTracks({
