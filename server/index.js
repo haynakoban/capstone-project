@@ -68,6 +68,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('user logout: ', socket.id));
 });
 
+// server running
 httpServer.listen(ACCESS_PORT, () => {
   console.log(`server running on port ${ACCESS_PORT}`);
 });
