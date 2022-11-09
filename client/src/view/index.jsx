@@ -118,11 +118,10 @@ const Home = () => {
                 mb={2}
                 textTransform='capitalize'
               >
-                1. Too easy to find internship
+                1. Register
               </Typography>
               <Typography variant='body1' component='p' fontWeight={600}>
-                it's easy to find internship in TrainNLearn with more than 1000+
-                partner companies
+                Fill the sign up form to create an account.
               </Typography>
             </Paper>
             <Paper
@@ -142,11 +141,11 @@ const Home = () => {
                 mb={2}
                 textTransform='capitalize'
               >
-                2. Too easy to find internship
+                2. Explore
               </Typography>
               <Typography variant='body1' component='p' fontWeight={600}>
-                it's easy to find internship in TrainNLearn with more than 1000+
-                partner companies
+                TrainNLearn makes it very simple to find an internship program
+                that you want to participate in. 
               </Typography>
             </Paper>
             <Paper
@@ -166,11 +165,11 @@ const Home = () => {
                 mb={2}
                 textTransform='capitalize'
               >
-                3. Too easy to find internship
+                3. Collaborate
               </Typography>
               <Typography variant='body1' component='p' fontWeight={600}>
-                it's easy to find internship in TrainNLearn with more than 1000+
-                partner companies
+                Collaborate, communicate, and make friends with your fellow
+                interns and employees.
               </Typography>
             </Paper>
             <Paper
@@ -190,11 +189,11 @@ const Home = () => {
                 mb={2}
                 textTransform='capitalize'
               >
-                4. Too easy to find internship
+                4. Grow
               </Typography>
               <Typography variant='body1' component='p' fontWeight={600}>
-                it's easy to find internship in TrainNLearn with more than 1000+
-                partner companies
+                Enhance your skills, knowledge, experience, and personality to
+                create a better life in the future.
               </Typography>
             </Paper>
           </Box>
