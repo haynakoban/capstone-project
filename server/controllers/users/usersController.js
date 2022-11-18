@@ -586,12 +586,45 @@ const leaveRoom = async (req, res, next) => {
   }
 };
 
+// get all users
+// get method | /api/users/admin/:type
+const getUsers = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+
+    if (type === 'true') {
+      const findUsers = await Users.find(
+        { isIntern: true },
+        '-employeeInfo'
+      ).sort({
+        createdAt: -1,
+        updatedAt: -1,
+      });
+
+      return res.json({ users: findUsers, type: 'interns' });
+    } else {
+      const findUsers = await Users.find(
+        { isIntern: false },
+        '-internInfo'
+      ).sort({
+        createdAt: -1,
+        updatedAt: -1,
+      });
+
+      return res.json({ users: findUsers, type: 'companies' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptCompanyOffer,
   changeAccountInfo,
   changeUsername,
   createNewUser,
   declineCompanyOffer,
+  getUsers,
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,

@@ -59,6 +59,9 @@ router.route('/leave/:id').put(usersController.leaveRoom);
 // delete method - delete file
 router.route('/files/:id').delete(delete_file);
 
+// get method - get all users
+router.route('/admin/:type').get(auth, usersController.getUsers);
+
 // put method - accept company offer
 // delete method - decline company offer
 router
