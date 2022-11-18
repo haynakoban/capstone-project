@@ -6,6 +6,8 @@ const initialState = {
   user_id: '',
   user: { isIntern: true },
   isAuthorized: true,
+  interns: [],
+  companies: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -197,6 +199,41 @@ export const leaveRoom = createAsyncThunk(
   }
 );
 
+// get all user
+export const getUsers = createAsyncThunk(
+  'users/getUsers',
+  async (initialState) => {
+    try {
+      const { type } = initialState;
+
+      const response = await axios.get(`api/users/admin/${type}`);
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// search users
+export const searchUsers = createAsyncThunk(
+  'users/searchUsers',
+  async (initialState) => {
+    try {
+      const { type } = initialState;
+
+      const response = await axios.post(
+        `api/users/admin/${type}`,
+        initialState
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -282,6 +319,31 @@ const usersSlice = createSlice({
         if (action.payload?.msg) {
           state.user = action.payload?.user;
         }
+      })
+      .addCase(getUsers.fulfilled, (state, action) => {
+        if (action.payload?.type === 'interns') {
+          state.interns = action.payload?.users;
+        }
+
+        if (action.payload?.type === 'companies') {
+          state.companies = action.payload?.users;
+        }
+      })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        if (action.payload?.err && action.payload?.type === 'interns') {
+          state.interns = [];
+        }
+        if (action.payload?.err && action.payload?.type === 'companies') {
+          state.companies = [];
+        }
+
+        if (action.payload?.type === 'interns') {
+          state.interns = action.payload?.users;
+        }
+
+        if (action.payload?.type === 'companies') {
+          state.companies = action.payload?.users;
+        }
       });
   },
 });
@@ -290,6 +352,8 @@ export const isUserAuthorized = (state) => state.users.isAuthorized;
 export const getUserId = (state) => state.users.user_id;
 export const getUserInfo = (state) => state.users.user;
 export const getUserStatus = (state) => state.users.status;
+export const getInterns = (state) => state.users.interns;
+export const getCompanies = (state) => state.users.companies;
 
 // remove the comment once a code in reducers added.
 export const { resetState, updateUserDocs } = usersSlice.actions;

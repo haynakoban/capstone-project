@@ -121,17 +121,17 @@ const createNewUser = async (req, res, next) => {
     const hashPassword = await bcryptjs.hash(password, 10);
 
     let userProps;
-    if (isIntern) {
+    if (isIntern === 'true' || isIntern) {
       userProps = {
-        hasCompany: false,
-        workingHours: {
-          completed: 0,
-          remaining: 0,
+        companyInfo: {
+          hasCompany: false,
         },
       };
     } else {
       userProps = {
-        hasCompany: false,
+        company: {
+          name: req?.body?.companyName,
+        },
       };
     }
 
@@ -147,10 +147,12 @@ const createNewUser = async (req, res, next) => {
 
     if (!user) return res.json({ err: 'error' });
 
-    // set the session cookie
-    req.session.user_id = user._id.toJSON();
+    if (isIntern === 'true' || isIntern) {
+      // set the session cookie
+      req.session.user_id = user._id.toJSON();
+    }
 
-    return res.status(201).json({ username: username, _id: user._id });
+    return res.status(201).json({ username: username, _id: user._id, user });
   } catch (e) {
     next(e);
   }
@@ -586,16 +588,149 @@ const leaveRoom = async (req, res, next) => {
   }
 };
 
+// get all users
+// get method | /api/users/admin/:type
+const getUsers = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+
+    if (type === 'true') {
+      const findUsers = await Users.find(
+        { isIntern: true },
+        '-employeeInfo'
+      ).sort({
+        createdAt: -1,
+        updatedAt: -1,
+      });
+
+      return res.json({ users: findUsers, type: 'interns' });
+    } else {
+      const findUsers = await Users.find(
+        { isIntern: false },
+        '-internInfo'
+      ).sort({
+        createdAt: -1,
+        updatedAt: -1,
+      });
+
+      return res.json({ users: findUsers, type: 'companies' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// search users
+// post method | /api/users/admin/:type
+const searchUsers = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    const { keyword } = req.body;
+
+    if (type === 'true') {
+      if (!keyword) {
+        const findUsers = await Users.find(
+          {
+            $and: [{ isIntern: true }],
+          },
+          '-employeeInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'interns' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'interns' });
+      } else {
+        const findUsers = await Users.find(
+          {
+            $and: [
+              { isIntern: true },
+              {
+                $or: [
+                  { name: { $regex: keyword, $options: 'i' } },
+                  { username: { $regex: keyword, $options: 'i' } },
+                  { email: { $regex: keyword, $options: 'i' } },
+                ],
+              },
+            ],
+          },
+          '-employeeInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'interns' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'interns' });
+      }
+    } else {
+      if (!keyword) {
+        const findUsers = await Users.find(
+          {
+            $and: [{ isIntern: false }],
+          },
+          '-internInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'companies' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'companies' });
+      } else {
+        const findUsers = await Users.find(
+          {
+            $and: [
+              { isIntern: false },
+              {
+                $or: [
+                  { name: { $regex: keyword, $options: 'i' } },
+                  { username: { $regex: keyword, $options: 'i' } },
+                  { email: { $regex: keyword, $options: 'i' } },
+                ],
+              },
+            ],
+          },
+          '-internInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'companies' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'companies' });
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptCompanyOffer,
   changeAccountInfo,
   changeUsername,
   createNewUser,
   declineCompanyOffer,
+  getUsers,
   getUserInfo,
   isUsernameValid,
   isUserLoggedIn,
   leaveRoom,
+  searchUsers,
   updateUserDocs,
   updateUserProfileInfo,
   userLogin,

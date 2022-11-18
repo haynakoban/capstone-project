@@ -3,18 +3,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 
 import RoomField from '../forms/RoomField';
-import TextInputField from '../forms/TextInputField';
 import DescriptionField from '../forms/DescriptionField';
 import PrivacyField from '../forms/PrivacyField';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
 import { StyledModalBox } from '../global';
 import { createNewRoom } from '../../features/companies/companiesSlice';
+import { AuthContext } from '../../lib/authContext';
 
 const CreateRoom = ({ id, handleCreateRoomOpen }) => {
+  const { _user } = useContext(AuthContext);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
@@ -31,19 +32,18 @@ const CreateRoom = ({ id, handleCreateRoomOpen }) => {
   } = useForm({
     defaultValues: {
       roomName: '',
-      companyName: '',
       description: '',
       showRoom: true,
     },
   });
 
   const handleFormSubmit = async (data) => {
-    const { roomName, companyName, description, showRoom } = data;
+    const { roomName, description, showRoom } = data;
 
     dispatch(
       createNewRoom({
         roomName,
-        companyName,
+        companyName: _user?.employeeInfo?.company?.name ?? '',
         description,
         showRoom,
         members: id,
@@ -52,7 +52,7 @@ const CreateRoom = ({ id, handleCreateRoomOpen }) => {
 
     handleCreateRoomOpen();
     handleClose();
-    reset({ roomName: '', companyName: '', description: '', showRoom: true });
+    reset({ roomName: '', description: '', showRoom: true });
   };
 
   return (
@@ -102,15 +102,6 @@ const CreateRoom = ({ id, handleCreateRoomOpen }) => {
             register={register}
             watch={watch}
             minlen={4}
-          />
-
-          {/* Company Name */}
-          <TextInputField
-            errors={errors.companyName?.message}
-            name='companyName'
-            label='Company Name'
-            register={register}
-            watch={watch}
           />
 
           {/* Description of the Room */}

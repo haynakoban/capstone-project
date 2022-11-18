@@ -39,6 +39,14 @@ import Invitation from '../view/settings/Invitation';
 import Request from '../view/settings/Request';
 import PageNotFound from '../view/404';
 
+// admin
+import AdminPage from '../admin';
+import AdminDashboardPage from '../admin/dashboard';
+import AdminLogReportsPage from '../admin/log';
+import AdminInternPage from '../admin/intern';
+import AdminCompanyPage from '../admin/company';
+import AdminAttendancePage from '../admin/attendance';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -82,6 +90,14 @@ const AppRoutes = () => {
         <Route path='resume' element={<Resume />} />
         <Route path='invitation' element={<Invitation />} />
         <Route path='request' element={<Request />} />
+      </Route>
+
+      <Route path='s_admin' element={<AdminPage />}>
+        <Route index element={<AdminDashboardPage />} />
+        <Route path='logs' element={<AdminLogReportsPage />} />
+        <Route path='interns' element={<AdminInternPage />} />
+        <Route path='companies' element={<AdminCompanyPage />} />
+        <Route path='attendances' element={<AdminAttendancePage />} />
       </Route>
 
       <Route path='*' element={<PageNotFound />} />

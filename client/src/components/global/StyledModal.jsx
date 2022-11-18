@@ -20,7 +20,7 @@ export const StyledModalBoxAttendance = styled(Box)(({ theme }) => ({
   top: '20px',
   left: '50%',
   transform: 'translate(-50%, 20px)',
-  maxHeight: 600,
+  maxHeight: 700,
   overflowY: 'auto',
   overflowX: 'hidden',
   padding: theme.spacing(2),

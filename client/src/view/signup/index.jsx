@@ -2,14 +2,8 @@ import {
   Box,
   Button,
   Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
   IconButton,
   Paper,
-  Radio,
-  RadioGroup,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -48,7 +42,6 @@ const SignUpPage = () => {
       name: '',
       username: '',
       email: '',
-      userType: '',
       password: '',
       confirmPassword: '',
     },
@@ -84,12 +77,6 @@ const SignUpPage = () => {
   const handleFormSubmit = async (data) => {
     const { name, username, email, password, confirmPassword } = data;
 
-    if (data.userType === 'intern') {
-      data.userType = true;
-    } else {
-      data.userType = false;
-    }
-
     if (password !== confirmPassword) {
       setError('confirmPassword', {
         type: 'focus',
@@ -100,7 +87,7 @@ const SignUpPage = () => {
         name,
         username,
         email,
-        isIntern: data.userType,
+        isIntern: true,
         password,
       });
 
@@ -167,47 +154,6 @@ const SignUpPage = () => {
                 register={register}
                 watch={watch}
               />
-
-              {/* intern or employee */}
-              <FormControl
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-evenly',
-                  mb: 2,
-                }}
-                required
-                {...(errors.userType?.message && { error: true })}
-              >
-                <FormLabel id='demo-row-radio-buttons-group-label'>
-                  Type :
-                </FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby='demo-row-radio-buttons-group-label'
-                  name='row-radio-buttons-group'
-                >
-                  <FormControlLabel
-                    value='intern'
-                    control={<Radio />}
-                    label='Intern'
-                    {...register('userType', {
-                      required: 'This field is required',
-                    })}
-                  />
-                  <FormControlLabel
-                    value='employee'
-                    control={<Radio />}
-                    label='Employee'
-                    {...register('userType', {
-                      required: 'This field is required',
-                    })}
-                  />
-                </RadioGroup>
-                <FormHelperText id='radio-buttons'>
-                  {errors.userType?.message && errors.userType?.message}
-                </FormHelperText>
-              </FormControl>
 
               {/* username */}
               <UsernameField

@@ -736,4 +736,65 @@ export const getMySummaryCSV = (state) => {
   return csv;
 };
 
+// get my daily pdf
+export const getMyDailyPDF = (state) => {
+  const items = state.attendances.my_daily_attendances?.[0];
+  const day = state.attendances.my_daily_attendances?.[0]?.attendance_date;
+
+  const in_time = items?.in_time ? TimeFormatter(items?.in_time) : '00:00';
+  const out_time = items?.out_time ? TimeFormatter(items?.out_time) : '00:00';
+
+  const pdf = `
+    Name: ${items?.name}
+    Attendance Date: ${items?.attendance_date}
+    In Time: ${in_time}
+    Out Time: ${out_time}
+    Status: ${items?.status}`;
+
+  return { pdf, day };
+};
+
+// get my daily pdf
+export const getMyMonthlyPDF = (state) => {
+  const items = state.attendances.my_monthly_attendances;
+  const month = state.attendances.my_monthly_attendances?.[0]?.month;
+  const monthlyHeader = [];
+
+  items?.[0]?.monthly.forEach((day) => {
+    // return true if day is in the monthlyheader, otherwise false
+    const res = monthlyHeader?.some((e) => e === day?.day);
+
+    // if res variable is false, add the day in the monthly header
+    if (!res) monthlyHeader?.push({ day: day?.day, status: day?.status });
+  });
+
+  const days = [
+    ...monthlyHeader?.map((e) => {
+      return `\r${e?.day}: ${e?.status}`;
+    }),
+  ].join('\n');
+
+  const pdf = `
+  Name: ${items?.[0]?.name}
+  Summary: ${items?.[0]?.summary}
+  Month: ${month}
+  ${days}
+  `;
+
+  return { pdf, month };
+};
+
+// get my summary pdf
+export const getMySummaryPDF = (state) => {
+  const items = state.attendances.my_summary_attendances;
+
+  const pdf = `
+    Name: ${items?.name}
+    Summary: ${items?.summary_hours}
+    Completed Hours: ${items?.completed_hours}
+    Remaining Hours: ${items?.remaining_hours}`;
+
+  return pdf;
+};
+
 export default attendancesSlice.reducer;
