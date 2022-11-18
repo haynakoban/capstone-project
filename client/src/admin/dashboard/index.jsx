@@ -1,4 +1,6 @@
+import AdminLayout from '../../layout/AdminLayout';
+
 const AdminDashboardPage = () => {
-  return <div>AdminDashboardPage</div>;
+  return <AdminLayout>AdminDashboardPage</AdminLayout>;
 };
 export default AdminDashboardPage;

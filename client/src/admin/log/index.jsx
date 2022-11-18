@@ -1,4 +1,6 @@
+import AdminLayout from '../../layout/AdminLayout';
+
 const AdminLogReportsPage = () => {
-  return <div>AdminLogReportsPage</div>;
+  return <AdminLayout>AdminLogReportsPage</AdminLayout>;
 };
 export default AdminLogReportsPage;

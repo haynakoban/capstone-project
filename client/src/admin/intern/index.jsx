@@ -1,4 +1,6 @@
+import AdminLayout from '../../layout/AdminLayout';
+
 const AdminInternPage = () => {
-  return <div>AdminInternPage</div>;
+  return <AdminLayout>AdminInternPage</AdminLayout>;
 };
 export default AdminInternPage;
