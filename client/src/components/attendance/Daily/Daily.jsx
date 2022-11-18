@@ -19,6 +19,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
+import jsPDF from 'jspdf';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -43,7 +44,7 @@ import {
   getDailyAttendances,
   getDailyCSV,
   getMyDailyAttendances,
-  getMyDailyCSV,
+  getMyDailyPDF,
 } from '../../../features/attendances/attendancesSlice';
 import {
   getMembers,
@@ -61,7 +62,7 @@ const Daily = ({ company_id }) => {
   const get_daily_attendances = useSelector(getDailyAttendances);
   const get_daily = useSelector(getMyDailyAttendances);
   const get_csv = useSelector(getDailyCSV);
-  const get_my_csv = useSelector(getMyDailyCSV);
+  const get_my_pdf = useSelector(getMyDailyPDF);
   const members = useSelector(getMembers);
 
   const { watch, setValue, getValues } = useForm({
@@ -200,6 +201,13 @@ const Daily = ({ company_id }) => {
     );
   };
 
+  // pdf
+  const pdf = () => {
+    const doc = new jsPDF();
+    doc.text(`${get_my_pdf?.pdf}`, 10, 10);
+    doc.save(`${get_my_pdf?.day}.pdf`);
+  };
+
   return (
     <Box>
       {/* calendar */}
@@ -265,7 +273,7 @@ const Daily = ({ company_id }) => {
               }}
               onClick={() => {
                 if (_user?.internInfo?.companyInfo?.hasCompany) {
-                  FileDownload(get_my_csv?.csv, `${get_my_csv?.day}.csv`);
+                  pdf();
                 } else {
                   FileDownload(get_csv?.csv, `${get_csv?.day}.csv`);
                 }

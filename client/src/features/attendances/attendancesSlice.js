@@ -736,4 +736,22 @@ export const getMySummaryCSV = (state) => {
   return csv;
 };
 
+// get my daily pdf
+export const getMyDailyPDF = (state) => {
+  const items = state.attendances.my_daily_attendances?.[0];
+  const day = state.attendances.my_daily_attendances?.[0]?.attendance_date;
+
+  const in_time = items?.in_time ? TimeFormatter(items?.in_time) : '00:00';
+  const out_time = items?.out_time ? TimeFormatter(items?.out_time) : '00:00';
+
+  const pdf = `
+    Name: ${items?.name}
+    Attendance Date: ${items?.attendance_date}
+    In Time: ${in_time}
+    Out Time: ${out_time}
+    Status: ${items?.status}`;
+
+  return { pdf, day };
+};
+
 export default attendancesSlice.reducer;
