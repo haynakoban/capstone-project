@@ -618,6 +618,105 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+// search users
+// post method | /api/users/admin/:type
+const searchUsers = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    const { keyword } = req.body;
+
+    if (type === 'true') {
+      if (!keyword) {
+        const findUsers = await Users.find(
+          {
+            $and: [{ isIntern: true }],
+          },
+          '-employeeInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'interns' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'interns' });
+      } else {
+        const findUsers = await Users.find(
+          {
+            $and: [
+              { isIntern: true },
+              {
+                $or: [
+                  { name: { $regex: keyword, $options: 'i' } },
+                  { username: { $regex: keyword, $options: 'i' } },
+                  { email: { $regex: keyword, $options: 'i' } },
+                ],
+              },
+            ],
+          },
+          '-employeeInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'interns' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'interns' });
+      }
+    } else {
+      if (!keyword) {
+        const findUsers = await Users.find(
+          {
+            $and: [{ isIntern: false }],
+          },
+          '-internInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'companies' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'companies' });
+      } else {
+        const findUsers = await Users.find(
+          {
+            $and: [
+              { isIntern: false },
+              {
+                $or: [
+                  { name: { $regex: keyword, $options: 'i' } },
+                  { username: { $regex: keyword, $options: 'i' } },
+                  { email: { $regex: keyword, $options: 'i' } },
+                ],
+              },
+            ],
+          },
+          '-internInfo'
+        ).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+
+        if (findUsers?.length > 0) {
+          return res.json({ users: findUsers, type: 'companies' });
+        }
+
+        return res.json({ err: 'No results matched', type: 'companies' });
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   acceptCompanyOffer,
   changeAccountInfo,
@@ -629,6 +728,7 @@ module.exports = {
   isUsernameValid,
   isUserLoggedIn,
   leaveRoom,
+  searchUsers,
   updateUserDocs,
   updateUserProfileInfo,
   userLogin,

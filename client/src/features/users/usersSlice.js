@@ -215,6 +215,25 @@ export const getUsers = createAsyncThunk(
   }
 );
 
+// search users
+export const searchUsers = createAsyncThunk(
+  'users/searchUsers',
+  async (initialState) => {
+    try {
+      const { type } = initialState;
+
+      const response = await axios.post(
+        `api/users/admin/${type}`,
+        initialState
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -302,6 +321,22 @@ const usersSlice = createSlice({
         }
       })
       .addCase(getUsers.fulfilled, (state, action) => {
+        if (action.payload?.type === 'interns') {
+          state.interns = action.payload?.users;
+        }
+
+        if (action.payload?.type === 'companies') {
+          state.companies = action.payload?.users;
+        }
+      })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        if (action.payload?.err && action.payload?.type === 'interns') {
+          state.interns = [];
+        }
+        if (action.payload?.err && action.payload?.type === 'companies') {
+          state.companies = [];
+        }
+
         if (action.payload?.type === 'interns') {
           state.interns = action.payload?.users;
         }
