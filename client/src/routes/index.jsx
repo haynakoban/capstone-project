@@ -45,6 +45,7 @@ import AdminDashboardPage from '../admin/dashboard';
 import AdminLogReportsPage from '../admin/log';
 import AdminInternPage from '../admin/intern';
 import AdminCompanyPage from '../admin/company';
+import AdminAttendancePage from '../admin/attendance';
 
 const AppRoutes = () => {
   return (
@@ -96,6 +97,7 @@ const AppRoutes = () => {
         <Route path='logs' element={<AdminLogReportsPage />} />
         <Route path='interns' element={<AdminInternPage />} />
         <Route path='companies' element={<AdminCompanyPage />} />
+        <Route path='attendances' element={<AdminAttendancePage />} />
       </Route>
 
       <Route path='*' element={<PageNotFound />} />
