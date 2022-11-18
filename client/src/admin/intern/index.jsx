@@ -16,6 +16,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import TablePaginationActions from '../../components/attendance/TablePaginationActions';
 
 import {
@@ -30,7 +31,6 @@ import {
   getUsers,
   searchUsers,
 } from '../../features/users/usersSlice';
-import { useDispatch, useSelector } from 'react-redux';
 
 const AdminInternPage = () => {
   const [searchKey, setSearchKey] = useState('');
@@ -181,10 +181,10 @@ const AdminInternPage = () => {
                         {row?.email}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.name}
+                        {row?.internInfo?.school?.name ?? '-'}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.course}
+                        {row?.internInfo?.school?.course ?? '-'}
                       </TableCell>
                     </TableRow>
                   ))}

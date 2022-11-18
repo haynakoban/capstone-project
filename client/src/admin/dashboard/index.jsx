@@ -40,7 +40,7 @@ const AdminDashboardPage = () => {
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: { xs: 'center', sm: 'flex-start' },
           justifyContent: 'space-between',
-          '& > div:first-child': {
+          '& > div:first-of-type': {
             mr: { xs: 0, sm: 1.5 },
             mb: { xs: 3, sm: 0 },
           },

@@ -121,17 +121,17 @@ const createNewUser = async (req, res, next) => {
     const hashPassword = await bcryptjs.hash(password, 10);
 
     let userProps;
-    if (isIntern) {
+    if (isIntern === 'true' || isIntern) {
       userProps = {
-        hasCompany: false,
-        workingHours: {
-          completed: 0,
-          remaining: 0,
+        companyInfo: {
+          hasCompany: false,
         },
       };
     } else {
       userProps = {
-        hasCompany: false,
+        company: {
+          name: req?.body?.companyName,
+        },
       };
     }
 
@@ -147,10 +147,12 @@ const createNewUser = async (req, res, next) => {
 
     if (!user) return res.json({ err: 'error' });
 
-    // set the session cookie
-    req.session.user_id = user._id.toJSON();
+    if (isIntern === 'true' || isIntern) {
+      // set the session cookie
+      req.session.user_id = user._id.toJSON();
+    }
 
-    return res.status(201).json({ username: username, _id: user._id });
+    return res.status(201).json({ username: username, _id: user._id, user });
   } catch (e) {
     next(e);
   }
