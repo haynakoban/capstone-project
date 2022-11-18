@@ -754,4 +754,17 @@ export const getMyDailyPDF = (state) => {
   return { pdf, day };
 };
 
+// get my daily pdf
+export const getMySummaryPDF = (state) => {
+  const items = state.attendances.my_summary_attendances;
+
+  const pdf = `
+    Name: ${items?.name}
+    Summary: ${items?.summary_hours}
+    Completed Hours: ${items?.completed_hours}
+    Remaining Hours: ${items?.remaining_hours}`;
+
+  return pdf;
+};
+
 export default attendancesSlice.reducer;

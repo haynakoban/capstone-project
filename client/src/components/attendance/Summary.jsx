@@ -17,6 +17,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
+import jsPDF from 'jspdf';
 
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,7 +27,7 @@ import {
   fetchMySummaryAttendance,
   fetchSummaryAttendance,
   getMySummaryAttendances,
-  getMySummaryCSV,
+  getMySummaryPDF,
   getSummaryAttendances,
   getSummaryCSV,
 } from '../../features/attendances/attendancesSlice';
@@ -43,7 +44,7 @@ const Summary = ({ company_id }) => {
   const get_summary_attendances = useSelector(getSummaryAttendances);
   const get_summary = useSelector(getMySummaryAttendances);
   const get_csv = useSelector(getSummaryCSV);
-  const get_my_csv = useSelector(getMySummaryCSV);
+  const get_my_pdf = useSelector(getMySummaryPDF);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -111,6 +112,13 @@ const Summary = ({ company_id }) => {
     }
   };
 
+  // pdf
+  const pdf = () => {
+    const doc = new jsPDF();
+    doc.text(`${get_my_pdf}`, 10, 10);
+    doc.save(`attendance_summary.pdf`);
+  };
+
   return (
     <Box>
       {sortedNames?.length > 0 && (
@@ -136,7 +144,7 @@ const Summary = ({ company_id }) => {
               }}
               onClick={() => {
                 if (_user?.internInfo?.companyInfo?.hasCompany) {
-                  FileDownload(get_my_csv, `attendance_summary.csv`);
+                  pdf();
                 } else {
                   FileDownload(get_csv, `attendance_summary.csv`);
                 }
