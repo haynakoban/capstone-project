@@ -755,6 +755,36 @@ export const getMyDailyPDF = (state) => {
 };
 
 // get my daily pdf
+export const getMyMonthlyPDF = (state) => {
+  const items = state.attendances.my_monthly_attendances;
+  const month = state.attendances.my_monthly_attendances?.[0]?.month;
+  const monthlyHeader = [];
+
+  items?.[0]?.monthly.forEach((day) => {
+    // return true if day is in the monthlyheader, otherwise false
+    const res = monthlyHeader?.some((e) => e === day?.day);
+
+    // if res variable is false, add the day in the monthly header
+    if (!res) monthlyHeader?.push({ day: day?.day, status: day?.status });
+  });
+
+  const days = [
+    ...monthlyHeader?.map((e) => {
+      return `\r${e?.day}: ${e?.status}`;
+    }),
+  ].join('\n');
+
+  const pdf = `
+  Name: ${items?.[0]?.name}
+  Summary: ${items?.[0]?.summary}
+  Month: ${month}
+  ${days}
+  `;
+
+  return { pdf, month };
+};
+
+// get my summary pdf
 export const getMySummaryPDF = (state) => {
   const items = state.attendances.my_summary_attendances;
 

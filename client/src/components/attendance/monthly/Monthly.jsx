@@ -16,6 +16,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
+import jsPDF from 'jspdf';
 
 import moment from 'moment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -33,8 +34,8 @@ import {
   fetchMyMonthlyAttendance,
   getMonthlyAttendances,
   getMonthlyCSV,
+  getMyMonthlyPDF,
   getMyMonthlyAttendances,
-  getMyMonthlyCSV,
 } from '../../../features/attendances/attendancesSlice';
 import { AuthContext } from '../../../lib/authContext';
 
@@ -47,7 +48,7 @@ const Monthly = ({ company_id }) => {
   const get_monthly_attendances = useSelector(getMonthlyAttendances);
   const get_monthly = useSelector(getMyMonthlyAttendances);
   const get_csv = useSelector(getMonthlyCSV);
-  const get_my_csv = useSelector(getMyMonthlyCSV);
+  const get_my_pdf = useSelector(getMyMonthlyPDF);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -149,6 +150,13 @@ const Monthly = ({ company_id }) => {
     }
   };
 
+  // pdf
+  const pdf = () => {
+    const doc = new jsPDF();
+    doc.text(`${get_my_pdf?.pdf}`, 10, 10);
+    doc.save(`${get_my_pdf?.month}.pdf`);
+  };
+
   return (
     <Box>
       {/* search and download */}
@@ -198,7 +206,7 @@ const Monthly = ({ company_id }) => {
               }}
               onClick={() => {
                 if (_user?.internInfo?.companyInfo?.hasCompany) {
-                  FileDownload(get_my_csv?.csv, `${get_my_csv?.month}.csv`);
+                  pdf();
                 } else {
                   FileDownload(get_csv?.csv, `${get_csv?.month}.csv`);
                 }
