@@ -48,6 +48,7 @@ app.use('/api/notifications', require('./routes/notificationsRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
 app.use('/api/tasks', require('./routes/tasksRoute'));
 app.use('/api/users', require('./routes/usersRoute'));
+app.use('/api/reports', require('./routes/reportsRoute'));
 
 global.onlineUsers = new Map();
 
