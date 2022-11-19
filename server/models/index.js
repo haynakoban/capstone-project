@@ -6,7 +6,7 @@ const Posts = require('./posts/postsModel');
 const Tasks = require('./tasks/tasksModel');
 const TasksSubmitted = require('./tasks/submittedTaskModel');
 const Users = require('./users/usersModel');
-const Reports = require('./reports/reportsModel');
+const Logs = require('./logs/logsModel');
 
 module.exports = {
   Attendances,
@@ -17,5 +17,5 @@ module.exports = {
   Tasks,
   TasksSubmitted,
   Users,
-  Reports,
+  Logs,
 };

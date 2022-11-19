@@ -6,7 +6,7 @@ const notificationController = require('./notifications/notificationsController'
 const postsController = require('./posts/postsController');
 const tasksController = require('./tasks/tasksController');
 const usersController = require('./users/usersController');
-const reportsController = require('./reports/reportsController');
+const logsController = require('./logs/logsController');
 
 module.exports = {
   attendancesController,
@@ -17,5 +17,5 @@ module.exports = {
   postsController,
   tasksController,
   usersController,
-  reportsController,
+  logsController,
 };

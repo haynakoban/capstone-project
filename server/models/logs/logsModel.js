@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const repotsSchema = new mongoose.Schema({
+const logsSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users',
@@ -37,4 +37,4 @@ const repotsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Reports', repotsSchema);
+module.exports = mongoose.model('Logs', logsSchema);
