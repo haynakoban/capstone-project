@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  Divider,
   Paper,
   Table,
   TableBody,
@@ -10,37 +12,64 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
+  TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import DownloadIcon from '@mui/icons-material/Download';
 
-import { useEffect, useState } from 'react';
+import FileDownload from 'js-file-download';
+
+import { Fragment, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import TablePaginationActions from '../../components/attendance/TablePaginationActions';
 
-import {
-  SearchContainer,
-  SearchIconWrapper,
-  StyledContainer,
-  StyledInputBase,
-} from '../../components/global';
-import AdminLayout from '../../layout/AdminLayout';
-import {
-  getInterns,
-  getUsers,
-  searchUsers,
-} from '../../features/users/usersSlice';
+import moment from 'moment';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-const AdminInternPage = () => {
-  const [searchKey, setSearchKey] = useState('');
+import TablePaginationActions from '../../../components/attendance/TablePaginationActions';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../../lib/DateFormatter';
+import {
+  fetchAllDailyAttendance,
+  getAllDaily,
+  getAllDailyCSV,
+} from '../../../features/attendances/attendancesSlice';
+
+const AdminDaily = () => {
+  const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
-  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const dispatch = useDispatch();
-  const interns = useSelector(getInterns);
+  const get_all_daily = useSelector(getAllDaily);
+  const get_all_csv = useSelector(getAllDailyCSV);
+
+  const { watch, setValue, getValues } = useForm({
+    defaultValues: {
+      attendance_date: moment(),
+    },
+  });
+
+  useEffect(() => {
+    dispatch(
+      fetchAllDailyAttendance({
+        attendance_date: DailyAttendanceDateFormatter(
+          getValues('attendance_date')
+        ),
+      })
+    );
+  }, [dispatch, getValues]);
+
+  // handle members
+  useEffect(() => {
+    setSortedName(get_all_daily);
+  }, [get_all_daily]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -55,40 +84,26 @@ const AdminInternPage = () => {
     setPage(0);
   };
 
-  useEffect(() => {
-    dispatch(getUsers({ type: true }));
-  }, [dispatch]);
-
-  // handle interns
-  useEffect(() => {
-    setSortedName(interns);
-  }, [interns]);
-
-  // handle event key
-  const handleKeyDown = (event) => {
-    if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
-      // fetch here
-      dispatch(searchUsers({ keyword: searchKey, type: true }));
-    }
-  };
-
-  // handle click button
-  const handleOnClick = () => {
-    // fetch here
-    dispatch(searchUsers({ keyword: searchKey, type: true }));
+  // handle when date change
+  const handleFormSubmit = (date) => {
+    dispatch(
+      fetchAllDailyAttendance({
+        attendance_date: DailyAttendanceDateFormatter(date),
+      })
+    );
   };
 
   // handle sort by name
   const handleSortByName = () => {
     if (order === 'asc') {
-      const users = [...interns];
+      const users = [...get_all_daily];
       const orderedNames = users?.sort((a, b) =>
         b?.name.localeCompare(a?.name)
       );
       setSortedName(orderedNames);
       setOrder('desc');
     } else if (order === 'desc') {
-      const users = [...interns];
+      const users = [...get_all_daily];
       const orderedNames = users?.sort((a, b) =>
         a?.name.localeCompare(b?.name)
       );
@@ -98,40 +113,66 @@ const AdminInternPage = () => {
   };
 
   return (
-    <AdminLayout>
-      <StyledContainer width='lg'>
-        <Toolbar
-          sx={{
-            display: 'flex',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            justifyContent: 'space-between',
-          }}
-          disableGutters
-        >
-          {/* search  */}
-          <SearchContainer>
-            <SearchIconWrapper
-              disableRipple
-              size='small'
-              onClick={handleOnClick}
-            >
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder='Search…'
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </SearchContainer>
-        </Toolbar>
+    <Box>
+      {/* calendar */}
+      <Toolbar
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          p: { xs: 0, sm: 2 },
+        }}
+      >
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            label='Choose Date'
+            value={watch('attendance_date')}
+            onChange={(date) => {
+              setValue('attendance_date', date);
+              handleFormSubmit(date);
+            }}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+      </Toolbar>
 
-        {/* list of interns */}
-        {sortedNames?.length > 0 ? (
+      <Divider
+        flexItem
+        sx={{ bgcolor: '#202128', height: '1px', mt: { xs: 1.5, sm: 0 } }}
+        variant='middle'
+      />
+
+      {sortedNames?.length > 0 && (
+        <Fragment>
+          {/* result and download */}
+          <Toolbar
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              p: { xs: 0, sm: 2 },
+            }}
+          >
+            <Typography variant='body1' fontWeight={600}>
+              Result: {sortedNames?.length}
+            </Typography>
+            <Button
+              color='success'
+              variant='contained'
+              startIcon={<DownloadIcon />}
+              sx={{
+                textTransform: 'capitalize',
+              }}
+              onClick={() =>
+                FileDownload(get_all_csv?.csv, `${get_all_csv?.day}.csv`)
+              }
+            >
+              Download
+            </Button>
+          </Toolbar>
+
+          {/* attendance sheet */}
           <Box mt={2}>
             <TableContainer component={Paper}>
               <Table
@@ -150,16 +191,16 @@ const AdminInternPage = () => {
                       </TableSortLabel>
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      Userrname
+                      Attendance Date
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      Email
+                      In Time
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      University
+                      Out Time
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      Course
+                      Status
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -176,17 +217,35 @@ const AdminInternPage = () => {
                         {row?.name}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.username}
+                        {row?.attendance_date}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.email}
+                        {row?.in_time ? TimeFormatter(row?.in_time) : '00:00'}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.name ?? '-'}
+                        {row?.out_time ? TimeFormatter(row?.out_time) : '00:00'}
                       </TableCell>
-                      <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.course ?? '-'}
-                      </TableCell>
+                      {row?.status === 'Absent' ? (
+                        <TableCell
+                          component='th'
+                          scope='row'
+                          sx={{ color: '#DF4759', fontWeight: 700 }}
+                        >
+                          {row?.status}
+                        </TableCell>
+                      ) : (
+                        <TableCell
+                          component='th'
+                          scope='row'
+                          sx={{
+                            color: '#0d6efd',
+                            fontStyle: 'italic',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {row?.status}
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
 
@@ -231,19 +290,9 @@ const AdminInternPage = () => {
               </Table>
             </TableContainer>
           </Box>
-        ) : (
-          <Typography
-            variant='h6'
-            component='p'
-            width='100%'
-            mt={{ xs: 3, sm: 5 }}
-            textAlign='center'
-          >
-            No results matched your search.
-          </Typography>
-        )}
-      </StyledContainer>
-    </AdminLayout>
+        </Fragment>
+      )}
+    </Box>
   );
 };
-export default AdminInternPage;
+export default AdminDaily;

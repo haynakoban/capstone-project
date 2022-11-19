@@ -12,6 +12,9 @@ const initialState = {
   my_daily_attendances: [],
   my_monthly_attendances: [],
   my_summary_attendances: {},
+  a_admin_daily: [],
+  a_admin_monthly: [],
+  a_admin_summary: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -172,6 +175,56 @@ export const fetchMyMonthlyAttendance = createAsyncThunk(
       const response = await axios.get(
         `api/attendances/monthly/${company_id}/${attendance_date}/${user_id}`
       );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all daily attendance
+export const fetchAllDailyAttendance = createAsyncThunk(
+  'attendances/fetchAllDailyAttendance',
+  async (initialState) => {
+    try {
+      const { attendance_date } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/admin/d/${attendance_date}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all monthly attendance
+export const fetchAllMonthlyAttendance = createAsyncThunk(
+  'attendances/fetchAllMonthlyAttendance',
+  async (initialState) => {
+    try {
+      const { attendance_date } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/admin/m/${attendance_date}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all summary attendance
+export const fetchAllSummaryAttendance = createAsyncThunk(
+  'attendances/fetchAllSummaryAttendance',
+  async () => {
+    try {
+      const response = await axios.get(`api/attendances/gen`);
 
       return response.data;
     } catch (e) {
@@ -456,9 +509,123 @@ const attendancesSlice = createSlice({
 
           state.daily_attendances = [...state.daily_attendances, attendance];
         }
+      })
+      .addCase(fetchAllDailyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.a_admin_daily = [];
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_daily = [];
+          const { attendances, users } = action.payload;
+
+          // assign name with attendance
+          for (const attendance of attendances) {
+            for (const user of users) {
+              if (attendance?.user_id === user?._id) {
+                attendance.name = user?.name;
+                state.a_admin_daily?.push(attendance);
+              }
+            }
+          }
+        }
+      })
+      .addCase(fetchAllMonthlyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.a_admin_monthly = [];
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_monthly = [];
+          const { attendances, users, month } = action.payload;
+
+          // assign hours
+          for (const user of users) {
+            user.month = month;
+
+            let summary = 0;
+            let total = 0;
+            let monthly = [];
+
+            for (const attendance of attendances) {
+              if (user?._id === attendance?.user_id) {
+                total += 1;
+
+                if (attendance?.status === 'Present') {
+                  summary += 1;
+                }
+
+                // push the day and status
+                monthly?.unshift({
+                  day: attendance?.attendance_date,
+                  status: attendance?.status,
+                });
+              }
+            }
+
+            // summary
+            user.summary = `${summary}/${total} days`;
+
+            // sort monthly
+            const newMonth = monthly.sort((a, b) =>
+              a?.day > b?.day ? 1 : b?.day > a?.day ? -1 : 0
+            );
+
+            // monthly
+            user.monthly = newMonth;
+
+            state.a_admin_monthly?.push(user);
+          }
+        }
+      })
+      .addCase(fetchAllSummaryAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.a_admin_summary = [];
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_summary = [];
+          const { attendances, users } = action.payload;
+
+          for (const user of users) {
+            let total = 0;
+
+            for (const attendance of attendances) {
+              if (user?._id === attendance?.user_id) {
+                // check if present and if there is total hours
+                if (
+                  attendance?.status === 'Present' &&
+                  attendance?.total_hours &&
+                  typeof attendance?.total_hours === 'number'
+                ) {
+                  total += attendance?.total_hours;
+                }
+              }
+            }
+
+            // completed hours
+            user.completed_hours = `${total?.toFixed(0)} Hours`;
+
+            // remaining hours
+            user.remaining_hours = `${(486 - total)?.toFixed(0)} Hours`;
+
+            // summary hours
+            user.summary_hours = `${total?.toFixed(0)}/486 Hours`;
+
+            state.a_admin_summary?.push(user);
+          }
+        }
       });
   },
 });
+
+// admin
+export const getAllDaily = (state) => state.attendances.a_admin_daily;
+export const getAllMonthly = (state) => state.attendances.a_admin_monthly;
+export const getAllSummary = (state) => state.attendances.a_admin_summary;
 
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
@@ -473,6 +640,138 @@ export const getMyDailyAttendances = (state) =>
   state.attendances.my_daily_attendances;
 export const getMyMonthlyAttendances = (state) =>
   state.attendances.my_monthly_attendances;
+
+// for admin: get all daily csv
+export const getAllDailyCSV = (state) => {
+  const items = state.attendances.a_admin_daily;
+  const day = state.attendances.a_admin_daily?.[0]?.attendance_date;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      attendance_date: item?.attendance_date,
+      in_time: item?.in_time ? TimeFormatter(item?.in_time) : '00:00',
+      out_time: item?.out_time ? TimeFormatter(item?.out_time) : '00:00',
+      status: item?.status,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Attendance Date', 'In Time', 'Out Time', 'Status'];
+  const fields = ['name', 'attendance_date', 'in_time', 'out_time', 'status'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return { csv, day };
+};
+
+// for admin: get all monthly csv
+export const getAllMonthlyCSV = (state) => {
+  const items = state.attendances.a_admin_monthly;
+  const month = state.attendances.a_admin_monthly?.[0]?.month;
+  const monthlyHeader = [];
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      month: item?.month,
+      name: item?.name,
+      monthly: item?.monthly,
+      summary: item?.summary,
+    };
+
+    item?.monthly.forEach((day) => {
+      // return true if day is in the monthlyheader, otherwise false
+      const res = monthlyHeader?.some((e) => e === day?.day);
+
+      // if res variable is false, add the day in the monthly header
+      if (!res) monthlyHeader?.push(day?.day);
+    });
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Month']?.concat(monthlyHeader);
+  const fields = ['name', 'summary', 'month'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) => {
+      // get user info: name, summary and month field
+      const getUserRow = fields.map((fieldName) =>
+        JSON.stringify(row?.[fieldName], replacer)
+      );
+
+      // get the rest of the day in month
+      const getDaysRow = monthlyHeader?.map((day) => {
+        const getDay = row?.monthly?.filter((d) => d?.day === day);
+
+        if (getDay?.length > 0) {
+          return JSON.stringify(getDay?.[0]?.status, replacer);
+        } else {
+          return null;
+        }
+      });
+
+      const getRow = getUserRow?.concat(getDaysRow)?.join(',');
+
+      return getRow;
+    }),
+  ].join('\r\n');
+
+  return { csv, month };
+};
+
+// for admin: get all summary csv
+export const getAllSummaryCSV = (state) => {
+  const items = state.attendances.a_admin_summary;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      completed_hours: item?.completed_hours,
+      remaining_hours: item?.remaining_hours,
+      summary_hours: item?.summary_hours,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Completed Hours', 'Remaining Hours'];
+  const fields = [
+    'name',
+    'summary_hours',
+    'completed_hours',
+    'remaining_hours',
+  ];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return csv;
+};
 
 // get daily csv
 export const getDailyCSV = (state) => {

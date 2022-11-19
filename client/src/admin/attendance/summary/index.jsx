@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -13,34 +14,38 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import DownloadIcon from '@mui/icons-material/Download';
 
-import { useEffect, useState } from 'react';
+import FileDownload from 'js-file-download';
+
+import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import TablePaginationActions from '../../components/attendance/TablePaginationActions';
 
+import TablePaginationActions from '../../../components/attendance/TablePaginationActions';
 import {
-  SearchContainer,
-  SearchIconWrapper,
-  StyledContainer,
-  StyledInputBase,
-} from '../../components/global';
-import AdminLayout from '../../layout/AdminLayout';
-import {
-  getInterns,
-  getUsers,
-  searchUsers,
-} from '../../features/users/usersSlice';
+  fetchAllSummaryAttendance,
+  getAllSummary,
+  getAllSummaryCSV,
+} from '../../../features/attendances/attendancesSlice';
 
-const AdminInternPage = () => {
-  const [searchKey, setSearchKey] = useState('');
+const AdminSummary = () => {
+  const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
-  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const dispatch = useDispatch();
-  const interns = useSelector(getInterns);
+  const get_all_summary = useSelector(getAllSummary);
+  const get_all_csv = useSelector(getAllSummaryCSV);
+
+  useEffect(() => {
+    dispatch(fetchAllSummaryAttendance());
+  }, [dispatch]);
+
+  // handle members
+  useEffect(() => {
+    setSortedName(get_all_summary);
+  }, [get_all_summary]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -55,40 +60,17 @@ const AdminInternPage = () => {
     setPage(0);
   };
 
-  useEffect(() => {
-    dispatch(getUsers({ type: true }));
-  }, [dispatch]);
-
-  // handle interns
-  useEffect(() => {
-    setSortedName(interns);
-  }, [interns]);
-
-  // handle event key
-  const handleKeyDown = (event) => {
-    if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
-      // fetch here
-      dispatch(searchUsers({ keyword: searchKey, type: true }));
-    }
-  };
-
-  // handle click button
-  const handleOnClick = () => {
-    // fetch here
-    dispatch(searchUsers({ keyword: searchKey, type: true }));
-  };
-
   // handle sort by name
   const handleSortByName = () => {
     if (order === 'asc') {
-      const users = [...interns];
+      const users = [...get_all_summary];
       const orderedNames = users?.sort((a, b) =>
         b?.name.localeCompare(a?.name)
       );
       setSortedName(orderedNames);
       setOrder('desc');
     } else if (order === 'desc') {
-      const users = [...interns];
+      const users = [...get_all_summary];
       const orderedNames = users?.sort((a, b) =>
         a?.name.localeCompare(b?.name)
       );
@@ -98,40 +80,35 @@ const AdminInternPage = () => {
   };
 
   return (
-    <AdminLayout>
-      <StyledContainer width='lg'>
-        <Toolbar
-          sx={{
-            display: 'flex',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            justifyContent: 'space-between',
-          }}
-          disableGutters
-        >
-          {/* search  */}
-          <SearchContainer>
-            <SearchIconWrapper
-              disableRipple
-              size='small'
-              onClick={handleOnClick}
+    <Box>
+      {sortedNames?.length > 0 && (
+        <Fragment>
+          {/* result and download */}
+          <Toolbar
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              p: { xs: 0, sm: 2 },
+            }}
+          >
+            <Typography variant='body1' fontWeight={600}>
+              Result: {sortedNames?.length}
+            </Typography>
+            <Button
+              color='success'
+              variant='contained'
+              startIcon={<DownloadIcon />}
+              sx={{
+                textTransform: 'capitalize',
+              }}
+              onClick={() => FileDownload(get_all_csv, `attendance report.csv`)}
             >
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder='Search…'
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </SearchContainer>
-        </Toolbar>
+              Download
+            </Button>
+          </Toolbar>
 
-        {/* list of interns */}
-        {sortedNames?.length > 0 ? (
+          {/* attendance sheet */}
           <Box mt={2}>
             <TableContainer component={Paper}>
               <Table
@@ -150,16 +127,13 @@ const AdminInternPage = () => {
                       </TableSortLabel>
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      Userrname
+                      Summary
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      Email
+                      Completed Hours
                     </TableCell>
                     <TableCell component='th' scope='row'>
-                      University
-                    </TableCell>
-                    <TableCell component='th' scope='row'>
-                      Course
+                      Remaining Hours
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -176,16 +150,13 @@ const AdminInternPage = () => {
                         {row?.name}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.username}
+                        {row?.summary_hours}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.email}
+                        {row?.completed_hours}
                       </TableCell>
                       <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.name ?? '-'}
-                      </TableCell>
-                      <TableCell component='th' scope='row'>
-                        {row?.internInfo?.school?.course ?? '-'}
+                        {row?.remaining_hours}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -231,19 +202,9 @@ const AdminInternPage = () => {
               </Table>
             </TableContainer>
           </Box>
-        ) : (
-          <Typography
-            variant='h6'
-            component='p'
-            width='100%'
-            mt={{ xs: 3, sm: 5 }}
-            textAlign='center'
-          >
-            No results matched your search.
-          </Typography>
-        )}
-      </StyledContainer>
-    </AdminLayout>
+        </Fragment>
+      )}
+    </Box>
   );
 };
-export default AdminInternPage;
+export default AdminSummary;
