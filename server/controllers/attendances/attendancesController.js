@@ -500,8 +500,38 @@ const fetchMyMonthlyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch all daily attendance
+// get method | api/attendances/admin/:attendance_date
+const fetchAllDailyAttendance = async (req, res, next) => {
+  try {
+    const { attendance_date } = req.params;
+
+    if (!attendance_date)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const attendances = await Attendances.find({
+      attendance_date,
+    });
+
+    if (attendances?.length > 0) {
+      const ids = attendances.map((e) => e.user_id);
+
+      const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+      return res.json({ attendances, users });
+    }
+
+    return res.json({ err: 'cannot find attendance today' });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
+  fetchAllDailyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
   fetchMyDailyAttendance,

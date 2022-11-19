@@ -14,6 +14,11 @@ router
 // post method - generate attendances
 router.route('/gen').post(auth, attendancesController.generateAttendances);
 
+// get method - fetch all daily attendance
+router
+  .route('/admin/:attendance_date')
+  .get(attendancesController.fetchAllDailyAttendance);
+
 // get method - fetch my daily attendance
 router
   .route('/daily/:company_id/:attendance_date/:user_id')

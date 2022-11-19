@@ -12,6 +12,7 @@ const initialState = {
   my_daily_attendances: [],
   my_monthly_attendances: [],
   my_summary_attendances: {},
+  a_admin_daily: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -171,6 +172,24 @@ export const fetchMyMonthlyAttendance = createAsyncThunk(
 
       const response = await axios.get(
         `api/attendances/monthly/${company_id}/${attendance_date}/${user_id}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all daily attendance
+export const fetchAllDailyAttendance = createAsyncThunk(
+  'attendances/fetchAllDailyAttendance',
+  async (initialState) => {
+    try {
+      const { attendance_date } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/admin/${attendance_date}`
       );
 
       return response.data;
@@ -456,9 +475,32 @@ const attendancesSlice = createSlice({
 
           state.daily_attendances = [...state.daily_attendances, attendance];
         }
+      })
+      .addCase(fetchAllDailyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_daily = [];
+          const { attendances, users } = action.payload;
+
+          // assign name with attendance
+          for (const attendance of attendances) {
+            for (const user of users) {
+              if (attendance?.user_id === user?._id) {
+                attendance.name = user?.name;
+                state.a_admin_daily?.push(attendance);
+              }
+            }
+          }
+        }
       });
   },
 });
+
+// admin
+export const getAllDaily = (state) => state.attendances.a_admin_daily;
 
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
@@ -473,6 +515,41 @@ export const getMyDailyAttendances = (state) =>
   state.attendances.my_daily_attendances;
 export const getMyMonthlyAttendances = (state) =>
   state.attendances.my_monthly_attendances;
+
+// for admin: get all daily csv
+export const getAllDailyCSV = (state) => {
+  const items = state.attendances.a_admin_daily;
+  const day = state.attendances.a_admin_daily?.[0]?.attendance_date;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      attendance_date: item?.attendance_date,
+      in_time: item?.in_time ? TimeFormatter(item?.in_time) : '00:00',
+      out_time: item?.out_time ? TimeFormatter(item?.out_time) : '00:00',
+      status: item?.status,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Attendance Date', 'In Time', 'Out Time', 'Status'];
+  const fields = ['name', 'attendance_date', 'in_time', 'out_time', 'status'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return { csv, day };
+};
 
 // get daily csv
 export const getDailyCSV = (state) => {
