@@ -572,10 +572,30 @@ const fetchAllMonthlyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch all summary attendance
+// get method | api/attendances/gen
+const fetchAllSummaryAttendance = async (req, res, next) => {
+  try {
+    const attendances = await Attendances.find();
+
+    if (!attendances?.length > 0)
+      return res.json({ err: 'cannot find summary attendance ' });
+
+    const ids = attendances.map((e) => e.user_id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+    return res.json({ attendances, users });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchAllDailyAttendance,
   fetchAllMonthlyAttendance,
+  fetchAllSummaryAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
   fetchMyDailyAttendance,

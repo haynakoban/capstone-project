@@ -12,7 +12,11 @@ router
   .put(auth, attendancesController.updateDailyAttendance);
 
 // post method - generate attendances
-router.route('/gen').post(auth, attendancesController.generateAttendances);
+// get method - fetch all summary attendance
+router
+  .route('/gen')
+  .post(auth, attendancesController.generateAttendances)
+  .get(attendancesController.fetchAllSummaryAttendance);
 
 // get method - fetch all daily attendance
 router

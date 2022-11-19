@@ -14,6 +14,7 @@ const initialState = {
   my_summary_attendances: {},
   a_admin_daily: [],
   a_admin_monthly: [],
+  a_admin_summary: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -210,6 +211,20 @@ export const fetchAllMonthlyAttendance = createAsyncThunk(
       const response = await axios.get(
         `api/attendances/admin/m/${attendance_date}`
       );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all summary attendance
+export const fetchAllSummaryAttendance = createAsyncThunk(
+  'attendances/fetchAllSummaryAttendance',
+  async () => {
+    try {
+      const response = await axios.get(`api/attendances/gen`);
 
       return response.data;
     } catch (e) {
@@ -564,6 +579,45 @@ const attendancesSlice = createSlice({
             state.a_admin_monthly?.push(user);
           }
         }
+      })
+      .addCase(fetchAllSummaryAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.a_admin_summary = [];
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_summary = [];
+          const { attendances, users } = action.payload;
+
+          for (const user of users) {
+            let total = 0;
+
+            for (const attendance of attendances) {
+              if (user?._id === attendance?.user_id) {
+                // check if present and if there is total hours
+                if (
+                  attendance?.status === 'Present' &&
+                  attendance?.total_hours &&
+                  typeof attendance?.total_hours === 'number'
+                ) {
+                  total += attendance?.total_hours;
+                }
+              }
+            }
+
+            // completed hours
+            user.completed_hours = `${total?.toFixed(0)} Hours`;
+
+            // remaining hours
+            user.remaining_hours = `${(486 - total)?.toFixed(0)} Hours`;
+
+            // summary hours
+            user.summary_hours = `${total?.toFixed(0)}/486 Hours`;
+
+            state.a_admin_summary?.push(user);
+          }
+        }
       });
   },
 });
@@ -571,6 +625,7 @@ const attendancesSlice = createSlice({
 // admin
 export const getAllDaily = (state) => state.attendances.a_admin_daily;
 export const getAllMonthly = (state) => state.attendances.a_admin_monthly;
+export const getAllSummary = (state) => state.attendances.a_admin_summary;
 
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
@@ -678,6 +733,44 @@ export const getAllMonthlyCSV = (state) => {
   ].join('\r\n');
 
   return { csv, month };
+};
+
+// for admin: get all summary csv
+export const getAllSummaryCSV = (state) => {
+  const items = state.attendances.a_admin_summary;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      completed_hours: item?.completed_hours,
+      remaining_hours: item?.remaining_hours,
+      summary_hours: item?.summary_hours,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Completed Hours', 'Remaining Hours'];
+  const fields = [
+    'name',
+    'summary_hours',
+    'completed_hours',
+    'remaining_hours',
+  ];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return csv;
 };
 
 // get daily csv
