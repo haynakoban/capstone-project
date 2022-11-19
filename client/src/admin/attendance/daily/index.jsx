@@ -66,6 +66,7 @@ const AdminDaily = () => {
     );
   }, [dispatch, getValues]);
 
+  // handle members
   useEffect(() => {
     setSortedName(get_all_daily);
   }, [get_all_daily]);

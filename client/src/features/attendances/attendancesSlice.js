@@ -13,6 +13,7 @@ const initialState = {
   my_monthly_attendances: [],
   my_summary_attendances: {},
   a_admin_daily: [],
+  a_admin_monthly: [],
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
@@ -189,7 +190,25 @@ export const fetchAllDailyAttendance = createAsyncThunk(
       const { attendance_date } = initialState;
 
       const response = await axios.get(
-        `api/attendances/admin/${attendance_date}`
+        `api/attendances/admin/d/${attendance_date}`
+      );
+
+      return response.data;
+    } catch (e) {
+      return e.message;
+    }
+  }
+);
+
+// fetch all monthly attendance
+export const fetchAllMonthlyAttendance = createAsyncThunk(
+  'attendances/fetchAllMonthlyAttendance',
+  async (initialState) => {
+    try {
+      const { attendance_date } = initialState;
+
+      const response = await axios.get(
+        `api/attendances/admin/m/${attendance_date}`
       );
 
       return response.data;
@@ -478,6 +497,7 @@ const attendancesSlice = createSlice({
       })
       .addCase(fetchAllDailyAttendance.fulfilled, (state, action) => {
         if (action.payload?.err) {
+          state.a_admin_daily = [];
           return;
         }
 
@@ -495,12 +515,62 @@ const attendancesSlice = createSlice({
             }
           }
         }
+      })
+      .addCase(fetchAllMonthlyAttendance.fulfilled, (state, action) => {
+        if (action.payload?.err) {
+          state.a_admin_monthly = [];
+          return;
+        }
+
+        if (action.payload?.attendances && action.payload?.users) {
+          state.a_admin_monthly = [];
+          const { attendances, users, month } = action.payload;
+
+          // assign hours
+          for (const user of users) {
+            user.month = month;
+
+            let summary = 0;
+            let total = 0;
+            let monthly = [];
+
+            for (const attendance of attendances) {
+              if (user?._id === attendance?.user_id) {
+                total += 1;
+
+                if (attendance?.status === 'Present') {
+                  summary += 1;
+                }
+
+                // push the day and status
+                monthly?.unshift({
+                  day: attendance?.attendance_date,
+                  status: attendance?.status,
+                });
+              }
+            }
+
+            // summary
+            user.summary = `${summary}/${total} days`;
+
+            // sort monthly
+            const newMonth = monthly.sort((a, b) =>
+              a?.day > b?.day ? 1 : b?.day > a?.day ? -1 : 0
+            );
+
+            // monthly
+            user.monthly = newMonth;
+
+            state.a_admin_monthly?.push(user);
+          }
+        }
       });
   },
 });
 
 // admin
 export const getAllDaily = (state) => state.attendances.a_admin_daily;
+export const getAllMonthly = (state) => state.attendances.a_admin_monthly;
 
 export const dailyAttendance = (state) => state.attendances.daily_attendance;
 export const getDailyAttendances = (state) =>
@@ -549,6 +619,65 @@ export const getAllDailyCSV = (state) => {
   ].join('\r\n');
 
   return { csv, day };
+};
+
+// for admin: get all monthly csv
+export const getAllMonthlyCSV = (state) => {
+  const items = state.attendances.a_admin_monthly;
+  const month = state.attendances.a_admin_monthly?.[0]?.month;
+  const monthlyHeader = [];
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      month: item?.month,
+      name: item?.name,
+      monthly: item?.monthly,
+      summary: item?.summary,
+    };
+
+    item?.monthly.forEach((day) => {
+      // return true if day is in the monthlyheader, otherwise false
+      const res = monthlyHeader?.some((e) => e === day?.day);
+
+      // if res variable is false, add the day in the monthly header
+      if (!res) monthlyHeader?.push(day?.day);
+    });
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = ['Name', 'Summary', 'Month']?.concat(monthlyHeader);
+  const fields = ['name', 'summary', 'month'];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) => {
+      // get user info: name, summary and month field
+      const getUserRow = fields.map((fieldName) =>
+        JSON.stringify(row?.[fieldName], replacer)
+      );
+
+      // get the rest of the day in month
+      const getDaysRow = monthlyHeader?.map((day) => {
+        const getDay = row?.monthly?.filter((d) => d?.day === day);
+
+        if (getDay?.length > 0) {
+          return JSON.stringify(getDay?.[0]?.status, replacer);
+        } else {
+          return null;
+        }
+      });
+
+      const getRow = getUserRow?.concat(getDaysRow)?.join(',');
+
+      return getRow;
+    }),
+  ].join('\r\n');
+
+  return { csv, month };
 };
 
 // get daily csv

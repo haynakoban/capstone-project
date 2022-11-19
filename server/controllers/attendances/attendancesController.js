@@ -501,7 +501,7 @@ const fetchMyMonthlyAttendance = async (req, res, next) => {
 };
 
 // fetch all daily attendance
-// get method | api/attendances/admin/:attendance_date
+// get method | api/attendances/admin/d/:attendance_date
 const fetchAllDailyAttendance = async (req, res, next) => {
   try {
     const { attendance_date } = req.params;
@@ -529,9 +529,53 @@ const fetchAllDailyAttendance = async (req, res, next) => {
   }
 };
 
+// fetch all monthly attendance
+// get method | api/attendances/admin/m/:attendance_date
+const fetchAllMonthlyAttendance = async (req, res, next) => {
+  try {
+    const { attendance_date } = req.params;
+
+    const startsWith = attendance_date?.slice(0, 2);
+    const endsWith = attendance_date?.slice(-4);
+
+    if (!attendance_date)
+      return res
+        .status(400)
+        .json({ err: 'company id and attendance date should be provided' });
+
+    const month = validateAttendanceDate(attendance_date);
+
+    const attendances = await Attendances.find({
+      $and: [
+        {
+          attendance_date: { $regex: `^${startsWith}`, $options: 'm' },
+        },
+        {
+          attendance_date: { $regex: `${endsWith}$`, $options: 'm' },
+        },
+      ],
+    });
+
+    if (!attendances?.length > 0) {
+      return res.json({
+        err: 'cannot find monthly attendance',
+      });
+    }
+
+    const ids = attendances.map((e) => e.user_id);
+
+    const users = await Users.find({ _id: { $in: ids } }, 'name').exec();
+
+    return res.json({ attendances, users, month });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   createDailyAttendance,
   fetchAllDailyAttendance,
+  fetchAllMonthlyAttendance,
   fetchDailyAttendance,
   fetchMonthlyAttendance,
   fetchMyDailyAttendance,

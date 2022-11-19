@@ -57,7 +57,7 @@ const Monthly = ({ company_id }) => {
     },
   });
 
-  // fetch daily attendance
+  // fetch monthly attendance
   // check if user intern or company
   useEffect(() => {
     if (company_id) {
