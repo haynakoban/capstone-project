@@ -28,7 +28,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
 import MonthlyRow from './MonthlyRow';
-import { MonthlyAttendanceDateFormatter } from '../../../lib/DateFormatter';
+import {
+  DailyAttendanceDateFormatter,
+  MonthlyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../../lib/DateFormatter';
 import {
   fetchMonthlyAttendance,
   fetchMyMonthlyAttendance,
@@ -38,6 +42,7 @@ import {
   getMyMonthlyAttendances,
 } from '../../../features/attendances/attendancesSlice';
 import { AuthContext } from '../../../lib/authContext';
+import { createLog } from '../../../features/logs/logsSlice';
 
 const Monthly = ({ company_id }) => {
   const { _user } = useContext(AuthContext);
@@ -205,6 +210,31 @@ const Monthly = ({ company_id }) => {
                 textTransform: 'capitalize',
               }}
               onClick={() => {
+                const date = new Date();
+
+                // create log
+                if (_user?.isIntern) {
+                  dispatch(
+                    createLog({
+                      user_id: _user?._id,
+                      report_date: DailyAttendanceDateFormatter(date),
+                      time: TimeFormatter(date),
+                      user_type: 'Intern',
+                      log: `Downloaded monthly attendance (${get_my_pdf?.month})`,
+                    })
+                  );
+                } else {
+                  dispatch(
+                    createLog({
+                      user_id: _user?._id,
+                      report_date: DailyAttendanceDateFormatter(date),
+                      time: TimeFormatter(date),
+                      user_type: 'Employee',
+                      log: `Downloaded monthly attendance (${get_csv?.month})`,
+                    })
+                  );
+                }
+
                 if (_user?.internInfo?.companyInfo?.hasCompany) {
                   pdf();
                 } else {

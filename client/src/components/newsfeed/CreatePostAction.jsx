@@ -22,6 +22,11 @@ import axios from '../../lib/axiosConfig';
 import { getUserInfo } from '../../features/users/usersSlice';
 import { addNewPost } from '../../features/posts/postsSlice';
 import { StyledPostBox, StyledModalBox } from '../global';
+import { createLog } from '../../features/logs/logsSlice';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 
 const CreatePostAction = () => {
   const dispatch = useDispatch();
@@ -78,6 +83,31 @@ const CreatePostAction = () => {
         .then((res) => {
           if (res.data?.post && res.data?.user?.[0]) {
             dispatch(addNewPost(res.data));
+
+            const date = new Date();
+
+            // create log
+            if (user?.isIntern) {
+              dispatch(
+                createLog({
+                  user_id: user?._id,
+                  report_date: DailyAttendanceDateFormatter(date),
+                  time: TimeFormatter(date),
+                  user_type: 'Intern',
+                  log: 'Created a post',
+                })
+              );
+            } else {
+              dispatch(
+                createLog({
+                  user_id: user?._id,
+                  report_date: DailyAttendanceDateFormatter(date),
+                  time: TimeFormatter(date),
+                  user_type: 'Employee',
+                  log: 'Created a post',
+                })
+              );
+            }
           }
         })
         .catch((err) => console.error(err))

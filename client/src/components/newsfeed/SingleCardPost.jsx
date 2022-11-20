@@ -23,6 +23,11 @@ import {
 } from '../../features/comments/commentsSlice';
 import CommentsCard from './CommentsCard';
 import avatarTheme from '../../lib/avatar';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
+import { createLog } from '../../features/logs/logsSlice';
 
 const SingleCardPost = ({ post }) => {
   const { _user } = useContext(AuthContext);
@@ -107,6 +112,31 @@ const SingleCardPost = ({ post }) => {
           user_id,
         })
       ).unwrap();
+
+      const date = new Date();
+
+      // create log
+      if (_user?.isIntern) {
+        dispatch(
+          createLog({
+            user_id: _user?._id,
+            report_date: DailyAttendanceDateFormatter(date),
+            time: TimeFormatter(date),
+            user_type: 'Intern',
+            log: `Commented on a post id (${post_id})`,
+          })
+        );
+      } else {
+        dispatch(
+          createLog({
+            user_id: _user?._id,
+            report_date: DailyAttendanceDateFormatter(date),
+            time: TimeFormatter(date),
+            user_type: 'Employee',
+            log: `Commented on a post id (${post_id})`,
+          })
+        );
+      }
       setValues({
         text: '',
         post_id: post?._id,

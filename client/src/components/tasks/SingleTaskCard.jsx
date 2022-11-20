@@ -36,10 +36,16 @@ import {
   submitTask,
   undoSubmitTask,
 } from '../../features/tasks/tasksSlice';
-import { DateFormatter, isDatePast } from '../../lib/DateFormatter';
+import {
+  DailyAttendanceDateFormatter,
+  DateFormatter,
+  isDatePast,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 import avatarTheme from '../../lib/avatar';
 import TaskClickAwayHandler from './TaskClickAwayHandler';
 import TasksRow from './TasksRow';
+import { createLog } from '../../features/logs/logsSlice';
 
 const SingleTaskCard = ({ task }) => {
   const { _user } = useContext(AuthContext);
@@ -116,6 +122,18 @@ const SingleTaskCard = ({ task }) => {
       .then((res) => {
         if (res.data?.task && res.data.msg === 'success') {
           dispatch(submitTask(res.data));
+
+          const date = new Date();
+          // create log
+          dispatch(
+            createLog({
+              user_id: _user?._id,
+              report_date: DailyAttendanceDateFormatter(date),
+              time: TimeFormatter(date),
+              user_type: 'Intern',
+              log: 'Submitted a task',
+            })
+          );
         }
       })
       .catch((err) => console.error(err))

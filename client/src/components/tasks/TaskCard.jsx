@@ -7,12 +7,22 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useContext } from 'react';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { TimeAgo } from '../global';
 import avatarTheme from '../../lib/avatar';
+import { AuthContext } from '../../lib/authContext';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
+import { createLog } from '../../features/logs/logsSlice';
 
 const TaskCard = ({ task }) => {
+  const { _user } = useContext(AuthContext);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const room_id = pathname.slice(6).slice(0, 24);
@@ -90,7 +100,34 @@ const TaskCard = ({ task }) => {
         <Button
           variant='outlined'
           sx={{ px: '23px' }}
-          onClick={() => navigate(`/room/${room_id}/tasks/${task?._id}`)}
+          onClick={() => {
+            const date = new Date();
+
+            // create log
+            if (_user?.isIntern) {
+              dispatch(
+                createLog({
+                  user_id: _user?._id,
+                  report_date: DailyAttendanceDateFormatter(date),
+                  time: TimeFormatter(date),
+                  user_type: 'Intern',
+                  log: `Viewed a task (${task?.title})`,
+                })
+              );
+            } else {
+              dispatch(
+                createLog({
+                  user_id: _user?._id,
+                  report_date: DailyAttendanceDateFormatter(date),
+                  time: TimeFormatter(date),
+                  user_type: 'Employee',
+                  log: `Viewed a task (${task?.title})`,
+                })
+              );
+            }
+
+            navigate(`/room/${room_id}/tasks/${task?._id}`);
+          }}
         >
           View Task
         </Button>

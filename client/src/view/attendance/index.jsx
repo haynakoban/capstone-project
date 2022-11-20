@@ -7,7 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { a11yProps, TabPanel } from '../../components/company_settings/';
 import { Daily, Monthly, Summary } from '../../components/attendance';
-import { DateToday } from '../../lib/DateFormatter';
+import {
+  DailyAttendanceDateFormatter,
+  DateToday,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 
 import RoomLayout from '../../layout/RoomLayout';
 import { AuthContext } from '../../lib/authContext';
@@ -16,6 +20,7 @@ import {
   getRoomInfo,
 } from '../../features/companies/companiesSlice';
 import { StyledContainer } from '../../components/global';
+import { createLog } from '../../features/logs/logsSlice';
 
 const Attendance = () => {
   const [value, setValue] = useState(0);
@@ -89,7 +94,34 @@ const Attendance = () => {
               alignSelf: 'flex-end',
               mt: { xs: 1, sm: 0 },
             }}
-            onClick={() => navigate(`/room/${room_id}/video`)}
+            onClick={() => {
+              const date = new Date();
+
+              // create log
+              if (_user?.isIntern) {
+                dispatch(
+                  createLog({
+                    user_id: _user?._id,
+                    report_date: DailyAttendanceDateFormatter(date),
+                    time: TimeFormatter(date),
+                    user_type: 'Intern',
+                    log: `Joined a meeting`,
+                  })
+                );
+              } else {
+                dispatch(
+                  createLog({
+                    user_id: _user?._id,
+                    report_date: DailyAttendanceDateFormatter(date),
+                    time: TimeFormatter(date),
+                    user_type: 'Employee',
+                    log: `Joined a meeting`,
+                  })
+                );
+              }
+
+              navigate(`/room/${room_id}/video`);
+            }}
           >
             Meet
           </Button>

@@ -164,7 +164,10 @@ const userLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const findUser = await Users.findOne({ username }, '_id username password');
+    const findUser = await Users.findOne(
+      { username },
+      '_id username password isIntern'
+    );
 
     if (!findUser) return res.json({ err: 'incorrect username' });
 
@@ -174,7 +177,11 @@ const userLogin = async (req, res, next) => {
       // set the session cookie
       req.session.user_id = findUser._id.toJSON();
 
-      return res.json({ username, _id: findUser._id });
+      return res.json({
+        username,
+        _id: findUser._id,
+        user_type: findUser?.isIntern,
+      });
     });
   } catch (e) {
     next(e);
