@@ -37,7 +37,8 @@ import {
 } from '../../components/global';
 
 import AdminLayout from '../../layout/AdminLayout';
-import { row } from './data';
+import { getLogReports, getLogs } from '../../features/logs/logsSlice';
+import { DailyAttendanceDateFormatter } from '../../lib/DateFormatter';
 
 const AdminLogReportsPage = () => {
   const [searchKey, setSearchKey] = useState('');
@@ -47,6 +48,7 @@ const AdminLogReportsPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const dispatch = useDispatch();
+  const get_logs = useSelector(getLogs);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
@@ -56,8 +58,13 @@ const AdminLogReportsPage = () => {
 
   // handle logs
   useEffect(() => {
-    setSortedName(row);
-  }, []);
+    setSortedName(get_logs);
+  }, [get_logs]);
+
+  // get log reports
+  useEffect(() => {
+    dispatch(getLogReports({ date: DailyAttendanceDateFormatter(new Date()) }));
+  }, [dispatch]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -228,25 +235,24 @@ const AdminLogReportsPage = () => {
                         )
                       : sortedNames
                     )?.map((row) => (
-                      // change the row?.name to row?._id
-                      <TableRow key={row?.name}>
+                      <TableRow key={row?._id}>
                         <TableCell component='th' scope='row'>
                           {row?.name ?? '-'}
                         </TableCell>
                         <TableCell component='th' scope='row'>
-                          {row?.date ?? '-'}
+                          {row?.report_date ?? '-'}
                         </TableCell>
                         <TableCell component='th' scope='row'>
                           {row?.time ?? '-'}
                         </TableCell>
                         <TableCell component='th' scope='row'>
-                          {row?.type ?? '-'}
+                          {row?.user_type ?? '-'}
                         </TableCell>
                         <TableCell component='th' scope='row'>
                           {row?.log ?? '-'}
                         </TableCell>
                         <TableCell component='th' scope='row'>
-                          {row?.ip ?? '-'}
+                          {row?.ip_address ?? '-'}
                         </TableCell>
                       </TableRow>
                     ))}

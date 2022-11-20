@@ -8,6 +8,6 @@ const auth = require('../middlewares/auth_user_cookie');
 router.route('/').post(auth, logsController.createLog);
 
 // get method - get log reports
-router.route('/:date').get(auth, logsController.createLog);
+router.route('/:date').get(auth, logsController.getLogReports);
 
 module.exports = router;

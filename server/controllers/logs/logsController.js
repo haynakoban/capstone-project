@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 const ipInfo = require('ipinfo');
 
+// create log report
+// post method | api/logs
 const createLog = async (req, res, next) => {
   try {
     const { user_id, report_date, time, user_type, log } = req.body;
@@ -36,6 +38,40 @@ const createLog = async (req, res, next) => {
   }
 };
 
+// get log reports
+// get method | api/logs/:date
+const getLogReports = async (req, res, next) => {
+  try {
+    const { date } = req.params;
+
+    if (!date) return res.json({ err: 'date field must have value' });
+
+    const findLogs = await Logs.find({ report_date: date }).sort({
+      createdAt: -1,
+      updatedAt: -1,
+    });
+
+    if (findLogs?.length > 0) {
+      const ids = findLogs?.map((e) => e?.user_id);
+
+      if (!ids) return res.json({ err: 'no ids' });
+
+      const users = await Users.find({ _id: { $in: ids } });
+
+      if (users?.length > 0) {
+        return res.json({ users, logs: findLogs });
+      }
+
+      return res.json({ err: 'no users' });
+    }
+
+    return res.json({ msg: 'No results matched your search.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createLog,
+  getLogReports,
 };
