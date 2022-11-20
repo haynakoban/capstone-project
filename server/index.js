@@ -44,6 +44,7 @@ app.use('/api/attendances', require('./routes/attendancesRoute'));
 app.use('/api/comments', require('./routes/commentsRoute'));
 app.use('/api/companies', require('./routes/companiesRoute'));
 app.use('/api/downloads', require('./routes/downloadsRoute'));
+app.use('/api/logs', require('./routes/logsRoute'));
 app.use('/api/notifications', require('./routes/notificationsRoute'));
 app.use('/api/posts', require('./routes/postsRoute'));
 app.use('/api/tasks', require('./routes/tasksRoute'));

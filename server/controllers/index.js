@@ -2,6 +2,7 @@ const attendancesController = require('./attendances/attendancesController');
 const commentsController = require('./comments/commentsController');
 const companiesController = require('./companies/companiesController');
 const downloadsController = require('./downloads/downloadsController');
+const logsController = require('./logs/logsController');
 const notificationController = require('./notifications/notificationsController');
 const postsController = require('./posts/postsController');
 const tasksController = require('./tasks/tasksController');
@@ -12,6 +13,7 @@ module.exports = {
   commentsController,
   companiesController,
   downloadsController,
+  logsController,
   notificationController,
   postsController,
   tasksController,
