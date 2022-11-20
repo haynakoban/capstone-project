@@ -74,6 +74,9 @@ const logsSlice = createSlice({
               }
             }
           }
+        } else {
+          state.logs = [];
+          return;
         }
       });
   },
