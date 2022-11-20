@@ -17,7 +17,7 @@ const createLog = async (req, res, next) => {
       if (err) return res.json({ err: 'cannot track ip address' });
 
       Logs.create({
-        user_id,
+        user_id: ObjectId(user_id),
         report_date,
         time,
         user_type,

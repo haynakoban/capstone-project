@@ -30,6 +30,11 @@ import {
   dailyAttendance,
   outTimeDailyAttendance,
 } from '../../features/attendances/attendancesSlice';
+import { createLog } from '../../features/logs/logsSlice';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 
 const UserSettings = () => {
   const dispatch = useDispatch();
@@ -54,13 +59,36 @@ const UserSettings = () => {
 
   // handle logout button
   const onUserLogout = () => {
+    const date = new Date();
+
+    // create log
+    if (user?.isIntern) {
+      dispatch(
+        createLog({
+          user_id: user?._id,
+          report_date: DailyAttendanceDateFormatter(date),
+          time: TimeFormatter(date),
+          user_type: 'Intern',
+          log: 'Logged Out',
+        })
+      );
+    } else {
+      dispatch(
+        createLog({
+          user_id: user?._id,
+          report_date: DailyAttendanceDateFormatter(date),
+          time: TimeFormatter(date),
+          user_type: 'Employee',
+          log: 'Logged Out',
+        })
+      );
+    }
+
     dispatch(userLogout());
 
     // if user is intern, create out time
     // otherwise ignore this line of code
     if (user?.internInfo?.companyInfo?.hasCompany) {
-      const date = new Date();
-
       if (date.getDay() !== 0) {
         if (daily_attendance?._id) {
           dispatch(

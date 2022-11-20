@@ -26,6 +26,11 @@ import {
 
 import Logo from '../../layout/MainLayout/Header/Logo';
 import LogInContainer from '../../components/global/LogInContainer';
+import { createLog } from '../../features/logs/logsSlice';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 
 const LogInPage = () => {
   const dispatch = useDispatch();
@@ -61,7 +66,31 @@ const LogInPage = () => {
     if (res.data?.err) {
       setError(res.data?.err);
     } else {
+      const date = new Date();
       setError('');
+
+      // create log
+      if (res?.data?.user_type) {
+        dispatch(
+          createLog({
+            user_id: res?.data?._id,
+            report_date: DailyAttendanceDateFormatter(date),
+            time: TimeFormatter(date),
+            user_type: 'Intern',
+            log: 'Logged In',
+          })
+        );
+      } else {
+        dispatch(
+          createLog({
+            user_id: res?.data?._id,
+            report_date: DailyAttendanceDateFormatter(date),
+            time: TimeFormatter(date),
+            user_type: 'Employee',
+            log: 'Logged In',
+          })
+        );
+      }
 
       navigate('/');
     }

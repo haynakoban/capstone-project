@@ -28,9 +28,19 @@ const logsSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder.addCase(createLog.fulfilled, (state, action) => {
-      console.log(action.payload);
+      if (action.payload?.err) {
+        return;
+      }
+
+      if (action.payload?.msg && action.payload?.log) {
+        const { log } = action.payload;
+
+        state.logs?.unshift(log);
+      }
     });
   },
 });
+
+export const getLogs = (state) => state.logs.logs;
 
 export default logsSlice.reducer;

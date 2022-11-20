@@ -7,11 +7,11 @@ const logsSchema = new mongoose.Schema({
     required: true,
   },
   report_date: {
-    type: Date,
+    type: String,
     required: true,
   },
   time: {
-    type: Date,
+    type: String,
     required: true,
   },
   user_type: {
