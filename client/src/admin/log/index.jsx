@@ -95,21 +95,21 @@ const AdminLogReportsPage = () => {
 
   // handle sort by name
   const handleSortByName = () => {
-    // if (order === 'asc') {
-    //   const users = [...interns];
-    //   const orderedNames = users?.sort((a, b) =>
-    //     b?.name.localeCompare(a?.name)
-    //   );
-    //   setSortedName(orderedNames);
-    //   setOrder('desc');
-    // } else if (order === 'desc') {
-    //   const users = [...interns];
-    //   const orderedNames = users?.sort((a, b) =>
-    //     a?.name.localeCompare(b?.name)
-    //   );
-    //   setSortedName(orderedNames);
-    //   setOrder('asc');
-    // }
+    if (order === 'asc') {
+      const users = [...get_logs];
+      const orderedNames = users?.sort((a, b) =>
+        b?.name.localeCompare(a?.name)
+      );
+      setSortedName(orderedNames);
+      setOrder('desc');
+    } else if (order === 'desc') {
+      const users = [...get_logs];
+      const orderedNames = users?.sort((a, b) =>
+        a?.name.localeCompare(b?.name)
+      );
+      setSortedName(orderedNames);
+      setOrder('asc');
+    }
   };
 
   return (

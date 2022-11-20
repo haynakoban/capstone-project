@@ -39,6 +39,11 @@ import { getUserInfo } from '../../features/users/usersSlice';
 import { addNewTask } from '../../features/tasks/tasksSlice';
 import { AssignedUser } from './AssignedUser';
 import { AuthContext } from '../../lib/authContext';
+import { createLog } from '../../features/logs/logsSlice';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../lib/DateFormatter';
 
 const CreateTaskAction = ({ members }) => {
   const { socket } = useContext(AuthContext);
@@ -171,6 +176,18 @@ const CreateTaskAction = ({ members }) => {
             dispatch(addNewTask(res.data));
 
             socket?.current?.emit('send_notif', res?.data);
+
+            const date = new Date();
+            // create log
+            dispatch(
+              createLog({
+                user_id: user?._id,
+                report_date: DailyAttendanceDateFormatter(date),
+                time: TimeFormatter(date),
+                user_type: 'Employee',
+                log: `Created a task (${title})`,
+              })
+            );
           }
         })
         .catch((err) => console.error(err))

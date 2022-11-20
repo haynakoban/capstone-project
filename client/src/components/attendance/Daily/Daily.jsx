@@ -50,6 +50,7 @@ import {
   getMembers,
   getRoomInfo,
 } from '../../../features/companies/companiesSlice';
+import { createLog } from '../../../features/logs/logsSlice';
 
 const Daily = ({ company_id }) => {
   const { _user } = useContext(AuthContext);
@@ -272,6 +273,31 @@ const Daily = ({ company_id }) => {
                 textTransform: 'capitalize',
               }}
               onClick={() => {
+                const date = new Date();
+
+                // create log
+                if (_user?.isIntern) {
+                  dispatch(
+                    createLog({
+                      user_id: _user?._id,
+                      report_date: DailyAttendanceDateFormatter(date),
+                      time: TimeFormatter(date),
+                      user_type: 'Intern',
+                      log: `Downloaded daily attendance (${get_my_pdf?.day})`,
+                    })
+                  );
+                } else {
+                  dispatch(
+                    createLog({
+                      user_id: _user?._id,
+                      report_date: DailyAttendanceDateFormatter(date),
+                      time: TimeFormatter(date),
+                      user_type: 'Employee',
+                      log: `Downloaded daily attendance (${get_csv?.day})`,
+                    })
+                  );
+                }
+
                 if (_user?.internInfo?.companyInfo?.hasCompany) {
                   pdf();
                 } else {

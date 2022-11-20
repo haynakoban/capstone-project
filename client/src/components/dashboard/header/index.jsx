@@ -3,9 +3,16 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import { Fragment } from 'react';
 import StyledPaperCard from './StyledPaperCard';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import {
+  DailyAttendanceDateFormatter,
+  TimeFormatter,
+} from '../../../lib/DateFormatter';
+import { createLog } from '../../../features/logs/logsSlice';
 
 const DashboardHeader = ({ _user, working_hours, room_id }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   return (
     <Fragment>
@@ -33,7 +40,34 @@ const DashboardHeader = ({ _user, working_hours, room_id }) => {
             variant='contained'
             startIcon={<VideocamIcon />}
             sx={{ textTransform: 'capitalize' }}
-            onClick={() => navigate(`/room/${room_id}/video`)}
+            onClick={() => {
+              const date = new Date();
+
+              // create log
+              if (_user?.isIntern) {
+                dispatch(
+                  createLog({
+                    user_id: _user?._id,
+                    report_date: DailyAttendanceDateFormatter(date),
+                    time: TimeFormatter(date),
+                    user_type: 'Intern',
+                    log: `Joined a meeting`,
+                  })
+                );
+              } else {
+                dispatch(
+                  createLog({
+                    user_id: _user?._id,
+                    report_date: DailyAttendanceDateFormatter(date),
+                    time: TimeFormatter(date),
+                    user_type: 'Employee',
+                    log: `Joined a meeting`,
+                  })
+                );
+              }
+
+              navigate(`/room/${room_id}/video`);
+            }}
           >
             Meet
           </Button>
