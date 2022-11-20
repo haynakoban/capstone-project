@@ -19,6 +19,8 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import FileDownload from 'js-file-download';
+
 import moment from 'moment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -37,7 +39,11 @@ import {
 } from '../../components/global';
 
 import AdminLayout from '../../layout/AdminLayout';
-import { getLogReports, getLogs } from '../../features/logs/logsSlice';
+import {
+  getLogReports,
+  getLogs,
+  getAllDailyLogsCSV,
+} from '../../features/logs/logsSlice';
 import { DailyAttendanceDateFormatter } from '../../lib/DateFormatter';
 
 const AdminLogReportsPage = () => {
@@ -49,22 +55,26 @@ const AdminLogReportsPage = () => {
 
   const dispatch = useDispatch();
   const get_logs = useSelector(getLogs);
+  const get_log_csv = useSelector(getAllDailyLogsCSV);
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
-      attendance_date: moment(),
+      report_date: moment(),
     },
   });
+
+  useEffect(() => {
+    dispatch(
+      getLogReports({
+        date: DailyAttendanceDateFormatter(getValues('report_date')),
+      })
+    );
+  }, [dispatch, getValues]);
 
   // handle logs
   useEffect(() => {
     setSortedName(get_logs);
   }, [get_logs]);
-
-  // get log reports
-  useEffect(() => {
-    dispatch(getLogReports({ date: DailyAttendanceDateFormatter(new Date()) }));
-  }, [dispatch]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -83,8 +93,16 @@ const AdminLogReportsPage = () => {
   const handleKeyDown = (event) => {
     if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
       // fetch here
-      // dispatch(searchUsers({ keyword: searchKey, type: true }));
+      //dispatch(searchUsers({ keyword: searchKey, type: true }));
     }
+  };
+
+  const handleFormSubmit = (date) => {
+    dispatch(
+      getLogReports({
+        date: DailyAttendanceDateFormatter(date),
+      })
+    );
   };
 
   // handle click button
@@ -128,10 +146,10 @@ const AdminLogReportsPage = () => {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label='Choose Date'
-              value={watch('attendance_date')}
+              value={watch('report_date')}
               onChange={(date) => {
-                setValue('attendance_date', date);
-                // handleFormSubmit(date);
+                setValue('report_date', date);
+                handleFormSubmit(date);
               }}
               renderInput={(params) => <TextField {...params} />}
             />
@@ -184,9 +202,12 @@ const AdminLogReportsPage = () => {
                 sx={{
                   textTransform: 'capitalize',
                 }}
-                // onClick={() =>
-                //   FileDownload(get_all_csv?.csv, `${get_all_csv?.day}.csv`)
-                // }
+                onClick={() =>
+                  FileDownload(
+                    get_log_csv?.csv,
+                    `Log Reports ${get_log_csv?.day}.csv`
+                  )
+                }
               >
                 Download
               </Button>

@@ -70,10 +70,13 @@ const logsSlice = createSlice({
             for (const user of users) {
               if (log?.user_id === user?._id) {
                 log.name = user?.name;
-                state?.logs?.push(log);
+                state.logs?.push(log);
               }
             }
           }
+        } else {
+          state.logs = [];
+          return;
         }
       });
   },
@@ -82,3 +85,53 @@ const logsSlice = createSlice({
 export const getLogs = (state) => state.logs.logs;
 
 export default logsSlice.reducer;
+
+// for admin: get all daily csv
+export const getAllDailyLogsCSV = (state) => {
+  const items = state.logs.logs;
+  const day = state.logs.logs?.[0]?.report_date;
+
+  const new_items = items?.map((item) => {
+    const newObj = {
+      name: item?.name,
+      report_date: item?.report_date,
+      time: item?.time,
+      user_type: item?.user_type,
+      log: item?.log,
+      ip_address: item?.ip_address,
+    };
+
+    return newObj;
+  });
+
+  // specify how you want to handle null values here
+  const replacer = (key, value) => (value === null ? '' : value);
+
+  const header = [
+    'Name',
+    'Report Date',
+    'Time',
+    'User Type',
+    'Log',
+    'IP Address',
+  ];
+  const fields = [
+    'name',
+    'report_date',
+    'time',
+    'user_type',
+    'log',
+    'ip_address',
+  ];
+
+  const csv = [
+    header.join(','), // header row first
+    ...new_items.map((row) =>
+      fields
+        .map((fieldName) => JSON.stringify(row?.[fieldName], replacer))
+        .join(',')
+    ),
+  ].join('\r\n');
+
+  return { csv, day };
+};
