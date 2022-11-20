@@ -70,7 +70,7 @@ const logsSlice = createSlice({
             for (const user of users) {
               if (log?.user_id === user?._id) {
                 log.name = user?.name;
-                state?.logs?.push(log);
+                state.logs?.push(log);
               }
             }
           }

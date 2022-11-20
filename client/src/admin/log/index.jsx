@@ -52,19 +52,22 @@ const AdminLogReportsPage = () => {
 
   const { watch, setValue, getValues } = useForm({
     defaultValues: {
-      attendance_date: moment(),
+      report_date: moment(),
     },
   });
+
+  useEffect(() => {
+    dispatch(
+      getLogReports({
+        date: DailyAttendanceDateFormatter(getValues('report_date')),
+      })
+    );
+  }, [dispatch, getValues]);
 
   // handle logs
   useEffect(() => {
     setSortedName(get_logs);
   }, [get_logs]);
-
-  // get log reports
-  useEffect(() => {
-    dispatch(getLogReports({ date: DailyAttendanceDateFormatter(new Date()) }));
-  }, [dispatch]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -85,6 +88,14 @@ const AdminLogReportsPage = () => {
       // fetch here
       // dispatch(searchUsers({ keyword: searchKey, type: true }));
     }
+  };
+
+  const handleFormSubmit = (date) => {
+    dispatch(
+      getLogReports({
+        date: DailyAttendanceDateFormatter(date),
+      })
+    );
   };
 
   // handle click button
@@ -128,10 +139,10 @@ const AdminLogReportsPage = () => {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label='Choose Date'
-              value={watch('attendance_date')}
+              value={watch('report_date')}
               onChange={(date) => {
-                setValue('attendance_date', date);
-                // handleFormSubmit(date);
+                setValue('report_date', date);
+                handleFormSubmit(date);
               }}
               renderInput={(params) => <TextField {...params} />}
             />
