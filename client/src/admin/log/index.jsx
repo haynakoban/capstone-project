@@ -25,10 +25,14 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import TablePaginationActions from '../../components/attendance/TablePaginationActions';
+
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
 
 import { StyledContainer } from '../../components/global';
 
@@ -46,7 +50,9 @@ const AdminLogReportsPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const { _isUserAuth } = useContext(AuthContext);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const get_logs = useSelector(getLogs);
   const get_log_csv = useSelector(getAllDailyLogsCSV);
 
@@ -55,6 +61,12 @@ const AdminLogReportsPage = () => {
       report_date: moment(),
     },
   });
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   useEffect(() => {
     dispatch(

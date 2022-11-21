@@ -1,9 +1,13 @@
 import { Box, Tab, Tabs } from '@mui/material';
 
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import { a11yProps, TabPanel } from '../../components/company_settings/';
 import { StyledContainer } from '../../components/global';
+
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
 
 import AdminDaily from './daily';
 import AdminMonthly from './monthly';
@@ -11,7 +15,16 @@ import AdminSummary from './summary';
 import AdminLayout from '../../layout/AdminLayout';
 
 const AdminAttendancePage = () => {
+  const { _isUserAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
