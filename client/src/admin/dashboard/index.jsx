@@ -1,6 +1,10 @@
 import { Container } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
 
 import AdminLayout from '../../layout/AdminLayout';
 import UsersCard from './UsersCard';
@@ -11,10 +15,18 @@ import {
 } from '../../features/users/usersSlice';
 
 const AdminDashboardPage = () => {
+  const { _isUserAuth } = useContext(AuthContext);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const interns = useSelector(getInterns);
   const companies = useSelector(getCompanies);
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   useEffect(() => {
     dispatch(getUsers({ type: false }));

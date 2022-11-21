@@ -16,7 +16,6 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
@@ -26,17 +25,16 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import TablePaginationActions from '../../components/attendance/TablePaginationActions';
 
-import {
-  SearchContainer,
-  SearchIconWrapper,
-  StyledContainer,
-  StyledInputBase,
-} from '../../components/global';
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
+
+import { StyledContainer } from '../../components/global';
 
 import AdminLayout from '../../layout/AdminLayout';
 import {
@@ -47,13 +45,14 @@ import {
 import { DailyAttendanceDateFormatter } from '../../lib/DateFormatter';
 
 const AdminLogReportsPage = () => {
-  const [searchKey, setSearchKey] = useState('');
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const { _isUserAuth } = useContext(AuthContext);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const get_logs = useSelector(getLogs);
   const get_log_csv = useSelector(getAllDailyLogsCSV);
 
@@ -62,6 +61,12 @@ const AdminLogReportsPage = () => {
       report_date: moment(),
     },
   });
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   useEffect(() => {
     dispatch(
@@ -89,26 +94,12 @@ const AdminLogReportsPage = () => {
     setPage(0);
   };
 
-  // handle event key
-  const handleKeyDown = (event) => {
-    if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
-      // fetch here
-      //dispatch(searchUsers({ keyword: searchKey, type: true }));
-    }
-  };
-
   const handleFormSubmit = (date) => {
     dispatch(
       getLogReports({
         date: DailyAttendanceDateFormatter(date),
       })
     );
-  };
-
-  // handle click button
-  const handleOnClick = () => {
-    // fetch here
-    // dispatch(searchUsers({ keyword: searchKey, type: true }));
   };
 
   // handle sort by name
@@ -154,24 +145,6 @@ const AdminLogReportsPage = () => {
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
-
-          {/* search  */}
-          <SearchContainer sx={{ mt: { xs: 2, sm: 0 } }}>
-            <SearchIconWrapper
-              disableRipple
-              size='small'
-              onClick={handleOnClick}
-            >
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder='Search…'
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </SearchContainer>
         </Toolbar>
 
         {/* list of users */}

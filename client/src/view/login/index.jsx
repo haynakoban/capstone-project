@@ -80,7 +80,7 @@ const LogInPage = () => {
             log: 'Logged In',
           })
         );
-      } else {
+      } else if (res?.data?.user_type === false) {
         dispatch(
           createLog({
             user_id: res?.data?._id,
@@ -92,7 +92,11 @@ const LogInPage = () => {
         );
       }
 
-      navigate('/');
+      if (res.data?.isAdmin) {
+        window.location = '/s_admin';
+      } else {
+        navigate('/');
+      }
     }
   };
 

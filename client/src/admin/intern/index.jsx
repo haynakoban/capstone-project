@@ -15,9 +15,13 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TablePaginationActions from '../../components/attendance/TablePaginationActions';
+
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../lib/authContext';
 
 import {
   SearchContainer,
@@ -39,7 +43,9 @@ const AdminInternPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const { _isUserAuth } = useContext(AuthContext);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const interns = useSelector(getInterns);
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -54,6 +60,12 @@ const AdminInternPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    if (!_isUserAuth) {
+      navigate('/login');
+    }
+  }, [_isUserAuth, navigate]);
 
   useEffect(() => {
     dispatch(getUsers({ type: true }));

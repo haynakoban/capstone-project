@@ -72,7 +72,7 @@ const UserSettings = () => {
           log: 'Logged Out',
         })
       );
-    } else {
+    } else if (user?.isIntern === false) {
       dispatch(
         createLog({
           user_id: user?._id,
