@@ -179,6 +179,10 @@ const usersSchema = new mongoose.Schema({
   employeeInfo,
   internInfo,
   docs,
+  isAdmin: {
+    type: Boolean,
+    required: false,
+  },
   createdAt: {
     type: Date,
     default: () => Date.now(),

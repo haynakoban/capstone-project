@@ -166,7 +166,7 @@ const userLogin = async (req, res, next) => {
 
     const findUser = await Users.findOne(
       { username },
-      '_id username password isIntern'
+      '_id username password isIntern isAdmin'
     );
 
     if (!findUser) return res.json({ err: 'incorrect username' });
@@ -181,6 +181,7 @@ const userLogin = async (req, res, next) => {
         username,
         _id: findUser._id,
         user_type: findUser?.isIntern,
+        isAdmin: findUser?.isAdmin,
       });
     });
   } catch (e) {
