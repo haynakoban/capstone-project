@@ -16,7 +16,6 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import FileDownload from 'js-file-download';
@@ -31,12 +30,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import TablePaginationActions from '../../components/attendance/TablePaginationActions';
 
-import {
-  SearchContainer,
-  SearchIconWrapper,
-  StyledContainer,
-  StyledInputBase,
-} from '../../components/global';
+import { StyledContainer } from '../../components/global';
 
 import AdminLayout from '../../layout/AdminLayout';
 import {
@@ -47,7 +41,6 @@ import {
 import { DailyAttendanceDateFormatter } from '../../lib/DateFormatter';
 
 const AdminLogReportsPage = () => {
-  const [searchKey, setSearchKey] = useState('');
   const [order, setOrder] = useState('asc');
   const [sortedNames, setSortedName] = useState([]);
   const [page, setPage] = useState(0);
@@ -89,26 +82,12 @@ const AdminLogReportsPage = () => {
     setPage(0);
   };
 
-  // handle event key
-  const handleKeyDown = (event) => {
-    if (event.code === 'Enter' || (event.shiftKey && event.code === 'Enter')) {
-      // fetch here
-      //dispatch(searchUsers({ keyword: searchKey, type: true }));
-    }
-  };
-
   const handleFormSubmit = (date) => {
     dispatch(
       getLogReports({
         date: DailyAttendanceDateFormatter(date),
       })
     );
-  };
-
-  // handle click button
-  const handleOnClick = () => {
-    // fetch here
-    // dispatch(searchUsers({ keyword: searchKey, type: true }));
   };
 
   // handle sort by name
@@ -154,24 +133,6 @@ const AdminLogReportsPage = () => {
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
-
-          {/* search  */}
-          <SearchContainer sx={{ mt: { xs: 2, sm: 0 } }}>
-            <SearchIconWrapper
-              disableRipple
-              size='small'
-              onClick={handleOnClick}
-            >
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder='Search…'
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </SearchContainer>
         </Toolbar>
 
         {/* list of users */}
