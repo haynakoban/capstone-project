@@ -216,11 +216,7 @@ const LogInPage = () => {
               fontWeight={600}
               mt={1}
               mb={1.5}
-              sx={{ cursor: 'pointer' }}
-              onClick={() => navigate('/forgotpassword')}
-            >
-              Forgot Password?
-            </Typography>
+            ></Typography>
 
             <Button
               variant='contained'
