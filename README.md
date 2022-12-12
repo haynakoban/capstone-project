@@ -32,19 +32,3 @@ OR
 
 Runs the app in the development mode.\
 Open [http://localhost:5000](http://localhost:5000) to view it in your browser.
-
-===========================================================================================================
-
-LOGIN CREDENTIALS
-
---- Administrator/University ---
-Username: SuperAdmin123
-Password: SuperAdmin123;
-
---- Company/Employee ---
-Username: Xenon123
-Password: Xenon123;
-
---- Intern/Student ---
-Username: InternExample123
-Password: InternExample123;
