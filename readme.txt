@@ -1,6 +1,6 @@
 # capstone-project
 
-# the images under the 'src/assets/svg/\*' path was credited to unDraw (https://undraw.co/)
+# the images under the 'src/assets/svg/*' path was credited to unDraw (https://undraw.co/)
 
 ===========================================================================================================
 
@@ -23,7 +23,6 @@ You may also see any lint errors in the console.
 In the server directory, you can run:
 
 ### `npm run dev`
-
 It automatically restarts your node application when it detects any changes.
 
 OR

@@ -11,11 +11,9 @@ import { AuthContext } from '../../lib/authContext';
 
 import { VideoPlayer } from './VideoPlayer';
 
-const APP_ID = '80930d9463754831a7af493ff25d2296';
-const TOKEN =
-  process.env.TOKEN ||
-  '007eJxTYPhstlZOIFeg0GBzxQs+5uulO7v3mbEmr5z9IW5Be3H2LnYFBgsDS2ODFEsTM2NzUxMLY8NE88Q0E0vjtDQj0xQjI0uztmXZyQ2BjAzHTLYzMjJAIIjPzBDi58PAAACiDhzz';
-const CHANNEL = process.env.CHANNEL || 'TNL';
+const APP_ID = 'Agora SDK APP ID';
+const TOKEN = 'Agora SDK TOKEN';
+const CHANNEL = 'Agora SDK CHANNEL';
 
 const client = AgoraRTC.createClient({
   mode: 'rtc',
